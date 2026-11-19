@@ -24,6 +24,26 @@ Each mod is separate: install only the ones you want.
 
 To update, add the newer zip the same way.
 
+## Tested with
+
+Only tested alongside these Patchbay frameworks, all enabled together with the three NocTweaks mods:
+
+| Framework | Version |
+| --- | --- |
+| Actions and Menus | 0.8.0-dev.1 |
+| Browser | 0.3.0-dev.1 |
+| Inspector | 0.3.0-dev.2 |
+| Nitro Devices | 1.3.0-dev.3 |
+| Notifications | 0.3.0-dev.1 |
+| Panels | 0.2.0-dev.2 |
+| Piano Roll | 0.2.0-dev.1 |
+| Settings | 1.0.0 |
+
+They haven't been tested or verified with any other Patchbay mods or frameworks (Plug-in Panels and Themes
+included). Most should be fine, but mods that change the same parts of Bitwig (the browser, the piano roll's
+expression editing, the Inspector) could clash. If something breaks with another mod enabled, please open an
+issue saying which one.
+
 ## Bitwig versions
 
 Bitwig **6.1.7** (Windows) only for now. The mods follow Patchbay: when Patchbay moves to a new Bitwig
@@ -34,6 +54,11 @@ version, they'll be updated to match.
 Each folder is a Patchbay mod (`mod.json`, `build.json`, `src/`, `package/`). Put it in a Patchbay build
 workspace's `Mods/` folder and run `python3 BML/tools/build_mod.py <mod id>`; see Patchbay's
 [building docs](https://github.com/shaboogen-dev/Patchbay/blob/main/docs/sdk/building.md).
+
+## Made with AI assistance
+
+NocTweaks is designed, directed and tested by noctaur, with much of the code written with the help of an AI
+assistant (Claude, by Anthropic). Commits it helped with are marked *Co-Authored-By: Claude*.
 
 ## Licence
 
