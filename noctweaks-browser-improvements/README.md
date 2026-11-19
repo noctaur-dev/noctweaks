@@ -19,7 +19,7 @@ Part of **NocTweaks** by noctaur.
   button, in the main browser and the popups (past Bitwig's limit of 12). Its Location column shows just that collection and the collections
   inside it, expanded.
 
-  ![Pinning a collection to the quick sources](images/br-pin-quick-source.gif)
+  ![Pinning the Pianos collection to the quick sources](images/br-pin-quick-source.gif)
 
 - **Location first:** picking a sidebar button opens the Location column, so the folders are right there.
 
@@ -37,11 +37,11 @@ Part of **NocTweaks** by noctaur.
   header menu, *Add Track Preset* in the arranger and panel background menus, and the Tracks button to browse
   them. Dropping a one-track preset adds that track, not a group.
 
+  ![Dragging a track preset from the Tracks button in the side browser](images/tp-drag-drop.gif)
+
   ![Saving a track as a track preset](images/tp-save.gif)
 
   ![Add Track Preset Below…](images/tp-add-below.gif)
-
-  ![Dragging a track preset from the Tracks button](images/tp-drag-drop.gif)
 
 ## Icons
 
@@ -56,3 +56,4 @@ dark_grey, or a custom `#rrggbb`). Folders end with `/` (`Drums/ = folder blue`)
 - Your collections, folders and icons are the same files NocTweaks and the Enhancement Suite used, so
   nothing needs moving.
 - Lucide icons: ISC licence (`icons/LUCIDE-LICENSE.txt`).
+- Not affiliated with Bitwig: an unofficial community project, not made, endorsed or supported by Bitwig GmbH.

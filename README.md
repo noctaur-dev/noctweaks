@@ -11,6 +11,11 @@ Mods for [Bitwig Studio](https://www.bitwig.com) by noctaur, for the
 
 Each mod is separate: install only the ones you want.
 
+> **Not affiliated with Bitwig.** NocTweaks is an unofficial, community-made project, built for the love of
+> Bitwig Studio. It isn't made, endorsed or supported by Bitwig GmbH. "Bitwig" and "Bitwig Studio" are
+> trademarks of Bitwig GmbH. Use the mods at your own risk, and please don't send Bitwig support requests
+> about problems they cause: open an issue here instead.
+
 ## Install
 
 1. Install [Patchbay](https://github.com/shaboogen-dev/Patchbay/releases) and set it up for your Bitwig.

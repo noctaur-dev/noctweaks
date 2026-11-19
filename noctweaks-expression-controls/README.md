@@ -39,3 +39,4 @@ Part of **NocTweaks** by noctaur. Note expression tools for the piano roll.
 - Bitwig 6.1.7 (Windows) only for now; on other versions Patchbay shows it as
   not available.
 - The shape icons are the mod's own SVGs (in `icons/`).
+- Not affiliated with Bitwig: an unofficial community project, not made, endorsed or supported by Bitwig GmbH.

@@ -3,7 +3,7 @@
   "mod": {
     "id": "noctweaks-browser-improvements",
     "name": "Browser: Collections, Icons and Track Presets",
-    "version": "0.1.0-dev.9",
+    "version": "0.1.0-dev.10",
     "author": "noctaur",
     "description": "Folders for your collections (and collections inside collections), Collections and Tracks buttons in the browser sidebar, your own icons for collections and folders, each plugin listed once instead of once per format, and track presets (experimental).",
     "area": "Browser",

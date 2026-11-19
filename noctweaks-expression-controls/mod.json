@@ -3,7 +3,7 @@
   "mod": {
     "id": "noctweaks-expression-controls",
     "name": "Piano Roll: Expression Controls",
-    "version": "0.1.0-dev.9",
+    "version": "0.1.0-dev.10",
     "author": "noctaur",
     "description": "Note expression tools for the piano roll: an Expression Shape section in the Points Inspector (draw shapes over selected points, Fade, live Melt and Simplify), Ctrl+drag to copy expression points, the edit modes always one click away, and the note editor opens on the piano roll instead of the drum grid.",
     "area": "Piano Roll",
