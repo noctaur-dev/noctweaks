@@ -11,7 +11,7 @@ Part of **NocTweaks** by noctaur. Edit any track in the piano roll without going
   it out. **Edit All Tracks** edits every track at once. It uses the arranger's own track selection, so
   everything else in Bitwig behaves as usual.
 
-  ![Opening the Edit screen and turning on the Track List panel with its footer button](images/gtv-edit-tracks.gif)
+  ![Turning the Track List panel on with its button in the footer, next to EDIT (zoomed in at the bottom)](images/gtv-edit-tracks.gif)
 
 - The editor's track list shows from **one** track up (Bitwig shows it from two), so the menu is always there.
 - **Layered editing switches on** when the editor goes from one track to several. Turn it off yourself and it
