@@ -1,0 +1,22 @@
+{
+  "manifest_version": 2,
+  "mod": {
+    "id": "noctweaks-browser-improvements",
+    "name": "Browser: Collections, Icons and Track Presets",
+    "version": "0.1.0-dev.7",
+    "author": "noctaur",
+    "description": "Folders for your collections (and collections inside collections), Collections and Tracks buttons in the browser sidebar, your own icons for collections and folders, each plugin listed once instead of once per format, and track presets (experimental).",
+    "area": "Browser",
+    "documentation": "readme",
+    "tags": ["noctweaks", "browser", "collections", "folders", "icons", "track presets"]
+  },
+  "built_against": {
+    "bitwig_version": "6.1.7",
+    "platform": "windows",
+    "architecture": "x64"
+  },
+  "resources": {
+    "readme": { "kind": "file", "path": "README.md", "media_type": "text/markdown" },
+    "icons": { "kind": "directory", "path": "icons" }
+  }
+}

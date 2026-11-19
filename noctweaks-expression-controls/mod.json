@@ -1,0 +1,22 @@
+{
+  "manifest_version": 2,
+  "mod": {
+    "id": "noctweaks-expression-controls",
+    "name": "Piano Roll: Expression Controls",
+    "version": "0.1.0-dev.8",
+    "author": "noctaur",
+    "description": "Note expression tools for the piano roll: an Expression Shape section in the Points Inspector (draw shapes over selected points, Fade, live Melt and Simplify), Ctrl+drag to copy expression points, the edit modes always one click away, and the note editor opens on the piano roll instead of the drum grid.",
+    "area": "Piano Roll",
+    "documentation": "readme",
+    "tags": ["noctweaks", "expressions", "mpe", "piano roll", "shapes"]
+  },
+  "built_against": {
+    "bitwig_version": "6.1.7",
+    "platform": "windows",
+    "architecture": "x64"
+  },
+  "resources": {
+    "readme": { "kind": "file", "path": "README.md", "media_type": "text/markdown" },
+    "icons": { "kind": "directory", "path": "icons" }
+  }
+}

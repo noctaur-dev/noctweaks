@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="23px" height="23px" viewBox="0 0 23 23" version="1.1" xmlns="http://www.w3.org/2000/svg" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;">
+    <rect x="0" y="0" width="23" height="23" style="fill:none;"/>
+    <path d="M5,3 L18,3 A2,2 0 0 1 20,5 L20,18 A2,2 0 0 1 18,20 L5,20 A2,2 0 0 1 3,18 L3,5 A2,2 0 0 1 5,3 Z" style="fill:black;"/>
+    <path d="M 11.5,11.5 L 11.5,7.667 a 0.479,0.479 0 0,1 0.479,-0.479 l 3.017,0 a 0.479,0.479 0 0,1 0.312,0.843 l -2.25,1.929" style="fill:none;stroke:white;stroke-width:1.15px;"/>
+    <path d="m 11.5,15.812 l -3.553,-3.553 A 0.958,0.958 0 0,1 7.667,11.582 L 7.667,8.824 a 0.48,0.48 0 0,1 0.818,-0.339 L 15.333,15.338" style="fill:none;stroke:white;stroke-width:1.15px;"/>
+    <path d="m 11.603,7.37 l 4.032,7.171 a 0.479,0.479 0 0,1 -0.08,0.575 l -0.56,0.557 a 0.479,0.479 0 0,1 -0.338,0.139 L 8.793,15.812 a 0.479,0.479 0 0,1 -0.299,-0.105 L 7.307,14.758 a 0.479,0.479 0 0,1 0.302,-0.853 l 1.996,0.013" style="fill:none;stroke:white;stroke-width:1.15px;"/>
+    <path d="M5,3 L18,3 A2,2 0 0 1 20,5 L20,18 A2,2 0 0 1 18,20 L5,20 A2,2 0 0 1 3,18 L3,5 A2,2 0 0 1 5,3 Z M5.5,4 A1.5,1.5 0 0 0 4,5.5 L4,17.5 A1.5,1.5 0 0 0 5.5,19 L17.5,19 A1.5,1.5 0 0 0 19,17.5 L19,5.5 A1.5,1.5 0 0 0 17.5,4 Z" style="fill:white;fill-rule:evenodd;"/>
+</svg>
