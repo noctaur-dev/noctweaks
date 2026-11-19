@@ -58,7 +58,7 @@ workspace's `Mods/` folder and run `python3 BML/tools/build_mod.py <mod id>`; se
 ## AI Disclosure
 
 Obviously, all of the Bitwig modification scene is done with LLM assistance. I believe in being open about AI use for those that choose to abstain from engaging with it. 
-I worked for several nights getting these mods working with Claude, but it would not have been possible without the LLM help. 
+I spent about a week getting these mods working with Claude, but it would not have been possible without the LLM help. 
 
 ## Licence
 
