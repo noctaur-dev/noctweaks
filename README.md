@@ -11,10 +11,10 @@ Mods for [Bitwig Studio](https://www.bitwig.com), for the
 
 Each mod is separate: install only the ones you want.
 
-> **Not affiliated with Bitwig.** NocTweaks is an unofficial, community-made project, built for the love of
-> Bitwig Studio. It isn't made, endorsed or supported by Bitwig GmbH. "Bitwig" and "Bitwig Studio" are
+> **Not affiliated with Bitwig.** NocTweaks is an unofficial, community-made mod, built via the known LLM patches and then ported over to PatchBay.
+> It isn't made, endorsed or supported by Bitwig GmbH. "Bitwig" and "Bitwig Studio" are
 > trademarks of Bitwig GmbH. Use the mods at your own risk, and please don't send Bitwig support requests
-> about problems they cause: open an issue here instead.
+> about problems they cause: open an issue here instead. Using any community patch is still uncharted territory, proceed with caution. 
 
 ## Install
 
@@ -55,10 +55,10 @@ Each folder is a Patchbay mod (`mod.json`, `build.json`, `src/`, `package/`). Pu
 workspace's `Mods/` folder and run `python3 BML/tools/build_mod.py <mod id>`; see Patchbay's
 [building docs](https://github.com/shaboogen-dev/Patchbay/blob/main/docs/sdk/building.md).
 
-## Made with AI assistance
+## AI Disclosure
 
-NocTweaks is designed, directed and tested by noctaur, with much of the code written with the help of an AI
-assistant (Claude, by Anthropic). Commits it helped with are marked *Co-Authored-By: Claude*.
+Obviously, all of the Bitwig modification scene is done with LLM assistance. I believe in being open about AI use for those that choose to abstain from engaging with it. 
+I worked for several nights getting these mods working with Claude, but it would not have been possible without the LLM help. 
 
 ## Licence
 
