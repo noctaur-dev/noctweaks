@@ -3,6 +3,8 @@
 Mods for [Bitwig Studio](https://www.bitwig.com), for the
 [Patchbay](https://github.com/shaboogen-dev/Patchbay) mod loader.
 
+[![Support me on Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20noctaur-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/noctaur)
+
 | Mod | What it does |
 | --- | --- |
 | [**Global Track View**](noctweaks-global-track-view) | Edit any track in the piano roll without going back to the arranger: an *Edit Tracks* menu, layered editing on when several tracks are open, and the Track List panel in the Edit screen. |
@@ -60,6 +62,16 @@ workspace's `Mods/` folder and run `python3 BML/tools/build_mod.py <mod id>`; se
 Obviously, most of the recent Bitwig modification scene is done with LLM assistance. I believe in being open about AI use for those that choose to abstain from engaging with it. 
 I spent about a week getting these mods working with Claude, but it would not have been possible without the LLM help. 
 
+## Support
+
+NocTweaks is free. If it's useful to you and you'd like to say thanks, you can buy me a coffee on
+[Ko-fi](https://ko-fi.com/noctaur).
+
 ## Licence
 
 [MIT](LICENSE). The Browser mod includes [Lucide](https://lucide.dev) icons (ISC).
+
+The MIT licence covers NocTweaks' own code and files only. Bitwig Studio's source code is proprietary and
+belongs to Bitwig GmbH: none of it is included here, and nothing here grants any rights to it. These mods and
+other community additions aren't affiliated with or part of the real product; they're unofficial, made by
+fans, and meant only as a fun resource for the Bitwig community.
