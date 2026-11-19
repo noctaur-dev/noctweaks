@@ -3,7 +3,7 @@
   "mod": {
     "id": "noctweaks-global-track-view",
     "name": "Piano Roll: Global Track View",
-    "version": "0.1.0-dev.4",
+    "version": "0.1.0-dev.5",
     "author": "noctaur",
     "description": "Edit any track in the piano roll without going back to the arranger: an Edit Tracks menu in the editor's track list, the Track List panel beside the editor in the Edit screen, layered editing switched on when several tracks are being edited, and other tracks' expression points kept out of the way while the layer filter is on.",
     "area": "Piano Roll",

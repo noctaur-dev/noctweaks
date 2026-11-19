@@ -6,12 +6,18 @@ Part of **NocTweaks** by noctaur. Edit any track in the piano roll without going
 
 ## What it adds
 
+- The **Track List panel** beside the editor in the **Edit** screen, with its button in the footer next to
+  *EDIT*. *Toggle Track List* works again.
+
+  > This panel was in an early Bitwig 6 beta and was taken out of the release, but its code is still in
+  > Bitwig. This mod switches it back on; it isn't a panel we wrote from scratch.
+
+  ![Turning the Track List panel on with its footer button (zoomed in at the bottom), then adding tracks and switching between them](images/gtv-edit-tracks.gif)
+
 - **Edit Tracks** in the right-click menu of the editor's track list: every track in the project as a
   checkbox. Tick a track to add it to the tracks being edited (layered in the piano roll), untick it to take
   it out. **Edit All Tracks** edits every track at once. It uses the arranger's own track selection, so
   everything else in Bitwig behaves as usual.
-
-  ![Turning the Track List panel on with its button in the footer, next to EDIT (zoomed in at the bottom)](images/gtv-edit-tracks.gif)
 
 - The editor's track list shows from **one** track up (Bitwig shows it from two), so the menu is always there.
 - **Layered editing switches on** when the editor goes from one track to several. Turn it off yourself and it
@@ -19,8 +25,6 @@ Part of **NocTweaks** by noctaur. Edit any track in the piano roll without going
 
   ![Switching between tracks, with the others layered underneath](images/gtv-add-layer.gif)
 
-- The **Track List panel** beside the editor in the **Edit** screen, with its button in the footer (the panel
-  from the Bitwig 6 beta). *Toggle Track List* works again.
 - With **edit selected layers only** on, other tracks' note expressions are drawn as lines only: no points,
   and nothing of them can be hovered or grabbed.
 
