@@ -1,6 +1,6 @@
 # NocTweaks
 
-Mods for [Bitwig Studio](https://www.bitwig.com) by noctaur, for the
+Mods for [Bitwig Studio](https://www.bitwig.com), for the
 [Patchbay](https://github.com/shaboogen-dev/Patchbay) mod loader.
 
 | Mod | What it does |
