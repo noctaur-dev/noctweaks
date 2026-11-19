@@ -73,5 +73,5 @@ I spent about a week getting these mods working with Claude, but it would not ha
 
 ## Support
 
-I expect nothing for this, but those Claude subscriptions are not cheap ;) ...so if you **do** want to donate, here you go
+I expect nothing for this, it was made for myself mainly, but those Claude subscriptions are not cheap ;) ...so if you ***do*** want to donate, here you go
 [![Support me on Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20noctaur-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/noctaur)
