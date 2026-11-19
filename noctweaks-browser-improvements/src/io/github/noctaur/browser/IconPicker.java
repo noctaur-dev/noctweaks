@@ -103,6 +103,16 @@ public final class IconPicker {
       Map.entry("black", new Color(0x1F, 0x1F, 0x1F)), Map.entry("light_grey", new Color(0xB0, 0xB0, 0xB0)),
       Map.entry("grey", new Color(0x80, 0x80, 0x80)), Map.entry("dark_grey", new Color(0x4A, 0x4A, 0x4A)));
 
+   /** A swatch colour: one of Bitwig's names, or a custom #rrggbb. */
+   private static final Map<JToggleButton, String> COLOURS_OF = new java.util.IdentityHashMap<>();
+
+   static Color swatch(String c) {
+      if (c != null && c.matches("#[0-9a-fA-F]{6}")) {
+         return new Color(Integer.parseInt(c.substring(1), 16));
+      }
+      return SWATCH.getOrDefault(c, FG);
+   }
+
    private static final Color BG = new Color(0x26, 0x26, 0x26);
    private static final Color FG = new Color(0xDD, 0xDD, 0xDD);
    private static final Color ACCENT = new Color(0xFF, 0x83, 0x2B);
@@ -313,7 +323,7 @@ public final class IconPicker {
          @Override
          public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean selected, boolean focus) {
             JLabel l = (JLabel) super.getListCellRendererComponent(list, "", index, selected, false);
-            l.setIcon(preview((String) value, SWATCH.getOrDefault(pickedColour[0], FG)));
+            l.setIcon(preview((String) value, swatch(pickedColour[0])));
             l.setHorizontalAlignment(JLabel.CENTER);
             l.setToolTipText((String) value);
             l.setBackground(selected ? new Color(0x4A, 0x36, 0x24) : new Color(0x1A, 0x1A, 0x1A));
@@ -361,7 +371,7 @@ public final class IconPicker {
                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                g2.setColor(BG);
                g2.fillRect(0, 0, getWidth(), getHeight());
-               g2.setColor(SWATCH.get(c));
+               g2.setColor(swatch(c));
                g2.fillRoundRect(3, 3, getWidth() - 6, getHeight() - 6, 6, 6);
                if (isSelected()) {
                   g2.setColor(Color.WHITE);
@@ -380,9 +390,56 @@ public final class IconPicker {
             }
             grid.repaint();
          });
+         COLOURS_OF.put(b, c);
          swatches.add(b);
          colours.add(b);
       }
+
+      // Custom colour: a colour wheel (rainbow swatch until a colour is picked, then that colour).
+      final String[] custom = {pickedColour[0].startsWith("#") ? pickedColour[0] : null};
+      JToggleButton wheel = new JToggleButton() {
+         @Override
+         protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(BG);
+            g2.fillRect(0, 0, getWidth(), getHeight());
+            int w = getWidth() - 6, h = getHeight() - 6;
+            if (custom[0] != null) {
+               g2.setColor(swatch(custom[0]));
+               g2.fillRoundRect(3, 3, w, h, 6, 6);
+            } else {
+               for (int a = 0; a < 360; a += 10) {
+                  g2.setColor(Color.getHSBColor(a / 360f, 0.8f, 0.95f));
+                  g2.fillArc(3, 3, w, h, a, 11);
+               }
+            }
+            if (isSelected()) {
+               g2.setColor(Color.WHITE);
+               g2.drawRoundRect(1, 1, getWidth() - 3, getHeight() - 3, 8, 8);
+            }
+         }
+      };
+      wheel.setPreferredSize(new Dimension(24, 24));
+      wheel.setToolTipText("Custom colour…");
+      wheel.setSelected(custom[0] != null);
+      wheel.setFocusable(false);
+      wheel.addActionListener(e -> {
+         Color start = custom[0] != null ? swatch(custom[0]) : ACCENT;
+         Color c = javax.swing.JColorChooser.showDialog(d, "Custom colour", start);
+         if (c != null) {
+            custom[0] = String.format("#%02x%02x%02x", c.getRed(), c.getGreen(), c.getBlue());
+            pickedColour[0] = custom[0];
+         }
+         boolean on = custom[0] != null && custom[0].equals(pickedColour[0]);
+         for (JToggleButton o : swatches) {
+            o.setSelected(on ? o == wheel : COLOURS_OF.get(o) != null && COLOURS_OF.get(o).equals(pickedColour[0]));
+         }
+         wheel.setSelected(on);
+         grid.repaint();
+      });
+      swatches.add(wheel);
+      colours.add(wheel);
 
       grid.addListSelectionListener(e -> {
          if (!e.getValueIsAdjusting() && grid.getSelectedValue() != null) {

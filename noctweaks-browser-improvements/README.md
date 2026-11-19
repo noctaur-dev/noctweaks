@@ -28,7 +28,7 @@ Part of **NocTweaks** by noctaur.
 The picker writes `%LOCALAPPDATA%\Bitwig Studio\library\collections\7\.suite\icons.txt`, which you can also
 edit by hand, one line per collection or folder: `Drums/Kits = drum orange` (Lucide icon name, then an optional
 colour: red, orange, yellow, lime, green, mint, turquoise, blue, purple, white, black, light_grey, grey,
-dark_grey). Folders end with `/` (`Drums/ = folder blue`); `@sidebar` and `@tracks` are the two buttons.
+dark_grey, or a custom `#rrggbb`). Folders end with `/` (`Drums/ = folder blue`); `@sidebar` and `@tracks` are the two buttons.
 
 ## Notes
 

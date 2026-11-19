@@ -307,6 +307,11 @@ public final class NocBrowser {
          if (!SEEN.add(p)) {
             return;
          }
+         synchronized (PINNED_NOW) {
+            for (Hc c : PINNED_NOW) {
+               pinInto(p, c);
+            }
+         }
          if (!hidden("collections") && p.beI((WV)SOURCE) < 0) {
             p.beI(ZO.beI(SOURCE), p.mEL());
          }
@@ -324,18 +329,46 @@ public final class NocBrowser {
       }
    }
 
-   /** Adds a collection to the quick sources (no limit: Bitwig's own drag stops at 12). */
+   /** Collections pinned this session, so a browser first opened later (a popup) gets them too. */
+   private static final Set<Hc> PINNED_NOW = Collections.newSetFromMap(Collections.synchronizedMap(new WeakHashMap<>()));
+
+   /** Every browser's quick sources seen so far: the main browser's and the popups' (each has its own). */
+   private static List<ZI> palettes() {
+      List<ZI> out = new ArrayList<>();
+      synchronized (SEEN) {
+         for (Object o : SEEN) {
+            if (o instanceof ZI z) {
+               out.add(z);
+            }
+         }
+      }
+      ZI main = palette();
+      if (main != null && !out.contains(main)) {
+         out.add(main);
+      }
+      return out;
+   }
+
+   private static void pinInto(ZI p, Hc collection) {
+      WC source = collection.mEL();   // the collection as a browser source
+      if (source != null && p.beI((WV)source) < 0) {
+         p.beI(ZO.beI(source), p.mEL());
+      }
+   }
+
+   /** Adds a collection to every browser's quick sources (no limit: Bitwig's own drag stops at 12). */
    static void pinCollection(Hc collection) {
       try {
-         ZI p = palette();
-         WC source = collection.mEL();   // the collection as a browser source
-         if (p == null || source == null) {
+         List<ZI> all = palettes();
+         if (all.isEmpty() || collection.mEL() == null) {
             log("Quick sources not ready yet: open the browser once, then try again", null);
             return;
          }
-         if (p.beI((WV)source) < 0) {
-            p.beI(ZO.beI(source), p.mEL());
+         PINNED_NOW.add(collection);
+         for (ZI p : all) {
+            pinInto(p, collection);
          }
+         log("Pinned " + collection.BBg() + " to " + all.size() + " browser(s)' quick sources", null);
       } catch (Throwable t) {
          log("Could not pin the collection", t);
       }
@@ -343,18 +376,25 @@ public final class NocBrowser {
 
    static boolean pinned(Hc collection) {
       try {
-         ZI p = palette();
-         return p != null && p.beI((WV)collection.mEL()) >= 0;
+         WV source = collection.mEL();
+         for (ZI p : palettes()) {
+            if (p.beI(source) >= 0) {
+               return true;
+            }
+         }
       } catch (Throwable t) {
-         return false;
       }
+      return false;
    }
 
    static void unpinCollection(Hc collection) {
       try {
-         ZI p = palette();
-         if (p != null) {
-            p.Gef((WV)collection.mEL());
+         PINNED_NOW.remove(collection);
+         WV source = collection.mEL();
+         for (ZI p : palettes()) {
+            if (p.beI(source) >= 0) {
+               p.Gef(source);
+            }
          }
       } catch (Throwable t) {
          log("Could not unpin the collection", t);
@@ -477,7 +517,7 @@ public final class NocBrowser {
          if (e == null || !svg(e.icon).isFile()) {
             return null;
          }
-         if (e.color != null && PALETTE.containsKey(e.color.toLowerCase())) {
+         if (e.color != null && colour(e.color) != null) {
             String coloured = colouredSvg(e.icon, e.color.toLowerCase());
             if (coloured != null) {
                return coloured;
@@ -493,9 +533,10 @@ public final class NocBrowser {
    /** Writes (once) a variant of the icon with the glyph in a fixed colour; returns its icon name. */
    private static String colouredSvg(String icon, String color) {
       try {
-         File out = new File(new File(stateDir(), "cache/icons"), icon + "-" + color + ".svg");
+         String tag = color.replace("#", "x");   // a custom colour (#rrggbb) as xrrggbb in the file name
+         File out = new File(new File(stateDir(), "cache/icons"), icon + "-" + tag + ".svg");
          if (!out.isFile()) {
-            Color c = PALETTE.get(color);
+            Color c = colour(color);
             String src = Files.readString(svg(icon).toPath(), StandardCharsets.UTF_8);
             String rgb = "rgb(" + c.getRed() + "," + c.getGreen() + "," + c.getBlue() + ")";
             out.getParentFile().mkdirs();
@@ -503,7 +544,7 @@ public final class NocBrowser {
             Files.writeString(tmp.toPath(), src.replace("stroke:white", "stroke:" + rgb).replace("fill:white", "fill:" + rgb), StandardCharsets.UTF_8);
             Files.move(tmp.toPath(), out.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
          }
-         return Icons.PREFIX + "coloured/" + icon + "-" + color + ".svg";
+         return Icons.PREFIX + "coloured/" + icon + "-" + tag + ".svg";
       } catch (Throwable t) {
          log("Could not write coloured icon (folder not writable?)", t);
          return null;
@@ -555,6 +596,18 @@ public final class NocBrowser {
       }
    }
 
+   /** A colour from icons.txt: one of Bitwig's colour names, or a custom one as #rrggbb. Null if neither. */
+   static Color colour(String name) {
+      if (name == null) {
+         return null;
+      }
+      String n = name.trim().toLowerCase();
+      if (n.matches("#[0-9a-f]{6}")) {
+         return new Color(Integer.parseInt(n.substring(1), 16));
+      }
+      return PALETTE.get(n);
+   }
+
    private static final Map<String, Color> PALETTE = Map.ofEntries(
       Map.entry("red", new Color(0xD9, 0x2E, 0x24)), Map.entry("orange", new Color(0xFF, 0x83, 0x2B)),
       Map.entry("yellow", new Color(0xE5, 0xC0, 0x1E)), Map.entry("lime", new Color(0xA3, 0xC6, 0x3B)),
@@ -574,7 +627,10 @@ public final class NocBrowser {
          log("Icon image missing: " + src.getAbsolutePath(), null);
          return null;
       }
-      Color fg = PALETTE.getOrDefault(color == null ? "" : color.toLowerCase(), new Color(0xD0, 0xD0, 0xD0));
+      Color fg = colour(color);
+      if (fg == null) {
+         fg = new Color(0xD0, 0xD0, 0xD0);
+      }
       File out = new File(new File(stateDir(), "cache"), "tile3-" + icon + "-" + Integer.toHexString(fg.getRGB()) + ".png");
       if (!out.isFile()) {
          out.getParentFile().mkdirs();
