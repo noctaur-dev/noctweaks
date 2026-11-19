@@ -4,9 +4,27 @@ Part of **NocTweaks** by noctaur. Note expression tools for the piano roll.
 
 ![Expression Controls](images/top.png)
 
+## How to use it: it all works on nodes
+
+Almost everything here works on **expression nodes** (the points on a note's expression curve), not on notes.
+Selecting a note isn't enough; the tools only show up once nodes are selected.
+
+1. Open a note's expression (Pitch/Transpose, Pressure, Timbre, Gain or Pan) in the piano roll.
+2. **Select nodes:** click one node, or drag a box around several.
+3. The **Points Inspector** then shows the *Expression Shape* section, and right-clicking a selected node shows
+   the shape and copy items.
+
+What gets changed depends on the nodes you select:
+
+- **Several nodes:** the stretch from the first selected node to the last.
+- **One node:** from that node to the next node (or to the end of the note if it's the last).
+
+To paste a copied shape onto automation, the same applies: select an **automation node** first, and the shape
+starts there.
+
 ## What it adds
 
-- **Expression Shape** section in the Points Inspector (and the note expression Inspector): pick a shape
+- **Expression Shape** section in the Points Inspector (with nodes selected): pick a shape
   (sine, triangle, saw up/down, square, ramps, random, flat) and draw it over the selected expression
   points, with Cycles, Amount, Skew, Grow/Fade, In/Out, live **Melt** and **Simplify**: redraws the selection with
   far fewer points that keep its shape, the way you'd draw it by hand with Alt-curved segments (a point on
