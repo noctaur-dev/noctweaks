@@ -3,8 +3,6 @@
 Mods for [Bitwig Studio](https://www.bitwig.com), for the
 [Patchbay](https://github.com/shaboogen-dev/Patchbay) mod loader.
 
-[![Support me on Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20noctaur-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/noctaur)
-
 | Mod | What it does |
 | --- | --- |
 | [**Global Track View**](noctweaks-global-track-view) | Edit any track in the piano roll without going back to the arranger: an *Edit Tracks* menu, layered editing on when several tracks are open, and the Track List panel in the Edit screen. |
@@ -64,8 +62,8 @@ I spent about a week getting these mods working with Claude, but it would not ha
 
 ## Support
 
-NocTweaks is free. If it's useful to you and you'd like to say thanks, you can buy me a coffee on
-[Ko-fi](https://ko-fi.com/noctaur).
+Obviously, I expect nothing for this, but those Claude subscriptions are not cheap ;) ...so if you do want to donate, here you go
+[![Support me on Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20noctaur-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/noctaur)
 
 ## Licence
 
