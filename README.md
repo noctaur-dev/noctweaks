@@ -55,15 +55,6 @@ Each folder is a Patchbay mod (`mod.json`, `build.json`, `src/`, `package/`). Pu
 workspace's `Mods/` folder and run `python3 BML/tools/build_mod.py <mod id>`; see Patchbay's
 [building docs](https://github.com/shaboogen-dev/Patchbay/blob/main/docs/sdk/building.md).
 
-## AI Disclosure
-
-Obviously, most of the recent Bitwig modification scene is done with LLM assistance. I believe in being open about AI use for those that choose to abstain from engaging with it. 
-I spent about a week getting these mods working with Claude, but it would not have been possible without the LLM help. 
-
-## Support
-
-Obviously, I expect nothing for this, but those Claude subscriptions are not cheap ;) ...so if you do want to donate, here you go
-[![Support me on Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20noctaur-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/noctaur)
 
 ## Licence
 
@@ -73,3 +64,14 @@ The MIT licence covers NocTweaks' own code and files only. Bitwig Studio's sourc
 belongs to Bitwig GmbH: none of it is included here, and nothing here grants any rights to it. These mods and
 other community additions aren't affiliated with or part of the real product; they're unofficial, made by
 fans, and meant only as a fun resource for the Bitwig community.
+
+## AI Disclosure
+
+Most of the recent Bitwig modification scene is done with LLM assistance. I believe in being open about AI use for those that choose to abstain from engaging with it. 
+I spent about a week getting these mods working with Claude, but it would not have been possible without the LLM help. 
+
+
+## Support
+
+I expect nothing for this, but those Claude subscriptions are not cheap ;) ...so if you **do** want to donate, here you go
+[![Support me on Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20noctaur-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/noctaur)
