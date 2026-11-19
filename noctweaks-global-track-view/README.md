@@ -7,12 +7,12 @@ Part of **NocTweaks** by noctaur. Edit any track in the piano roll without going
 ## What it adds
 
 - The **Track List panel** beside the editor in the **Edit** screen, with its button in the footer next to
-  *EDIT*. *Toggle Track List* works again.
+  *EDIT*. *Toggle Track List* works again. Its *+* adds a track below, without leaving the editor.
 
   > This panel was in an early Bitwig 6 beta and was taken out of the release, but its code is still in
   > Bitwig. This mod switches it back on; it isn't a panel we wrote from scratch.
 
-  ![Turning the Track List panel on with its footer button (zoomed in at the bottom), then adding tracks and switching between them](images/gtv-edit-tracks.gif)
+  ![Turning the Track List panel on with its footer button (zoomed in at the bottom), adding tracks with its + button, and switching between them](images/gtv-edit-tracks.gif)
 
 - **Edit Tracks** in the right-click menu of the editor's track list: every track in the project as a
   checkbox. Tick a track to add it to the tracks being edited (layered in the piano roll), untick it to take
