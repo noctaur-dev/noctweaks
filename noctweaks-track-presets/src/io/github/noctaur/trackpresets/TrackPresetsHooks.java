@@ -125,13 +125,22 @@ public final class TrackPresetsHooks {
       NocTracks.previewing(load.FzB, load.MRY); // FzB: the files; MRY: the project
    }
 
-   /** ... and its "File type not supported" message is left out for a track preset there. */
+   /**
+    * ... and its "File type not supported" message is left out for a track preset there. The load still ends
+    * as failed (cfM(String) does both: it ends the load, then shows the message), or the browser waits for it.
+    */
    @Hook(target = cen.class, method = "cfM()V", at = At.REPLACE_CALL,
          callOwner = cen.class, call = "cfM(Ljava/lang/String;)V", id = "popup-preview-error")
    public static void popupPreviewError(cen load, String message) {
-      if (!NocTracks.previewIsPreset(load.FzB)) {
-         load.cfM(message);
+      if (NocTracks.previewIsPreset(load.FzB)) {
+         try {
+            load.IwV.cfM(message);   // IwV: the load's result; ends it as failed, without the message
+            return;
+         } catch (Throwable t) {
+            TrackPresets.log("New track browser: could not end the preview quietly", t);
+         }
       }
+      load.cfM(message);
    }
 
    /** The popup closes without OK. */
