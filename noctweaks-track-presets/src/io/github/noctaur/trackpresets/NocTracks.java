@@ -998,4 +998,68 @@ public final class NocTracks {
          newTrack = null;
       }
    }
+
+   /** The track preset picked in the new track's browser (added on OK), and the project it goes into. */
+   private static volatile File pendingPreset;
+   private static volatile g2L pendingProject;
+
+   private static File presetFile(z2y[] files) {
+      try {
+         if (files == null || files.length != 1 || files[0] == null) {
+            return null;
+         }
+         File f = files[0].cfM();
+         String p = f == null ? "" : f.getPath().replace('\\', '/').toLowerCase(Locale.ROOT);
+         return p.endsWith(EXT) && p.contains("track presets/") && !p.contains("/.previous/") ? f : null;
+      } catch (Throwable t) {
+         return null;
+      }
+   }
+
+   /** Bitwig loads the picked item into the new track for a preview: remember a track preset for OK. */
+   static void previewing(z2y[] files, g2L project) {
+      if (newTrack == null) {
+         return;
+      }
+      File f = presetFile(files);
+      pendingPreset = f;
+      pendingProject = f == null ? null : project;
+      if (f != null) {
+         TrackPresets.log("New track browser: picked " + f.getName(), null);
+      }
+   }
+
+   static boolean previewIsPreset(z2y[] files) {
+      return newTrack != null && presetFile(files) != null;
+   }
+
+   /** OK in the new track's browser: a picked track preset replaces the new, empty track. */
+   static void popupCommit(aXs target) {
+      File file = pendingPreset;
+      g2L project = pendingProject;
+      boolean mine = target != null && target == newTrack;
+      popupClosing(target, true);
+      pendingPreset = null;
+      pendingProject = null;
+      if (!mine || file == null || !(target instanceof aXC c)) {
+         return;
+      }
+      try {
+         Object track = c.qoU().K_();   // the empty track (its device chain's owner)
+         g2L into = document(track) != null ? document(track) : project;
+         Fq.cfM(() -> {
+            try {
+               load(file, track, into);
+               if (into != null && track != null) {
+                  into.cfM(java.util.List.of(track));   // remove the empty track
+               }
+               TrackPresets.log("New track browser: " + file.getName() + " added in place of the new track", null);
+            } catch (Throwable t) {
+               TrackPresets.log("New track browser: could not add " + file.getName(), t);
+            }
+         });
+      } catch (Throwable t) {
+         TrackPresets.log("New track browser: OK", t);
+      }
+   }
 }

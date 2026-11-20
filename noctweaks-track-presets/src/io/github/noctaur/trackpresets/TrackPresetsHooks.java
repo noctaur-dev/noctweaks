@@ -8,7 +8,8 @@ import bml.api.Return;
 import bml.api.This;
 import com.bitwig.flt.document.core.master.IbI;                          // what a dropped browser item is added to
 import com.bitwig.flt.document.core.master.zwV;                         // what a dropped browser item becomes
-import com.bitwig.flt.document.core.master.g2L;                          // a loaded project (a dropped preset)
+import com.bitwig.flt.document.core.master.g2L;
+import com.bitwig.flt.document.core.master.cen;                          // Bitwig loading files into a place                          // a loaded project (a dropped preset)
 import com.bitwig.base.io.z2y;                                          // a library file (path + sub-item)
 
 import java.util.List;
@@ -112,7 +113,25 @@ public final class TrackPresetsHooks {
    /** The popup's OK: its choice is kept (logged, to see what a track preset did there). */
    @Hook(target = aXC.class, method = "cfM(LaXu;)V", at = At.ENTRY, id = "popup-commit")
    public static void popupCommit(@This aXC target) {
-      NocTracks.popupClosing(target, true);
+      NocTracks.popupCommit(target);
+   }
+
+   /**
+    * cen: Bitwig loading files into a place (here: the item picked in the new track's browser, previewed on the
+    * track). A track preset can't go into a device chain; in the new track's browser it's kept for OK instead.
+    */
+   @Hook(target = cen.class, method = "cfM()V", at = At.ENTRY, id = "popup-preview")
+   public static void popupPreview(@This cen load) {
+      NocTracks.previewing(load.FzB, load.MRY); // FzB: the files; MRY: the project
+   }
+
+   /** ... and its "File type not supported" message is left out for a track preset there. */
+   @Hook(target = cen.class, method = "cfM()V", at = At.REPLACE_CALL,
+         callOwner = cen.class, call = "cfM(Ljava/lang/String;)V", id = "popup-preview-error")
+   public static void popupPreviewError(cen load, String message) {
+      if (!NocTracks.previewIsPreset(load.FzB)) {
+         load.cfM(message);
+      }
    }
 
    /** The popup closes without OK. */
