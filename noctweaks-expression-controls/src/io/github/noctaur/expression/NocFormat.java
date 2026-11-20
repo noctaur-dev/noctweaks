@@ -4,7 +4,7 @@ import bitwig.obf.*;
 import java.util.function.DoubleFunction;
 
 /** NocTweaks: how a NocNumber reads in its field ("4 st", "35 %", "Grow 50 %"). */
-final class NocFormat implements dPX {
+final class NocFormat implements dOu {
    private final DoubleFunction<String> text;
 
    NocFormat(DoubleFunction<String> text) {
@@ -12,7 +12,7 @@ final class NocFormat implements dPX {
    }
 
    @Override
-   public String beI(double v) {
+   public String cfM(double v) {
       try {
          return text.apply(v);
       } catch (Throwable t) {
@@ -21,13 +21,13 @@ final class NocFormat implements dPX {
    }
 
    @Override
-   public String beI(double v, boolean a, boolean b) {
-      return beI(v);
+   public String cfM(double v, boolean a, boolean b) {
+      return cfM(v);
    }
 
    /** Typed-in text: the first number in it. */
    @Override
-   public double beI(String s, double fallback) {
+   public double cfM(String s, double fallback) {
       try {
          java.util.regex.Matcher m = java.util.regex.Pattern.compile("-?\\d+(\\.\\d+)?|-?\\.\\d+").matcher(s);
          if (m.find()) {

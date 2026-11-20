@@ -9,12 +9,12 @@ import java.util.function.DoubleConsumer;
  * NocTweaks: a number NocTweaks owns, shown and edited by Bitwig's own number
  * field (dNo) like any Inspector value. Changing it calls back.
  */
-final class NocNumber implements Clo {
+final class NocNumber implements mcu {
    private volatile double value;
    private volatile double min, max;
    private final boolean whole;
    private final DoubleConsumer changed;
-   private final List<NVD> listeners = new CopyOnWriteArrayList<>();
+   private final List<foz> listeners = new CopyOnWriteArrayList<>();
 
    NocNumber(double value, double min, double max, boolean whole, DoubleConsumer changed) {
       this.value = value;
@@ -66,8 +66,8 @@ final class NocNumber implements Clo {
    }
 
    private void fire(double old) {
-      MNh event = new MNh(this, old, value);   // Bitwig's value-changed event
-      for (NVD l : listeners) {
+      VGL event = new VGL(this, old, value);   // Bitwig's value-changed event
+      for (foz l : listeners) {
          try {
             l.eventOccurred(event);
          } catch (Throwable t) {
@@ -93,10 +93,10 @@ final class NocNumber implements Clo {
       }
    }
    @Override public boolean isObservable() { return true; }
-   @Override public void addListener(NVD l) {
+   @Override public void addListener(foz l) {
       if (l != null) {
          listeners.add(l);
       }
    }
-   @Override public void removeListener(NVD l) { listeners.remove(l); }
+   @Override public void removeListener(foz l) { listeners.remove(l); }
 }

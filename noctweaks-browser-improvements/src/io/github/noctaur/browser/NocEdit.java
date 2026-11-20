@@ -34,7 +34,7 @@ public final class NocEdit {
 
    // ------------------------------------------------------------------ right-click menu
 
-   public static void menu(cGK view, dMt menu, List selection) {
+   public static void menu(cFm view, dKW menu, List selection) {
       pendingParent = null;
       try {
          if (selection == null || selection.isEmpty()) {
@@ -44,65 +44,64 @@ public final class NocEdit {
          List<String> collections = new ArrayList<>();   // full names of selected collections
          List<String> folders = new ArrayList<>();       // keys of selected plain folders
          for (Object o : selection) {
-            if (o instanceof Hh fj && !fj.mYH()) {
-               collections.add(fj.zzi().BBg());
-            } else if (o instanceof yO && NocCollectionFolders.folderKey(o) != null) {
+            if (o instanceof GW fj && !fj.emh()) {
+               collections.add(fj.z3I().IwV());
+            } else if (o instanceof yF && NocCollectionFolders.folderKey(o) != null) {
                folders.add(NocCollectionFolders.folderKey(o));
             } else {
                return;   // something else is selected (a section, a device folder…): leave Bitwig's menu alone
             }
          }
 
-         EN dn = view.qVz().WYl();
+         EE dn = view.bB().Bpn();
          if (dn == null || NocCollectionFolders.collectionsWwc() == null) {
             return;
          }
 
-         menu.fpX();
+         menu.ELS();
          List<String> iconKeys = new ArrayList<>(collections);
          for (String f : folders) {
             iconKeys.add(f + SEP);
          }
          String what = iconKeys.size() == 1 ? "\"" + leaf(iconKeys.get(0).replaceAll("/$", "")) + "\"" : iconKeys.size() + " items";
-         menu.beI("Set Icon…", () -> IconWindow.open(iconKeys, what));
-         if (selection.size() == 1 && !collections.isEmpty() && selection.get(0) instanceof Hh row) {
-            Hc c = row.zzi();
+         menu.cfM("Set Icon…", () -> IconWindow.open(iconKeys, what));
+         if (selection.size() == 1 && !collections.isEmpty() && selection.get(0) instanceof GW row) {
+            GT c = row.z3I();
             if (NocBrowser.pinned(c)) {
-               menu.beI("Unpin from Quick Sources", () -> NocBrowser.unpinCollection(c));
+               menu.cfM("Unpin from Quick Sources", () -> NocBrowser.unpinCollection(c));
             } else {
-               menu.beI("Pin to Quick Sources", () -> NocBrowser.pinCollection(c));
+               menu.cfM("Pin to Quick Sources", () -> NocBrowser.pinCollection(c));
             }
          }
-         dMt buttons = menu.sCA("Sidebar Buttons");
-         buttons.beI("Collections Button Icon…", () -> IconWindow.open(List.of("@sidebar"), "Collections button"));
-         buttons.beI("Tracks Button Icon…", () -> IconWindow.open(List.of("@tracks"), "Tracks button"));
-         buttons.fpX();
-         for (String which : new String[]{"collections", "tracks"}) {
-            boolean shown = !NocBrowser.hidden(which);
-            String name = "collections".equals(which) ? "Collections" : "Tracks";
-            buttons.beI((shown ? "✓ " : "    ") + "Show " + name + " Button", () -> NocBrowser.setHidden(which, shown));
+         dKW buttons = menu.Hnt("Sidebar Buttons");
+         buttons.cfM("Collections Button Icon…", () -> IconWindow.open(List.of("@sidebar"), "Collections button"));
+         if (NocBrowser.tracksButton) {   // the Track Presets mod's button
+            buttons.cfM("Tracks Button Icon…", () -> IconWindow.open(List.of("@tracks"), "Tracks button"));
          }
+         buttons.ELS();
+         boolean shown = !NocBrowser.hidden("collections");
+         buttons.cfM((shown ? "✓ " : "    ") + "Show Collections Button", () -> NocBrowser.setHidden("collections", shown));
          if (selection.size() == 1) {
             String parent = collections.isEmpty() ? folders.get(0) : collections.get(0);
-            menu.beI("New Collection Inside \"" + leaf(parent) + "\"…", () -> {
+            menu.cfM("New Collection Inside \"" + leaf(parent) + "\"…", () -> {
                pendingParent = parent;
                pendingSince = System.currentTimeMillis();
-               cDk.beI((dwF)view, dn);
+               cBP.cfM((dve)view, dn);
             });
          }
 
          if (selection.size() == 1 && !folders.isEmpty()) {
             String folder = folders.get(0);
-            menu.beI("Remove Folder \"" + leaf(folder) + "\" (keep its collections)", () -> removeFolder(dn, folder));
+            menu.cfM("Remove Folder \"" + leaf(folder) + "\" (keep its collections)", () -> removeFolder(dn, folder));
          }
 
          List<String> moving = new ArrayList<>(collections);
          moving.addAll(folders);
          Set<String> targets = targets(dn);
-         dMt sub = menu.sCA("Move To");
+         dKW sub = menu.Hnt("Move To");
          boolean anyNested = moving.stream().anyMatch(k -> k.contains(SEP));
          if (anyNested) {
-            sub.beI("Top Level", () -> move(dn, collections, folders, ""));
+            sub.cfM("Top Level", () -> move(dn, collections, folders, ""));
          }
          int added = 0;
          for (String t : targets) {
@@ -115,12 +114,12 @@ public final class NocEdit {
             }
             if (ok) {
                String label = t.replace(SEP, "  ›  ");
-               sub.beI(label, () -> move(dn, collections, folders, t));
+               sub.cfM(label, () -> move(dn, collections, folders, t));
                added++;
             }
          }
          if (added == 0 && !anyNested) {
-            sub.beI("(nowhere else to move to)", () -> {
+            sub.cfM("(nowhere else to move to)", () -> {
             });
          }
       } catch (Throwable t) {
@@ -129,10 +128,10 @@ public final class NocEdit {
    }
 
    /** Every collection and folder that can hold others. */
-   private static Set<String> targets(EN dn) {
+   private static Set<String> targets(EE dn) {
       Set<String> out = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
-      for (Object o : dn.sBA()) {
-         String name = ((Hc)o).BBg();
+      for (Object o : dn.Cuu()) {
+         String name = ((GT)o).IwV();
          if (name == null) {
             continue;
          }
@@ -171,7 +170,7 @@ public final class NocEdit {
          return name;
       }
       try {
-         File root = NocCollectionFolders.collectionsWwc().af();
+         File root = NocCollectionFolders.collectionsWwc().vpw();
          new File(root, parent.replace(SEP, File.separator)).mkdirs();
          return parent + SEP + name;
       } catch (Throwable t) {
@@ -185,16 +184,16 @@ public final class NocEdit {
    private static final Set<String> EXPLICIT = Collections.synchronizedSet(new HashSet<>());
    private static final ThreadLocal<Boolean> CHILD = ThreadLocal.withInitial(() -> false);
 
-   private static void move(EN dn, List<String> collections, List<String> folders, String target) {
+   private static void move(EE dn, List<String> collections, List<String> folders, String target) {
       hold();
       try {
          for (String c : collections) {
-            Hc fd = dn.BBg(c);
+            GT fd = dn.IwV(c);
             if (fd != null) {
                String to = free(dn, target.isEmpty() ? leaf(c) : target + SEP + leaf(c));
                EXPLICIT.add(to);
                try {
-                  fd.beI(to);
+                  fd.cfM(to);
                } finally {
                   EXPLICIT.remove(to);
                }
@@ -211,10 +210,10 @@ public final class NocEdit {
    }
 
    /** The name itself if nothing uses it yet, otherwise "Name 2", "Name 3", … */
-   private static String free(EN dn, String name) {
-      File root = NocCollectionFolders.collectionsWwc().af();
+   private static String free(EE dn, String name) {
+      File root = NocCollectionFolders.collectionsWwc().vpw();
       String candidate = name;
-      for (int i = 2; dn.BBg(candidate) != null || new File(root, (candidate + ".collection").replace(SEP, File.separator)).exists()
+      for (int i = 2; dn.IwV(candidate) != null || new File(root, (candidate + ".collection").replace(SEP, File.separator)).exists()
          || new File(root, candidate.replace(SEP, File.separator)).exists(); i++) {
          candidate = name + " " + i;
       }
@@ -222,8 +221,8 @@ public final class NocEdit {
    }
 
    /** Moves a plain folder (no collection of its own) and everything inside it. */
-   private static void moveFolder(EN dn, String from, String to) throws Exception {
-      File root = NocCollectionFolders.collectionsWwc().af();
+   private static void moveFolder(EE dn, String from, String to) throws Exception {
+      File root = NocCollectionFolders.collectionsWwc().vpw();
       File src = new File(root, from.replace(SEP, File.separator));
       File dst = new File(root, to.replace(SEP, File.separator));
       if (!src.isDirectory() || dst.exists() || to.startsWith(from + SEP) || clash(dn, from, to, null)) {
@@ -241,10 +240,10 @@ public final class NocEdit {
     * taken up there is renamed "Name (from Folder)"; an exact duplicate of the one up there (same
     * file contents) is removed instead, with a copy kept in .suite/trash. Nothing else is deleted.
     */
-   private static void removeFolder(EN dn, String key) {
+   private static void removeFolder(EE dn, String key) {
       hold();
       try {
-         File root = NocCollectionFolders.collectionsWwc().af();
+         File root = NocCollectionFolders.collectionsWwc().vpw();
          File dir = new File(root, key.replace(SEP, File.separator));
          File up = dir.getParentFile();
          String parent = parentOf(key);
@@ -285,14 +284,14 @@ public final class NocEdit {
          // Duplicates: keep a copy in .suite/trash, then let Bitwig delete the collection.
          for (String stem : duplicates) {
             String full = key + SEP + stem;
-            Hc fd = dn.BBg(full);
+            GT fd = dn.IwV(full);
             File src = new File(dir, stem + ".collection");
             File trash = new File(NocBrowser.stateDir(), "trash");
             trash.mkdirs();
             Files.copy(src.toPath(), new File(trash, full.replace(SEP, " - ") + " " + System.currentTimeMillis()
                + ".collection").toPath());
             if (fd != null) {
-               dn.Gef(fd);
+               dn.MRY(fd);
             }
             if (src.exists()) {
                src.delete();
@@ -314,15 +313,15 @@ public final class NocEdit {
             dir.delete();
          }
 
-         List<Hc> inside = new ArrayList<>();
-         for (Object o : dn.sBA()) {
-            String n = ((Hc)o).BBg();
+         List<GT> inside = new ArrayList<>();
+         for (Object o : dn.Cuu()) {
+            String n = ((GT)o).IwV();
             if (n != null && n.startsWith(key + SEP)) {
-               inside.add((Hc)o);
+               inside.add((GT)o);
             }
          }
-         for (Hc c : inside) {
-            String rest = c.BBg().substring(key.length() + 1);
+         for (GT c : inside) {
+            String rest = c.IwV().substring(key.length() + 1);
             int cut = rest.indexOf(SEP);
             String stem = cut < 0 ? rest : rest.substring(0, cut);
             String to = newStem.get(stem);
@@ -331,11 +330,11 @@ public final class NocEdit {
             }
             String moved = to + rest.substring(stem.length());
             String n = parent.isEmpty() ? moved : parent + SEP + moved;
-            c.Gef(wwc(n + ".collection"));
+            c.MRY(wwc(n + ".collection"));
             EXPLICIT.add(n);
             CHILD.set(true);
             try {
-               c.beI(n);
+               c.cfM(n);
             } finally {
                CHILD.set(false);
                EXPLICIT.remove(n);
@@ -355,13 +354,13 @@ public final class NocEdit {
     * Hook at the start of FD.IYM(String) (rename a collection). Returns the name to set without running
     * Bitwig's own rename, or null to let Bitwig rename a plain top-level collection as usual.
     */
-   public static String rename(Hc fd, String name) {
+   public static String rename(GT fd, String name) {
       try {
-         String old = fd.BBg();
-         if (old == null || name == null || !(fd instanceof GS) || NocCollectionFolders.collectionsWwc() == null) {
+         String old = fd.IwV();
+         if (old == null || name == null || !(fd instanceof GK) || NocCollectionFolders.collectionsWwc() == null) {
             return null;
          }
-         File root = NocCollectionFolders.collectionsWwc().af();
+         File root = NocCollectionFolders.collectionsWwc().vpw();
          File oldDir = new File(root, old.replace(SEP, File.separator));
 
          String target;
@@ -386,13 +385,13 @@ public final class NocEdit {
                return old;
             }
          }
-         EN dn = fd.y3f();
+         EE dn = fd.uWE();
          if (target.startsWith(old + SEP) || (dn != null && clash(dn, old, target, fd))) {
             NocBrowser.log("Can't rename " + old + " to " + target + " (name taken?)", null);
             return old;
          }
 
-         File src = fd.Hqm().af();
+         File src = fd.ejd().vpw();
          File dst = new File(root, (target + ".collection").replace(SEP, File.separator));
          File newDir = new File(root, target.replace(SEP, File.separator));
          if (oldDir.isDirectory() && newDir.exists() && !newDir.equals(oldDir)) {
@@ -406,7 +405,7 @@ public final class NocEdit {
             dst.getParentFile().mkdirs();
             Files.move(src.toPath(), dst.toPath());
          }
-         fd.Gef(wwc(target + ".collection"));
+         fd.MRY(wwc(target + ".collection"));
          if (oldDir.isDirectory() && !newDir.equals(oldDir)) {
             Files.move(oldDir.toPath(), newDir.toPath());
          }
@@ -417,7 +416,7 @@ public final class NocEdit {
             final String from = old;
             final String to = target;
             final File emptied = src.getParentFile();
-            Fx.Gef(() -> {
+            Fq.MRY(() -> {
                try {
                   if (dn != null) {
                      renameChildren(dn, from, to);
@@ -434,7 +433,7 @@ public final class NocEdit {
          return target;
       } catch (Throwable t) {
          NocBrowser.log("Rename failed", t);
-         return fd.BBg();
+         return fd.IwV();
       }
    }
 
@@ -451,14 +450,14 @@ public final class NocEdit {
    }
 
    /** Another collection already has the new name (or one of the moved children's new names). */
-   private static boolean clash(EN dn, String from, String to, Hc self) {
-      Hc existing = dn.BBg(to);
+   private static boolean clash(EE dn, String from, String to, GT self) {
+      GT existing = dn.IwV(to);
       if (existing != null && existing != self) {
          return true;
       }
-      for (Object o : dn.sBA()) {
-         String n = ((Hc)o).BBg();
-         if (n != null && n.startsWith(from + SEP) && dn.BBg(to + n.substring(from.length())) != null) {
+      for (Object o : dn.Cuu()) {
+         String n = ((GT)o).IwV();
+         if (n != null && n.startsWith(from + SEP) && dn.IwV(to + n.substring(from.length())) != null) {
             return true;
          }
       }
@@ -466,21 +465,21 @@ public final class NocEdit {
    }
 
    /** Files have already moved with their folder: point each sub-collection at its new place and name. */
-   private static void renameChildren(EN dn, String from, String to) {
-      List<Hc> children = new ArrayList<>();
-      for (Object o : dn.sBA()) {
-         String n = ((Hc)o).BBg();
+   private static void renameChildren(EE dn, String from, String to) {
+      List<GT> children = new ArrayList<>();
+      for (Object o : dn.Cuu()) {
+         String n = ((GT)o).IwV();
          if (n != null && n.startsWith(from + SEP)) {
-            children.add((Hc)o);
+            children.add((GT)o);
          }
       }
-      for (Hc c : children) {
-         String n = to + c.BBg().substring(from.length());
-         c.Gef(wwc(n + ".collection"));
+      for (GT c : children) {
+         String n = to + c.IwV().substring(from.length());
+         c.MRY(wwc(n + ".collection"));
          EXPLICIT.add(n);
          CHILD.set(true);
          try {
-            c.beI(n);
+            c.cfM(n);
          } finally {
             CHILD.set(false);
             EXPLICIT.remove(n);
@@ -488,10 +487,10 @@ public final class NocEdit {
       }
    }
 
-   private static scz wwc(String relative) {
-      scz w = NocCollectionFolders.collectionsWwc();
+   private static YBi wwc(String relative) {
+      YBi w = NocCollectionFolders.collectionsWwc();
       for (String seg : relative.split(SEP)) {
-         w = w.unz(seg);
+         w = w.UNj(seg);
       }
       return w;
    }
@@ -566,7 +565,7 @@ public final class NocEdit {
    /** Ends a change at the end of the current event (after anything else it set off). */
    private static void release() {
       try {
-         Fx.Gef(NocEdit::releaseNow);
+         Fq.MRY(NocEdit::releaseNow);
       } catch (Throwable t) {
          releaseNow();
       }
@@ -579,7 +578,7 @@ public final class NocEdit {
       holds = 0;
       for (Object el : new ArrayList<>(VIEWS.keySet())) {
          try {
-            ((FL)el).p1J();   // marks the Location column for refresh and schedules it
+            ((FE)el).Pgx();   // marks the Location column for refresh and schedules it
          } catch (Throwable t) {
             NocBrowser.log("Refresh failed", t);
          }
@@ -593,32 +592,32 @@ public final class NocEdit {
 
    /** Hook at the end of cDC.jPB(ti, boolean): remembers which tree widget shows which column. */
    public static void treeView(Object view, Object model) {
-      if (model instanceof FL && view instanceof cFm) {
+      if (model instanceof FE && view instanceof cDO) {
          VIEWS.put(model, view);
       }
    }
 
    /** Hides the tree's root row while the Collections tab is active; restores it otherwise. */
-   static void showRoot(FL el, boolean flat) {
+   static void showRoot(FE el, boolean flat) {
       try {
          Object v = VIEWS.get(el);
-         if (!(v instanceof cFm view)) {
+         if (!(v instanceof cDO view)) {
             return;
          }
-         eow tree = view.Anf;
+         emX tree = view.hUR;
          Boolean original = SHOW_ROOT.get(tree);
          if (original == null) {
             if (!flat) {
                return;   // never changed it: nothing to restore
             }
-            original = tree.Anf;
+            original = tree.hUR;
             SHOW_ROOT.put(tree, original);
          }
          boolean want = flat ? false : original;
-         if (tree.Anf != want) {
-            Fx.Gef(() -> {
+         if (tree.hUR != want) {
+            Fq.MRY(() -> {
                try {
-                  tree.Heb(want);
+                  tree.TtY(want);
                } catch (Throwable t) {
                   NocBrowser.log("Could not change the root row", t);
                }

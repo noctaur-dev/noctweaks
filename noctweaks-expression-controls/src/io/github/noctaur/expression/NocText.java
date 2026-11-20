@@ -4,11 +4,11 @@ import bitwig.obf.*;
 import java.util.function.Supplier;
 
 /** NocTweaks: a read-only text value whose text is worked out when it's read. */
-public final class NocText implements JW {
+public final class NocText implements LJt {
    private final Supplier<String> text;
    private final boolean observable;
    private volatile Object last = "";
-   private final java.util.List<NVD> listeners = new java.util.concurrent.CopyOnWriteArrayList<>();
+   private final java.util.List<foz> listeners = new java.util.concurrent.CopyOnWriteArrayList<>();
 
    NocText(Supplier<String> text) {
       this(text, false);
@@ -22,9 +22,9 @@ public final class NocText implements JW {
    /** Tells whoever shows this text that it changed. */
    void changed() {
       Object v = getValue();
-      MNh event = new MNh(this, last, v);   // Bitwig's value-changed event
+      VGL event = new VGL(this, last, v);   // Bitwig's value-changed event
       last = v;
-      for (NVD l : listeners) {
+      for (foz l : listeners) {
          try {
             l.eventOccurred(event);
          } catch (Throwable t) {
@@ -63,14 +63,14 @@ public final class NocText implements JW {
    }
 
    @Override
-   public void addListener(NVD listener) {
+   public void addListener(foz listener) {
       if (observable && listener != null) {
          listeners.add(listener);
       }
    }
 
    @Override
-   public void removeListener(NVD listener) {
+   public void removeListener(foz listener) {
       listeners.remove(listener);
    }
 }

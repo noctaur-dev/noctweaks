@@ -1,16 +1,16 @@
-package io.github.noctaur.browser;
+package io.github.noctaur.trackpresets;
 
 import bitwig.obf.*;
-import com.bitwig.base.async.PPR;
-import com.bitwig.base.io.vQq;
-import com.bitwig.base.io.Lpf;
-import com.bitwig.flt.document.core.iface.zCn;
-import com.bitwig.flt.document.core.iface.qAF;
-import com.bitwig.flt.document.core.master.Awj;
-import com.bitwig.flt.document.core.master.sJU;
-import com.bitwig.flt.document.core.master.GJy;
-import com.bitwig.flt.document.core.master.CmH;
-import com.bitwig.flt.document.file.JSA;
+import com.bitwig.base.async.oRV;
+import com.bitwig.base.io.gJi;
+import com.bitwig.base.io.z2y;
+import com.bitwig.flt.document.core.iface.WSA;
+import com.bitwig.flt.document.core.iface.iYN;
+import com.bitwig.flt.document.core.master.IbI;
+import com.bitwig.flt.document.core.master.zwV;
+import com.bitwig.flt.document.core.master.ruS;
+import com.bitwig.flt.document.core.master.g2L;
+import com.bitwig.flt.document.file.Uev;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,18 +19,11 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * NocTweaks: track presets. EXPERIMENTAL.
+ * NocTweaks: track presets.
  *
- * Saves whole tracks (devices, plugin states, mixer settings, colour, name, clips) as files and adds
- * them back into a project, the way Bitwig itself copies tracks between two open projects.
- *
- * A preset is a small Bitwig project holding just the saved tracks, written without opening it
- * (the same way Bitwig writes .bwclip files), stored as <Library>/Track Presets/<Name>.bwtrack.
- *
- * Hook (inserted by the build-time patcher):
- *   bml.IYM(dKG, duK, bhW, gC)      -> menu(menu, owner, header)   track header right-click menu
- *   aZr.IYM(dKG, double, double, eoV) -> areaMenu(menu, view)     arranger background right-click menu
- *   cAX.<init>(qg...)               -> kinds(kinds)               main browser also lists projects (presets only)
+ * Saves whole tracks (devices, plugin states, mixer settings, colour, name, clips) as files and adds them back
+ * into a project, the way Bitwig itself copies tracks between two open projects. A preset is a small Bitwig
+ * project holding just the saved tracks, stored in <My Library>/Track Presets/<Name>.bwproject.
  */
 public final class NocTracks {
    static final String EXT = ".bwproject";        // indexed by Bitwig's browser as a project
@@ -42,49 +35,49 @@ public final class NocTracks {
 
    // ------------------------------------------------------------------ menu
 
-   public static void menu(dMt menu, dwF owner, bju header) {
+   public static void menu(dKW menu, dve owner, big header) {
       try {
          List<Object> tracks = selected(header);
          if (tracks.isEmpty()) {
             return;
          }
 
-         menu.fpX();
+         menu.ELS();
          String what = tracks.size() == 1 ? "Track" : tracks.size() + " Tracks";
          String base = clean(name(tracks.get(0)));
          File existing = new File(folder(), base + EXT);
          if (existing.isFile()) {
             // Same name already saved: replace it, or keep both by numbering the new one.
-            dMt save = menu.sCA("Save " + what + " as Track Preset");
-            save.beI("Replace \"" + base + "\"", () -> save(tracks, base));
+            dKW save = menu.Hnt("Save " + what + " as Track Preset");
+            save.cfM("Replace \"" + base + "\"", () -> save(tracks, base));
             String variant = variant(base);
-            save.beI("Save as New Variant \"" + variant + "\"", () -> save(tracks, variant));
+            save.cfM("Save as New Variant \"" + variant + "\"", () -> save(tracks, variant));
          } else {
-            menu.beI("Save " + what + " as Track Preset", () -> save(tracks, base));
+            menu.cfM("Save " + what + " as Track Preset", () -> save(tracks, base));
          }
 
          Object after = tracks.get(tracks.size() - 1);
-         addPresetsMenu(menu.sCA("Add Track Preset Below \"" + clean(name(after)) + "\""), f -> load(f, after, null));
+         addPresetsMenu(menu.Hnt("Add Track Preset Below \"" + clean(name(after)) + "\""), f -> load(f, after, null));
       } catch (Throwable t) {
-         NocBrowser.log("Track presets: could not build the menu", t);
+         TrackPresets.log("Track presets: could not build the menu", t);
       }
    }
 
    // Track views (one per open project window), seen when their track headers are made.
-   private static final java.util.Set<GRp> VIEWS = java.util.Collections.newSetFromMap(
+   private static final java.util.Set<ICh> VIEWS = java.util.Collections.newSetFromMap(
       java.util.Collections.synchronizedMap(new java.util.WeakHashMap<>()));
    private static final java.util.Set<Object> MENUS = java.util.Collections.newSetFromMap(
       java.util.Collections.synchronizedMap(new java.util.WeakHashMap<>()));
 
-   private static volatile java.lang.ref.WeakReference<GRp> lastView = new java.lang.ref.WeakReference<>(null);
+   private static volatile java.lang.ref.WeakReference<ICh> lastView = new java.lang.ref.WeakReference<>(null);
 
    /** The project track views seen so far (most recent last). */
-   static List<GRp> views() {
-      List<GRp> out = new ArrayList<>();
+   static List<ICh> views() {
+      List<ICh> out = new ArrayList<>();
       synchronized (VIEWS) {
          out.addAll(VIEWS);
       }
-      GRp last = lastView.get();
+      ICh last = lastView.get();
       if (last != null) {
          out.remove(last);
          out.add(last);
@@ -97,7 +90,7 @@ public final class NocTracks {
    }
 
    /** Hook at the start of bhW(SWl): remember the project's track view (for its selected track). */
-   public static void view(GRp view) {
+   public static void view(ICh view) {
       try {
          if (view != null) {
             VIEWS.add(view);
@@ -108,17 +101,17 @@ public final class NocTracks {
    }
 
    /** Hook at the end of the arranger's right-click menu (aZn): dead space and track lanes. */
-   public static void arrangerMenu(dMt menu, Object document) {
+   public static void arrangerMenu(dKW menu, Object document) {
       try {
-         CmH doc = document instanceof CmH o ? o : null;
+         g2L doc = document instanceof g2L o ? o : null;
          if (doc == null) {
             return;
          }
-         GRp found = null;
+         ICh found = null;
          synchronized (VIEWS) {
-            for (GRp v : VIEWS) {
+            for (ICh v : VIEWS) {
                try {
-                  if (v.kys() == doc) {
+                  if (v.pYg() == doc) {
                      found = v;
                   }
                } catch (Throwable ignored) {
@@ -127,17 +120,17 @@ public final class NocTracks {
          }
          areaMenu(menu, found, doc);
       } catch (Throwable t) {
-         NocBrowser.log("Track presets: could not build the arranger menu", t);
+         TrackPresets.log("Track presets: could not build the arranger menu", t);
       }
    }
 
    /** Hook at the end of aLW's right-click menu (the arranger timeline: empty space and lanes). */
-   public static void laneMenu(dMt menu, Object timeline) {
+   public static void laneMenu(dKW menu, Object timeline) {
       try {
-         Object doc = ((aNi)timeline).np2().dNa();
+         Object doc = ((aMh)timeline).TD2().gfw();
          arrangerMenu(menu, doc);
       } catch (Throwable t) {
-         NocBrowser.log("Track presets: could not build the timeline menu", t);
+         TrackPresets.log("Track presets: could not build the timeline menu", t);
       }
    }
 
@@ -148,55 +141,55 @@ public final class NocTracks {
     */
    public static Object dropped(Object result, Object document, Object item) {
       try {
-         if (!(item instanceof Awj faq)) {
-            NocBrowser.log("Track presets: drop of " + kind(item) + ", not a library file", null);
+         if (!(item instanceof IbI faq)) {
+            TrackPresets.log("Track presets: drop of " + kind(item) + ", not a library file", null);
             return result;
          }
-         var where = faq.beI();
-         File f = where == null ? null : where.beI();
+         var where = faq.cfM();
+         File f = where == null ? null : where.cfM();
          String p = f != null ? f.getPath() : String.valueOf(where);
          p = p.replace('\\', '/').toLowerCase(Locale.ROOT);
          if (!p.contains("track presets/") || p.contains("/.previous/")) {
             return result;   // not a track preset: a project dropped as usual
          }
-         if (!(result instanceof GJy root)) {
-            NocBrowser.log("Track presets: dropped " + p + " gave " + kind(result) + ", left as is", null);
+         if (!(result instanceof ruS root)) {
+            TrackPresets.log("Track presets: dropped " + p + " gave " + kind(result) + ", left as is", null);
             return result;
          }
-         int n = root.qaW();   // top-level tracks (as when adding a preset from the menu)
-         Object first = n == 1 ? root.MgQ(0) : null;
-         if (first instanceof sJU one) {
-            NocBrowser.log("Track presets: dropped " + p + " as its track (" + kind(one) + ")", null);
+         int n = root.ugU();   // top-level tracks (as when adding a preset from the menu)
+         Object first = n == 1 ? root.FzB(0) : null;
+         if (first instanceof zwV one) {
+            TrackPresets.log("Track presets: dropped " + p + " as its track (" + kind(one) + ")", null);
             return one;
          }
-         NocBrowser.log("Track presets: dropped " + p + " (" + n + " tracks, kept as a group)", null);
+         TrackPresets.log("Track presets: dropped " + p + " (" + n + " tracks, kept as a group)", null);
       } catch (Throwable t) {
-         NocBrowser.log("Track presets: drop check failed", t);
+         TrackPresets.log("Track presets: drop check failed", t);
       }
       return result;
    }
 
    /** "0" when this dropped file is a track preset holding one track (so only that track is added), else null. */
-   static String dropIndex(CmH doc, Lpf file) {
-      File f = file.beI();
+   static String dropIndex(g2L doc, z2y file) {
+      File f = file.cfM();
       String p = (f != null ? f.getPath() : String.valueOf(file)).replace('\\', '/').toLowerCase(Locale.ROOT);
       if (!p.contains("track presets/") || p.contains("/.previous/")) {
          return null;   // a project: dropped as a group, as usual
       }
-      GJy root = doc.svk();
-      int n = root == null ? 0 : root.qaW();   // top-level tracks
+      ruS root = doc.spd();
+      int n = root == null ? 0 : root.ugU();   // top-level tracks
       if (n != 1) {
-         NocBrowser.log("Track presets: dropped " + p + " (" + n + " tracks, kept as a group)", null);
+         TrackPresets.log("Track presets: dropped " + p + " (" + n + " tracks, kept as a group)", null);
          return null;
       }
-      List<?> all = root.CtA();               // the list Bitwig picks the sub-item from
-      Object first = root.MgQ(0);
+      List<?> all = root.E1b();               // the list Bitwig picks the sub-item from
+      Object first = root.FzB(0);
       int index = all.indexOf(first);
       if (index < 0) {
-         NocBrowser.log("Track presets: dropped " + p + ": its track isn't in the list, kept as a group", null);
+         TrackPresets.log("Track presets: dropped " + p + ": its track isn't in the list, kept as a group", null);
          return null;
       }
-      NocBrowser.log("Track presets: dropped " + p + " as its track (#" + index + ")", null);
+      TrackPresets.log("Track presets: dropped " + p + " as its track (#" + index + ")", null);
       return String.valueOf(index);
    }
 
@@ -205,90 +198,90 @@ public final class NocTracks {
    }
 
    /** Hook in aYD.IYM(duK, dKG) after the "Add … Track" items of a panel's background menu. */
-   public static void panelMenu(dMt menu, Object panel) {
+   public static void panelMenu(dKW menu, Object panel) {
       try {
-         arrangerMenu(menu, ((aCZ)panel).cdX());
+         arrangerMenu(menu, ((aBW)panel).mtS());
       } catch (Throwable t) {
-         NocBrowser.log("Track presets: could not build the panel menu", t);
+         TrackPresets.log("Track presets: could not build the panel menu", t);
       }
    }
 
    /** Hook at the end of aZr's right-click menu. */
-   public static void areaMenu(dMt menu, GRp view) {
+   public static void areaMenu(dKW menu, ICh view) {
       Object d = null;
       try {
-         d = view.kys();
+         d = view.pYg();
       } catch (Throwable ignored) {
       }
-      areaMenu(menu, view, d instanceof CmH o ? o : null);
+      areaMenu(menu, view, d instanceof g2L o ? o : null);
    }
 
-   private static void areaMenu(dMt menu, GRp view, CmH doc) {
+   private static void areaMenu(dKW menu, ICh view, g2L doc) {
       try {
          if (menu == null || !MENUS.add(menu)) {
             return;   // already added to this menu
          }
          Object cursor = null;
          try {
-            cursor = view == null ? null : view.mm2();   // the selected track
+            cursor = view == null ? null : view.LIK();   // the selected track
          } catch (Throwable ignored) {
          }
          if (doc == null && cursor != null) {
             doc = document(cursor);
          }
          if (doc == null) {
-            NocBrowser.log("Track presets: menu without a project, not adding presets", null);
+            TrackPresets.log("Track presets: menu without a project, not adding presets", null);
             return;
          }
-         final Object after = cursor instanceof zCn && document(cursor) == doc ? cursor : null;
-         final CmH into = doc;
-         menu.fpX();
+         final Object after = cursor instanceof WSA && document(cursor) == doc ? cursor : null;
+         final g2L into = doc;
+         menu.ELS();
          String where = after == null ? " (at the End)" : " Below \"" + clean(name(after)) + "\"";
-         addPresetsMenu(menu.sCA("Add Track Preset" + where), f -> load(f, after, into));
+         addPresetsMenu(menu.Hnt("Add Track Preset" + where), f -> load(f, after, into));
       } catch (Throwable t) {
-         NocBrowser.log("Track presets: could not build the arranger menu", t);
+         TrackPresets.log("Track presets: could not build the arranger menu", t);
       }
    }
 
    /** Collections that hold track presets (as submenus), then all presets, then the folder. */
-   private static void addPresetsMenu(dMt insert, java.util.function.Consumer<File> pick) {
+   private static void addPresetsMenu(dKW insert, java.util.function.Consumer<File> pick) {
       File[] presets = presets();
       if (presets.length == 0) {
-         insert.beI("(none saved yet: right-click a track > Save Track as Track Preset)", () -> {
+         insert.cfM("(none saved yet: right-click a track > Save Track as Track Preset)", () -> {
          });
       }
       try {
-         for (Object o : EN.unz().sBA()) {
-            if (!(o instanceof GS fw)) {
+         for (Object o : EE.UNj().Cuu()) {
+            if (!(o instanceof GK fw)) {
                continue;
             }
             List<File> in = new ArrayList<>();
             for (File f : presets) {
                try {
-                  if (fw.beI(new Lpf(f))) {
+                  if (fw.cfM(new z2y(f))) {
                      in.add(f);
                   }
                } catch (Throwable ignored) {
                }
             }
             if (!in.isEmpty()) {
-               dMt sub = insert.sCA(String.valueOf(fw.BBg()).replace("/", "  ›  "));
+               dKW sub = insert.Hnt(String.valueOf(fw.IwV()).replace("/", "  ›  "));
                for (File f : in) {
-                  sub.beI(title(f), () -> pick.accept(f));
+                  sub.cfM(title(f), () -> pick.accept(f));
                }
             }
          }
       } catch (Throwable t) {
-         NocBrowser.log("Track presets: could not list collections", t);
+         TrackPresets.log("Track presets: could not list collections", t);
       }
       if (presets.length > 0) {
-         insert.fpX();
+         insert.ELS();
       }
       for (File f : presets) {
-         insert.beI(title(f), () -> pick.accept(f));
+         insert.cfM(title(f), () -> pick.accept(f));
       }
-      insert.fpX();
-      insert.beI("Open Track Presets Folder", NocTracks::openFolder);
+      insert.ELS();
+      insert.cfM("Open Track Presets Folder", NocTracks::openFolder);
    }
 
    /** "Name 2", "Name 3"… : the first that isn't saved yet. */
@@ -303,16 +296,16 @@ public final class NocTracks {
       }
    }
 
-   private static List<Object> selected(bju header) {
+   private static List<Object> selected(big header) {
       List<Object> out = new ArrayList<>();
       try {
-         for (Object o : header.unz().MgQ()) {
-            if (o instanceof zCn) {
+         for (Object o : header.UNj().FzB()) {
+            if (o instanceof WSA) {
                out.add(o);
             }
          }
       } catch (Throwable t) {
-         NocBrowser.log("Track presets: no track selection", t);
+         TrackPresets.log("Track presets: no track selection", t);
       }
       return out;
    }
@@ -322,9 +315,9 @@ public final class NocTracks {
    static void save(List<Object> tracks, String base) {
       try {
          Object first = tracks.get(0);
-         CmH src = document(first);
+         g2L src = document(first);
          if (src == null) {
-            NocBrowser.log("Track presets: can't find the project of this track (" + first.getClass().getName() + ")", null);
+            TrackPresets.log("Track presets: can't find the project of this track (" + first.getClass().getName() + ")", null);
             return;
          }
 
@@ -341,12 +334,12 @@ public final class NocTracks {
 
          // A new, unopened project holding copies of the tracks (as Bitwig does for .bwclip files and
          // for dragging tracks onto a new project tab).
-         CmH doc = CmH.qbl();
-         doc.byf(src.ckt());
+         g2L doc = g2L.qwJ();
+         doc.TMF(src.nfq());
          try {
-            doc.svk().IvP(src.svk().eAA().ccv().unz());
+            doc.spd().HL(src.spd().jOH().fFs().UNj());
          } catch (Throwable t) {
-            NocBrowser.log("Track presets: tempo not copied", t);
+            TrackPresets.log("Track presets: tempo not copied", t);
          }
          final File target = out;
          final boolean[] written = {false};
@@ -358,40 +351,40 @@ public final class NocTracks {
                written[0] = true;
             }
             try {
-               int n = doc.svk().qaW();
-               JSA.sCA().Gef(doc, target);
-               NocBrowser.log("Track presets: saved " + n + " of " + tracks.size() + " track(s) to " + target
+               int n = doc.spd().ugU();
+               Uev.Hnt().MRY(doc, target);
+               TrackPresets.log("Track presets: saved " + n + " of " + tracks.size() + " track(s) to " + target
                   + (n == 0 ? " (EMPTY: tracks " + describe(tracks, src) + ")" : ""), null);
                // Plug-in states live in separate files; put them inside the preset like a saved project does.
                Thread t = new Thread(() -> embedPluginStates(target), "Track preset plug-in states");
                t.setDaemon(true);
                t.start();
             } catch (Throwable t) {
-               NocBrowser.log("Track presets: writing " + target + " failed", t);
+               TrackPresets.log("Track presets: writing " + target + " failed", t);
             }
          };
          // Copying can finish later (plug-in states come from the audio engine): write when it's done.
-         doc.svk().beI(new ArrayList<Object>(tracks), 0, true, new PPR() {
+         doc.spd().cfM(new ArrayList<Object>(tracks), 0, true, new oRV() {
             @Override
-            public void beI(Object result) {
-               Fx.Gef(write);
+            public void cfM(Object result) {
+               Fq.MRY(write);
             }
 
             @Override
-            public void beI(Exception e) {
-               NocBrowser.log("Track presets: copying the track failed", e);
-               Fx.Gef(write);
+            public void cfM(Exception e) {
+               TrackPresets.log("Track presets: copying the track failed", e);
+               Fq.MRY(write);
             }
          }, null);
          // In case the copy never reports back.
          new java.util.Timer(true).schedule(new java.util.TimerTask() {
             @Override
             public void run() {
-               Fx.beI(write);
+               Fq.cfM(write);
             }
          }, 8000);
       } catch (Throwable t) {
-         NocBrowser.log("Track presets: save failed", t);
+         TrackPresets.log("Track presets: save failed", t);
       }
    }
 
@@ -407,9 +400,9 @@ public final class NocTracks {
    static void embedPluginStates(File target) {
       File dir;
       try {
-         dir = XAe.cCV();
+         dir = iJW.Nnn();
       } catch (Throwable t) {
-         NocBrowser.log("Track presets: plug-in state folder not found", t);
+         TrackPresets.log("Track presets: plug-in state folder not found", t);
          return;
       }
       embedPluginStates(target, dir);
@@ -419,7 +412,7 @@ public final class NocTracks {
       try {
          byte[] data = java.nio.file.Files.readAllBytes(target.toPath());
          if (data.length < 40 || data[0] != 'B' || data[1] != 't' || data[2] != 'W' || data[3] != 'g') {
-            NocBrowser.log("Track presets: " + target.getName() + " has an unexpected header; plug-in states not added", null);
+            TrackPresets.log("Track presets: " + target.getName() + " has an unexpected header; plug-in states not added", null);
             return;
          }
          long resources = Long.parseLong(new String(data, 24, 16, java.nio.charset.StandardCharsets.US_ASCII), 16);
@@ -472,7 +465,7 @@ public final class NocTracks {
             }
          }
          if (added == 0) {
-            NocBrowser.log("Track presets: no plug-in state files found for " + target.getName() + " (missing " + missing + ")", null);
+            TrackPresets.log("Track presets: no plug-in state files found for " + target.getName() + " (missing " + missing + ")", null);
             return;
          }
          byte[] header = String.format("%016x", (long)data.length).getBytes(java.nio.charset.StandardCharsets.US_ASCII);
@@ -483,89 +476,107 @@ public final class NocTracks {
             zipBytes.writeTo(out);
          }
          java.nio.file.Files.move(tmp.toPath(), target.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-         NocBrowser.log("Track presets: added " + added + " plug-in state(s) to " + target.getName()
+         TrackPresets.log("Track presets: added " + added + " plug-in state(s) to " + target.getName()
             + (missing.isEmpty() ? "" : " (still missing " + missing + ")"), null);
       } catch (Throwable t) {
-         NocBrowser.log("Track presets: could not add plug-in states to " + target, t);
+         TrackPresets.log("Track presets: could not add plug-in states to " + target, t);
       }
    }
 
    // ------------------------------------------------------------------ load
 
-   static void load(File file, Object after, CmH project) {
+   static void load(File file, Object after, g2L project) {
       try {
-         CmH dst = after != null ? document(after) : project;
+         g2L dst = after != null ? document(after) : project;
          if (dst == null) {
-            NocBrowser.log("Track presets: can't find the project to insert into", null);
+            TrackPresets.log("Track presets: can't find the project to insert into", null);
             return;
          }
          try {
-            gwa.beI(file);   // unpack the preset's plug-in states (as Bitwig does for packaged files)
+            qBz.cfM(file);   // unpack the preset's plug-in states (as Bitwig does for packaged files)
          } catch (Throwable ignored) {
             // no plug-in states inside (older preset or none needed)
          }
-         CmH preset = CmH.beI(file, XAe.unz());
-         GJy from = preset.svk();
+         g2L preset = g2L.cfM(file, iJW.UNj());
+         ruS from = preset.spd();
          List<Object> tracks = new ArrayList<>();
-         for (int i = 0; i < from.qaW(); i++) {
-            tracks.add(from.MgQ(i));
+         for (int i = 0; i < from.ugU(); i++) {
+            tracks.add(from.FzB(i));
          }
          if (tracks.isEmpty()) {
-            NocBrowser.log("Track presets: " + file.getName() + " has no tracks", null);
+            TrackPresets.log("Track presets: " + file.getName() + " has no tracks", null);
             return;
          }
 
-         GJy into = dst.svk();
-         int at = into.qaW();
+         ruS into = dst.spd();
+         int at = into.ugU();
          try {
-            int i = after == null ? -1 : into.MgQ((zCn)after);
+            int i = after == null ? -1 : into.FzB((WSA)after);
             if (i >= 0) {
                at = i + 1;
             }
          } catch (Throwable ignored) {
             // nested track (inside a group): add at the end of the project
          }
-         into.MgQ(tracks, at, true, null);
-         NocBrowser.log("Track presets: inserted " + tracks.size() + " track(s) from " + file.getName() + " at " + at, null);
+         into.FzB(tracks, at, true, null);
+         TrackPresets.log("Track presets: inserted " + tracks.size() + " track(s) from " + file.getName() + " at " + at, null);
       } catch (Throwable t) {
-         NocBrowser.log("Track presets: insert failed", t);
+         TrackPresets.log("Track presets: insert failed", t);
       }
    }
 
    // ------------------------------------------------------------------ Tracks sidebar button
 
    /** Browser button listing the track presets (projects in My Library/Track Presets). */
-   static final class Source extends Wc {
+   static final class Source extends Vu {
       @Override
-      public String ymo() {
+      public String E3() {
          return "suite_tracks";
       }
 
       @Override
-      public String io_() {
+      public String in_() {
          return "Tracks";
       }
 
       @Override
-      public List MgQ() {
+      public List FzB() {
          return List.of("tracks", "track presets");
       }
 
       @Override
-      public java.util.Set scr() {
-         return java.util.Set.of(qV.ymo);   // projects
+      public java.util.Set wGc() {
+         return java.util.Set.of(qD.E3);   // projects
+      }
+
+      /** The button's image (the Browser mod can replace it with an icon of the user's choice). */
+      @Override
+      public java.net.URI hUR() {
+         java.net.URI bitwig = null;
+         try {
+            bitwig = super.hUR();   // the Browser mod puts an icon chosen for @tracks here
+            if (bitwig != null && "file".equals(bitwig.getScheme()) && new File(bitwig).isFile()) {
+               return bitwig;
+            }
+         } catch (Throwable ignored) {
+         }
+         try {
+            return TrackPresets.MOD.resource("icons").resolve("tracks.png").toUri();
+         } catch (Throwable t) {
+            return bitwig;
+         }
       }
 
       @Override
-      public WX Heb() {
-         return WX.Gef;
+      public Wo TtY() {
+         return Wo.MRY;
       }
 
       @Override
-      public jma Gef(EN dn) {
+      public M22 MRY(EE dn) {
          if (!asked) {
             asked = true;
-            NocBrowser.log("Tracks button: searching for track presets", null);
+            TrackPresets.log("Tracks button: searching for track presets", null);
          }
          return PresetsOnly.INSTANCE;
       }
@@ -573,95 +584,95 @@ public final class NocTracks {
 
    private static volatile boolean asked;
 
-   public static Wc source() {
+   public static Vu source() {
       return SOURCE;
    }
 
    /** Matches files under a "Track Presets" folder; judged per file. */
-   static final class PresetsOnly extends jma {
+   static final class PresetsOnly extends M22 {
       static final PresetsOnly INSTANCE = new PresetsOnly();
 
       @Override
-      public AKW beI(ZWh cursor, oiy context) {
+      public nCp cfM(pAe cursor, Ihc context) {
          return new InFolder(cursor);
       }
 
       @Override
-      public void a_(vQq out) {
+      public void a_(gJi out) {
       }
 
       @Override
-      public boolean beI(jma other) {
+      public boolean cfM(M22 other) {
          return other instanceof PresetsOnly;
       }
 
       @Override
-      public int Gef() {
+      public int MRY() {
          return 3;
       }
 
       @Override
-      public void beI(List list) {
+      public void cfM(List list) {
       }
 
       @Override
-      public java.util.Set beI(xme kind) {
+      public java.util.Set cfM(flj kind) {
          return null;
       }
    }
 
 
-   static final class InFolder extends AKW {
-      private final ZWh cursor;
+   static final class InFolder extends nCp {
+      private final pAe cursor;
 
-      InFolder(ZWh cursor) {
+      InFolder(pAe cursor) {
          this.cursor = cursor;
       }
 
       @Override
-      public void beI() {
+      public void cfM() {
       }
 
       @Override
-      public QlC beI(QlC parent) {
-         return QlC.Gef;   // decide per file
+      public INH cfM(INH parent) {
+         return INH.MRY;   // decide per file
       }
 
       @Override
-      public void sCA() {
+      public void Hnt() {
       }
 
       @Override
-      public boolean Gef() {
+      public boolean MRY() {
          return isPreset(cursor);
       }
    }
 
    /** True for a browser item stored under a "Track Presets" folder. */
-   static boolean isPreset(ZWh cursor) {
+   static boolean isPreset(pAe cursor) {
       String full = "", dir = "", name = "", root = "";
       try {
          try {
-            full = String.valueOf(cursor.Bqk());   // path inside the location, folders included
+            full = String.valueOf(cursor.lYc());   // path inside the location, folders included
          } catch (Throwable ignored) {
          }
          try {
-            dir = String.valueOf(cursor.BBg());
+            dir = String.valueOf(cursor.IwV());
          } catch (Throwable ignored) {
          }
          try {
-            name = String.valueOf(cursor.unz());
+            name = String.valueOf(cursor.UNj());
          } catch (Throwable ignored) {
          }
          try {
-            Ff dd = ((PE)cursor).BZt();
-            root = dd == null || dd.neH() == null ? "" : dd.neH().getPath();
+            EX dd = ((Ph)cursor).UZr();
+            root = dd == null || dd.MJ() == null ? "" : dd.MJ().getPath();
          } catch (Throwable ignored) {
          }
          String all = ("/" + root + "/" + full + "|/" + root + "/" + dir + "/" + name).replace('\\', '/').toLowerCase(Locale.ROOT);
          boolean in = !all.contains("/.previous/") && all.contains("/track presets/");
          if (SEEN.size() < 12 && SEEN.add(full + "|" + dir)) {
-            NocBrowser.log("Tracks: project item path='" + full + "' dir='" + dir + "' name='" + name + "' in '" + root + "' -> " + in, null);
+            TrackPresets.log("Tracks: project item path='" + full + "' dir='" + dir + "' name='" + name + "' in '" + root + "' -> " + in, null);
          }
          return in;
       } catch (Throwable t) {
@@ -672,15 +683,15 @@ public final class NocTracks {
    private static final java.util.Set<String> SEEN = java.util.concurrent.ConcurrentHashMap.newKeySet();
 
    /** Hook at the start of cAX(qg...): the main browser also searches projects, so track presets can show. */
-   public static qV[] kinds(qV[] kinds) {
+   public static qD[] kinds(qD[] kinds) {
       try {
-         for (qV k : kinds) {
-            if (k == qV.ymo) {
+         for (qD k : kinds) {
+            if (k == qD.E3) {
                return kinds;
             }
          }
-         qV[] out = Arrays.copyOf(kinds, kinds.length + 1);
-         out[kinds.length] = qV.ymo;
+         qD[] out = Arrays.copyOf(kinds, kinds.length + 1);
+         out[kinds.length] = qD.E3;
          return out;
       } catch (Throwable t) {
          return kinds;
@@ -689,19 +700,19 @@ public final class NocTracks {
 
    // ------------------------------------------------------------------ helpers
 
-   private static String describe(List<Object> tracks, CmH src) {
+   private static String describe(List<Object> tracks, g2L src) {
       StringBuilder b = new StringBuilder();
       for (Object t : tracks) {
-         CmH d = document(t);
+         g2L d = document(t);
          b.append(t.getClass().getSimpleName()).append(d == src ? " in this project" : d == null ? " no project" : " in another project").append("; ");
       }
       return b.toString();
    }
 
-   private static CmH document(Object track) {
+   private static g2L document(Object track) {
       try {
-         Object d = ((zCn)track).z3j();
-         return d instanceof CmH o ? o : null;
+         Object d = ((WSA)track).apV();
+         return d instanceof g2L o ? o : null;
       } catch (Throwable t) {
          return null;
       }
@@ -709,7 +720,7 @@ public final class NocTracks {
 
    private static String name(Object track) {
       try {
-         String n = ((qAF)track).cc_();
+         String n = ((iYN)track).cb_();
          return n == null || n.isBlank() ? "Track" : n;
       } catch (Throwable t) {
          return "Track";
@@ -724,48 +735,22 @@ public final class NocTracks {
    /** <My Library>/Track Presets, so Bitwig's browser indexes the presets (as projects). */
    static File folder() {
       try {
-         EN dn = EN.unz();
-         for (List<?> list : List.of(dn.fmw(), dn.BZt(), dn.qJX(), dn.jTT(), dn.CtA())) {
+         EE dn = EE.UNj();
+         for (List<?> list : List.of(dn.OzW(), dn.UZr(), dn.NC(), dn.BNq(), dn.E1b())) {
             for (Object o : list) {
-               if (o instanceof Ff dd && "MY_LIBRARY".equals(String.valueOf(dd.ymo())) && dd.neH() != null) {
-                  return new File(dd.neH(), "Track Presets");
+               if (o instanceof EX dd && "MY_LIBRARY".equals(String.valueOf(dd.E3())) && dd.MJ() != null) {
+                  return new File(dd.MJ(), "Track Presets");
                }
             }
          }
       } catch (Throwable t) {
-         NocBrowser.log("Track presets: My Library not found", t);
+         TrackPresets.log("Track presets: My Library not found", t);
       }
       return new File(System.getProperty("user.home"), "Documents/Bitwig Studio/Library/Track Presets");
    }
 
-   /** The 0.8.0 test build saved .bwtrack files elsewhere: move them in once. */
-   private static void migrate(File dir) {
-      try {
-         File collections = NocCollectionFolders.collectionsDir();
-         if (collections == null || collections.getParentFile() == null) {
-            return;
-         }
-         File old = new File(collections.getParentFile().getParentFile(), "track-presets");
-         File[] files = old.listFiles(f -> f.getName().toLowerCase(Locale.ROOT).endsWith(OLD_EXT));
-         if (files == null) {
-            return;
-         }
-         dir.mkdirs();
-         for (File f : files) {
-            String base = f.getName().substring(0, f.getName().length() - OLD_EXT.length());
-            File to = new File(dir, base + EXT);
-            if (!to.exists()) {
-               java.nio.file.Files.move(f.toPath(), to.toPath());
-            }
-         }
-      } catch (Throwable t) {
-         NocBrowser.log("Track presets: could not move old presets", t);
-      }
-   }
-
    static File[] presets() {
       File dir = folder();
-      migrate(dir);
       File[] all = dir.listFiles(f -> f.isFile() && f.getName().toLowerCase(Locale.ROOT).endsWith(EXT));
       if (all == null) {
          return new File[0];
@@ -783,9 +768,166 @@ public final class NocTracks {
       try {
          File dir = folder();
          dir.mkdirs();
-         new ProcessBuilder("explorer.exe", dir.getAbsolutePath()).start();
+         new ProcessBuilder(TrackPresets.fileManager(), dir.getAbsolutePath()).start();
       } catch (Throwable t) {
-         NocBrowser.log("Track presets: could not open " + folder(), t);
+         TrackPresets.log("Track presets: could not open " + folder(), t);
+      }
+   }
+
+   // ------------------------------------------------------------------ the Tracks button
+
+   private static final java.util.Set<Object> PINNED = java.util.Collections.newSetFromMap(
+      java.util.Collections.synchronizedMap(new java.util.WeakHashMap<>()));
+   private static volatile java.lang.ref.WeakReference<YO> mainPalette = new java.lang.ref.WeakReference<>(null);
+
+   /**
+    * A browser's sidebar buttons (quick sources) were asked for: Tracks goes on the main browser's, every session
+    * (Bitwig drops buttons it doesn't know when it starts without this mod), unless it's hidden from the menu.
+    * A popup browser's sidebar never gets it.
+    */
+   static void ensurePinned(YO p, boolean main) {
+      try {
+         if (p == null) {
+            return;
+         }
+         if (main) {
+            mainPalette = new java.lang.ref.WeakReference<>(p);
+         }
+         if (!PINNED.add(p)) {
+            return;
+         }
+         int at = p.cfM((Wl)SOURCE);
+         if (main) {
+            if (TrackPresets.buttonShown() && at < 0) {
+               p.cfM(YS.cfM(SOURCE), p.tp2());   // pin it at the end
+            }
+         } else if (at >= 0) {
+            p.MRY((Wl)SOURCE);   // pinned there by an earlier version: track presets are main-browser only
+         }
+      } catch (Throwable t) {
+         TrackPresets.log("Could not pin the Tracks button", t);
+      }
+   }
+
+   /** Show or hide the Tracks button (the browser's right-click menu). */
+   static void browserMenu(dKW menu) {
+      boolean shown = TrackPresets.buttonShown();
+      menu.cfM((shown ? "Hide" : "Show") + " Tracks Button", () -> {
+         TrackPresets.setButtonShown(!shown);
+         try {
+            YO p = mainPalette.get();
+            if (p != null) {
+               if (shown) {
+                  p.MRY((Wl)SOURCE);                          // unpin it
+               } else if (p.cfM((Wl)SOURCE) < 0) {
+                  p.cfM(YS.cfM(SOURCE), p.tp2());           // pin it at the end
+               }
+            }
+         } catch (Throwable t) {
+            TrackPresets.log("Could not change the sidebar", t);
+         }
+      });
+   }
+
+   /** The browser switched to Tracks: open its Location column, where the preset folders are. */
+   static void sourceChosen(Jp session) {
+      try {
+         Wl now = session.Scv();
+         if (now != SOURCE) {
+            return;
+         }
+         Fq.cfM(() -> {
+            try {
+               if (session.Scv() == now) {
+                  now.MRY(session);   // open the source's own column (Location)
+               }
+            } catch (Throwable t) {
+               TrackPresets.log("Could not open the Location column", t);
+            }
+         });
+      } catch (Throwable t) {
+         TrackPresets.log("source chosen", t);
+      }
+   }
+
+   // ------------------------------------------------------------------ projects: track presets only
+
+   /** The browser's query, with projects (which the main browser now lists) kept to track presets. */
+   static M22 presetsOnly(M22 query) {
+      return query == null || query instanceof PresetsQuery ? query : new PresetsQuery(query);
+   }
+
+   static final class PresetsQuery extends M22 {
+      final M22 inner;
+
+      PresetsQuery(M22 inner) {
+         this.inner = inner;
+      }
+
+      @Override
+      public nCp cfM(pAe cursor, Ihc context) {
+         nCp m = inner.cfM(cursor, context);
+         if (m == null || !(cursor instanceof Nv)) {   // Nv: a project in the browser
+            return m;
+         }
+         return new PresetMatch(m, cursor);
+      }
+
+      @Override
+      public void a_(gJi out) {
+         inner.a_(out);
+      }
+
+      @Override
+      public boolean cfM(M22 other) {
+         return other instanceof PresetsQuery q && inner.equals(q.inner);
+      }
+
+      @Override
+      public int MRY() {
+         return inner.MRY();
+      }
+
+      @Override
+      public void cfM(List list) {
+         inner.cfM(list);
+      }
+
+      @Override
+      public java.util.Set cfM(flj kind) {
+         return inner.cfM(kind);
+      }
+   }
+
+   /** The original matcher, judged per file: a project matches only when it's a track preset. */
+   static final class PresetMatch extends nCp {
+      private final nCp inner;
+      private final pAe cursor;
+
+      PresetMatch(nCp inner, pAe cursor) {
+         this.inner = inner;
+         this.cursor = cursor;
+      }
+
+      @Override
+      public void cfM() {
+         inner.cfM();
+      }
+
+      @Override
+      public INH cfM(INH parent) {
+         INH s = inner.UNj();   // enter the directory in the original matcher
+         return s == INH.cfM ? INH.MRY : s;
+      }
+
+      @Override
+      public void Hnt() {
+         inner.hUR();           // leave the directory in the original matcher
+      }
+
+      @Override
+      public boolean MRY() {
+         return inner.IwV() && isPreset(cursor);
       }
    }
 }

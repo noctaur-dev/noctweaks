@@ -30,6 +30,6 @@ Part of **NocTweaks** by noctaur. Edit any track in the piano roll without going
 
 ## Notes
 
-- Bitwig 6.1.7 (Windows) only for now; on other versions Patchbay shows it as
-  not available.
+- Built against Bitwig 6.1.4, Patchbay's reference version, so Patchbay can run it on every Bitwig version it
+  supports (6.0 to 6.1.7) on Windows, macOS and Linux. So far it has only been tested on Windows with 6.1.7.
 - Not affiliated with Bitwig: an unofficial community project, not made, endorsed or supported by Bitwig GmbH.

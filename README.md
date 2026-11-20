@@ -5,11 +5,14 @@ Mods for [Bitwig Studio](https://www.bitwig.com), for the
 
 | Mod | What it does |
 | --- | --- |
-| [**Global Track View**](noctweaks-global-track-view) | Edit any track in the piano roll without going back to the arranger: an *Edit Tracks* menu, layered editing on when several tracks are open, and the Track List panel in the Edit screen. |
-| [**Expression Controls**](noctweaks-expression-controls) | Draw shapes over note expression points, simplify and melt them, copy an expression shape onto automation, Ctrl+drag to copy points, and the edit modes one click away. |
-| [**Browser Improvements**](noctweaks-browser-improvements) | Folders and nested collections, your own icons (Lucide), collections pinned as quick sources, a Tracks button for track presets, and each plugin listed once. |
+| [**Global Track View**](noctweaks-global-track-view) | Edit any track in the piano roll without going back to the arranger: the Track List panel in the Edit screen, an *Edit Tracks* menu, and layered editing when several tracks are open. |
+| [**Expression Controls**](noctweaks-expression-controls) | Draw shapes over note expression points, simplify and melt them, copy an expression shape onto automation, and Ctrl+drag to copy points. |
+| [**Edit Modes Strip**](noctweaks-edit-modes) | The editor's edit modes (note expressions, or Stretch, Gain, Pan and so on for audio) as a strip of buttons, each one click away. |
+| [**Browser: Collections and Icons**](noctweaks-browser-improvements) | Folders and nested collections, your own icons (Lucide), collections pinned as quick sources, and each plugin listed once. |
+| [**Track Presets**](noctweaks-track-presets) | Save whole tracks as presets and add them back into any project, with a Tracks button in the browser to drag them in. Experimental. |
 
-Each mod is separate: install only the ones you want.
+Each mod is separate: install only the ones you want. Each one changes as little of Bitwig as it can, so it's
+less likely to clash with other mods.
 
 > **Not affiliated with Bitwig.** NocTweaks is an unofficial, community-made mod, built via the known LLM patches and then ported over to PatchBay.
 > It isn't made, endorsed or supported by Bitwig GmbH. "Bitwig" and "Bitwig Studio" are
@@ -26,7 +29,7 @@ To update, add the newer zip the same way.
 
 ## Tested with
 
-Only tested alongside these Patchbay frameworks, all enabled together with the three NocTweaks mods:
+Only tested alongside these Patchbay frameworks, all enabled together with the NocTweaks mods:
 
 | Framework | Version |
 | --- | --- |
@@ -46,8 +49,10 @@ issue saying which one.
 
 ## Bitwig versions
 
-Bitwig **6.1.7** (Windows) only for now. The mods follow Patchbay: when Patchbay moves to a new Bitwig
-version, they'll be updated to match.
+The mods are built against Bitwig **6.1.4**, Patchbay's reference version. Patchbay translates them to every
+version it supports (6.0 up to 6.1.7) on **Windows, macOS and Linux**. So far they've only been tested on
+Windows with 6.1.7. If one doesn't work on your setup, please open an issue with your platform and Bitwig
+version.
 
 ## Building from source
 

@@ -47,32 +47,32 @@ public final class NocBrowser {
    // ------------------------------------------------------------------ source
 
    /** Bitwig built-in style source: only Collections and its folders in the Location column. */
-   static final class Source extends Wc {
+   static final class Source extends Vu {
       @Override
-      public String ymo() {
+      public String E3() {
          return SOURCE_ID;
       }
 
       @Override
-      public String io_() {
+      public String in_() {
          return "Collections";
       }
 
       @Override
-      public List MgQ() {
+      public List FzB() {
          return List.of("collections", "folders");
       }
 
       @Override
-      public Set scr() {
-         return nEh.beI(qV.class);
+      public Set wGc() {
+         return ztR.cfM(qD.class);
       }
 
       /** Open the Location column automatically when the button is clicked. */
       @Override
-      public DL beI(Jy ij) {
+      public DC cfM(Jp ij) {
          try {
-            return ij.vUU();
+            return ij.tB1();
          } catch (Throwable t) {
             log("Could not open the Location column", t);
             return null;
@@ -80,22 +80,22 @@ public final class NocBrowser {
       }
 
       @Override
-      public WX Heb() {
-         return WX.Gef;
+      public Wo TtY() {
+         return Wo.MRY;
       }
 
       @Override
-      public jma Gef(EN dn) {
+      public M22 MRY(EE dn) {
          try {
-            List<jma> queries = new ArrayList<>();
-            GS favorites = dn.QDQ();
+            List<M22> queries = new ArrayList<>();
+            GK favorites = dn.MJs();
             if (favorites != null) {
-               queries.add(favorites.byf());
+               queries.add(favorites.TMF());
             }
-            for (Object o : dn.sBA()) {
-               queries.add(((Hc)o).byf());
+            for (Object o : dn.Cuu()) {
+               queries.add(((GT)o).TMF());
             }
-            return queries.isEmpty() ? null : JUW.beI((Collection)queries);
+            return queries.isEmpty() ? null : zvZ.cfM((Collection)queries);
          } catch (Throwable t) {
             log("Collections source query failed", t);
             return null;
@@ -109,19 +109,19 @@ public final class NocBrowser {
     * preset folder button (Bitwig's "device_hotswap" popup, aXz): if it was left on Collections or Tracks,
     * open it in Everything so all of the device's presets show. Other popups keep Bitwig's own setting.
     */
-   public static void popupOpening(Jy ij, Object popup) {
+   public static void popupOpening(Jp ij, Object popup) {
       try {
-         if (ij == null || !(popup instanceof aYN p)) {
+         if (ij == null || !(popup instanceof aXu p)) {
             return;
          }
-         Object target = p.Bqk();
-         if (!(target instanceof aYX) && !(p.byf() instanceof aYX)) {
+         Object target = p.lYc();
+         if (!(target instanceof aXE) && !(p.TMF() instanceof aXE)) {
             return;
          }
-         WV current = ij.GKF();
-         String id = current == null ? null : current.beI();
-         if (id != null && (id.equals(((WV)SOURCE).beI()) || id.equals(((WV)NocTracks.SOURCE).beI()))) {
-            ij.beI((WV)Wn.Bqk());
+         Wl current = ij.Scv();
+         String id = current == null ? null : current.cfM();
+         if (id != null && (id.equals(((Wl)SOURCE).cfM()) || id.equals(TRACKS_ID))) {
+            ij.cfM((Wl)VF.lYc());
          }
       } catch (Throwable t) {
          log("Could not switch the device preset browser to Everything", t);
@@ -192,12 +192,12 @@ public final class NocBrowser {
             b.append(i == 0 ? "" : " in ").append(w.getClass().getName());
             Object up = null;
             try {
-               up = ((dxu)w).oRH();
+               up = ((dvW)w).RbC();
             } catch (Throwable ignored) {
             }
             if (up == null) {
                try {
-                  up = ((dxu)w).neH();
+                  up = ((dvW)w).MJ();
                } catch (Throwable ignored) {
                }
             }
@@ -216,20 +216,20 @@ public final class NocBrowser {
          if (tracing == null) {
             tracing = new File(stateDir(), "trace-menus").exists();
          }
-         if (!tracing || !(widget instanceof dDG n) || TRACED.size() > 200) {
+         if (!tracing || !(widget instanceof dCm n) || TRACED.size() > 200) {
             return;
          }
          List<String> opts = new ArrayList<>();
-         n.beI((java.util.function.Consumer<Object>)o -> opts.add(o == null ? "null" : o.getClass().getName() + "=" + o));
+         n.cfM((java.util.function.Consumer<Object>)o -> opts.add(o == null ? "null" : o.getClass().getName() + "=" + o));
          String value = "?";
          try {
-            Object v = n.ERa();
+            Object v = n.evx();
             value = v == null ? "null" : v.getClass().getName() + "=" + v;
          } catch (Throwable ignored) {
          }
          String cur = "?";
          try {
-            Object c = n.vYz();
+            Object c = n.urM();
             cur = c == null ? "null" : c.getClass().getName() + "=" + c;
          } catch (Throwable ignored) {
          }
@@ -243,12 +243,25 @@ public final class NocBrowser {
       }
    }
 
-   public static Wc source() {
+   /** The Track Presets mod's sidebar button (its id): its icon can be set here, and it isn't a collection. */
+   static final String TRACKS_ID = "suite_tracks";
+   /** True once the Track Presets mod's button has been seen. */
+   static volatile boolean tracksButton;
+
+   static boolean isTracks(Object source) {
+      try {
+         return source instanceof Wl w && TRACKS_ID.equals(w.cfM());
+      } catch (Throwable t) {
+         return false;
+      }
+   }
+
+   public static Vu source() {
       return SOURCE;
    }
 
-   public static String label(SRR owner) {
-      return owner == SOURCE ? "Collections" : owner == NocTracks.SOURCE ? "Tracks" : null;
+   public static String label(zTz owner) {
+      return owner == SOURCE ? "Collections" : null;
    }
 
    // ------------------------------------------------------------------ sidebar pin
@@ -257,9 +270,9 @@ public final class NocBrowser {
    private static Boolean pinThisSession;
 
    /** The quick sources (the sidebar's pinned buttons), as last seen. */
-   private static volatile java.lang.ref.WeakReference<ZI> palette = new java.lang.ref.WeakReference<>(null);
+   private static volatile java.lang.ref.WeakReference<YO> palette = new java.lang.ref.WeakReference<>(null);
 
-   static ZI palette() {
+   static YO palette() {
       return palette.get();
    }
 
@@ -277,13 +290,13 @@ public final class NocBrowser {
          } else {
             Files.deleteIfExists(f.toPath());
          }
-         ZI p = palette();
+         YO p = palette();
          if (p != null) {
-            WV source = "collections".equals(which) ? SOURCE : NocTracks.SOURCE;
+            Wl source = SOURCE;
             if (hide) {
-               p.Gef(source);                       // unpin it
-            } else if (p.beI(source) < 0) {
-               p.beI(ZO.beI(source), p.mEL());     // pin it at the end
+               p.MRY(source);                       // unpin it
+            } else if (p.cfM(source) < 0) {
+               p.cfM(YS.cfM(source), p.tp2());     // pin it at the end
             }
          }
       } catch (Throwable t) {
@@ -296,7 +309,7 @@ public final class NocBrowser {
     * Bitwig drops buttons it doesn't know when it starts without this mod, so this runs every session instead
     * of once; hiding a button from the browser's menu (Sidebar Buttons) keeps it off.
     */
-   public static void ensurePinned(ZI p, boolean main) {
+   public static void ensurePinned(YO p, boolean main) {
       try {
          if (p == null) {
             return;
@@ -308,21 +321,12 @@ public final class NocBrowser {
             return;
          }
          synchronized (PINNED_NOW) {
-            for (Hc c : PINNED_NOW) {
+            for (GT c : PINNED_NOW) {
                pinInto(p, c);
             }
          }
-         if (!hidden("collections") && p.beI((WV)SOURCE) < 0) {
-            p.beI(ZO.beI(SOURCE), p.mEL());
-         }
-         int tracks = p.beI((WV)NocTracks.SOURCE);
-         if (main) {
-            if (!hidden("tracks") && tracks < 0) {
-               p.beI(ZO.beI(NocTracks.SOURCE), p.mEL());
-            }
-         } else if (tracks >= 0) {
-            p.Gef((WV)NocTracks.SOURCE);   // pinned there by an earlier version: track presets are main-browser only
-            log("Took the Tracks button off a popup browser's sidebar", null);
+         if (!hidden("collections") && p.cfM((Wl)SOURCE) < 0) {
+            p.cfM(YS.cfM(SOURCE), p.tp2());
          }
       } catch (Throwable t) {
          log("Could not pin Collections and Tracks to the sidebar", t);
@@ -330,55 +334,55 @@ public final class NocBrowser {
    }
 
    /** Collections pinned this session, so a browser first opened later (a popup) gets them too. */
-   private static final Set<Hc> PINNED_NOW = Collections.newSetFromMap(Collections.synchronizedMap(new WeakHashMap<>()));
+   private static final Set<GT> PINNED_NOW = Collections.newSetFromMap(Collections.synchronizedMap(new WeakHashMap<>()));
 
    /** Every browser's quick sources seen so far: the main browser's and the popups' (each has its own). */
-   private static List<ZI> palettes() {
-      List<ZI> out = new ArrayList<>();
+   private static List<YO> palettes() {
+      List<YO> out = new ArrayList<>();
       synchronized (SEEN) {
          for (Object o : SEEN) {
-            if (o instanceof ZI z) {
+            if (o instanceof YO z) {
                out.add(z);
             }
          }
       }
-      ZI main = palette();
+      YO main = palette();
       if (main != null && !out.contains(main)) {
          out.add(main);
       }
       return out;
    }
 
-   private static void pinInto(ZI p, Hc collection) {
-      WC source = collection.mEL();   // the collection as a browser source
-      if (source != null && p.beI((WV)source) < 0) {
-         p.beI(ZO.beI(source), p.mEL());
+   private static void pinInto(YO p, GT collection) {
+      VT source = collection.tp2();   // the collection as a browser source
+      if (source != null && p.cfM((Wl)source) < 0) {
+         p.cfM(YS.cfM(source), p.tp2());
       }
    }
 
    /** Adds a collection to every browser's quick sources (no limit: Bitwig's own drag stops at 12). */
-   static void pinCollection(Hc collection) {
+   static void pinCollection(GT collection) {
       try {
-         List<ZI> all = palettes();
-         if (all.isEmpty() || collection.mEL() == null) {
+         List<YO> all = palettes();
+         if (all.isEmpty() || collection.tp2() == null) {
             log("Quick sources not ready yet: open the browser once, then try again", null);
             return;
          }
          PINNED_NOW.add(collection);
-         for (ZI p : all) {
+         for (YO p : all) {
             pinInto(p, collection);
          }
-         log("Pinned " + collection.BBg() + " to " + all.size() + " browser(s)' quick sources", null);
+         log("Pinned " + collection.IwV() + " to " + all.size() + " browser(s)' quick sources", null);
       } catch (Throwable t) {
          log("Could not pin the collection", t);
       }
    }
 
-   static boolean pinned(Hc collection) {
+   static boolean pinned(GT collection) {
       try {
-         WV source = collection.mEL();
-         for (ZI p : palettes()) {
-            if (p.beI(source) >= 0) {
+         Wl source = collection.tp2();
+         for (YO p : palettes()) {
+            if (p.cfM(source) >= 0) {
                return true;
             }
          }
@@ -387,13 +391,13 @@ public final class NocBrowser {
       return false;
    }
 
-   static void unpinCollection(Hc collection) {
+   static void unpinCollection(GT collection) {
       try {
          PINNED_NOW.remove(collection);
-         WV source = collection.mEL();
-         for (ZI p : palettes()) {
-            if (p.beI(source) >= 0) {
-               p.Gef(source);
+         Wl source = collection.tp2();
+         for (YO p : palettes()) {
+            if (p.cfM(source) >= 0) {
+               p.MRY(source);
             }
          }
       } catch (Throwable t) {
@@ -402,20 +406,20 @@ public final class NocBrowser {
    }
 
    /** A browser session switched to a sidebar button: Collections and Tracks open on their Location column. */
-   static void sourceChosen(Jy session) {
+   static void sourceChosen(Jp session) {
       try {
-         WV now = session.GKF();
-         if (now == SOURCE || now == NocTracks.SOURCE || now instanceof WC) {
-            Fx.beI(() -> {
+         Wl now = session.Scv();
+         if (now == SOURCE || now instanceof VT) {
+            Fq.cfM(() -> {
                try {
-                  if (session.GKF() == now) {
-                     if (now instanceof WC) {
-                        DL location = session.vUU();   // the Location column
+                  if (session.Scv() == now) {
+                     if (now instanceof VT) {
+                        DC location = session.tB1();   // the Location column
                         if (location != null) {
-                           session.Gef((ud) location);   // open it
+                           session.MRY((tE) location);   // open it
                         }
                      } else {
-                        now.Gef(session);   // open the source's own column (Location)
+                        now.MRY(session);   // open the source's own column (Location)
                      }
                   }
                } catch (Throwable t) {
@@ -495,7 +499,7 @@ public final class NocBrowser {
 
    private static String collectionKey(Object node) {
       try {
-         return node instanceof Hh fj ? fj.zzi().BBg() : null;
+         return node instanceof GW fj ? fj.z3I().IwV() : null;
       } catch (Throwable t) {
          return null;
       }
@@ -506,7 +510,7 @@ public final class NocBrowser {
       if (m.isEmpty()) {
          return null;
       }
-      String key = node instanceof yO ? folderKey(node) : collectionKey(node);
+      String key = node instanceof yF ? folderKey(node) : collectionKey(node);
       return key == null ? null : m.get(key);
    }
 
@@ -555,8 +559,8 @@ public final class NocBrowser {
    public static URI nodeImage(Object node) {
       try {
          Entry e = entryFor(node);
-         if (e != null && node instanceof Hh fj) {
-            return tile(e.icon, e.color != null ? e.color : colorName(fj.zzi()));
+         if (e != null && node instanceof GW fj) {
+            return tile(e.icon, e.color != null ? e.color : colorName(fj.z3I()));
          }
       } catch (Throwable t) {
          log("nodeImage failed", t);
@@ -571,13 +575,14 @@ public final class NocBrowser {
             Entry e = icons().get("@sidebar");
             return tile(e != null ? e.icon : "folder-tree", e != null && e.color != null ? e.color : "orange");
          }
-         if (source == NocTracks.SOURCE) {
-            Entry e = icons().get("@tracks");
-            return tile(e != null ? e.icon : "layers", e != null && e.color != null ? e.color : "blue");
+         if (source instanceof Wl w && TRACKS_ID.equals(w.cfM())) {
+            tracksButton = true;
+            Entry e = icons().get("@tracks");   // the Track Presets mod's button: only an icon chosen here replaces its own
+            return e == null ? null : tile(e.icon, e.color != null ? e.color : "blue");
          }
-         if (source instanceof WC ve) {
-            Hc fd = ve.ymo();
-            Entry e = icons().get(fd.BBg());
+         if (source instanceof VT ve) {
+            GT fd = ve.E3();
+            Entry e = icons().get(fd.IwV());
             if (e != null) {
                return tile(e.icon, e.color != null ? e.color : colorName(fd));
             }
@@ -588,9 +593,9 @@ public final class NocBrowser {
       return null;
    }
 
-   private static String colorName(Hc fd) {
+   private static String colorName(GT fd) {
       try {
-         return RCp.beI(((GS)fd).neH()).Gef();
+         return AlY.cfM(((GK)fd).MJ()).MRY();
       } catch (Throwable t) {
          return "default";
       }
@@ -668,12 +673,12 @@ public final class NocBrowser {
    /** The sidebar source the browser session of this column is showing, or null. */
    static Object currentSource(Object column) {
       try {
-         Jy session = ((DL)column).IDq();
+         Jp session = ((DC)column).zpW();
          if (session == null) {
             return null;
          }
-         Object src = session.GKF();
-         return src != null ? src : session.Bqd();
+         Object src = session.Scv();
+         return src != null ? src : session.BDm();
       } catch (Throwable t) {
          return null;
       }
@@ -681,7 +686,7 @@ public final class NocBrowser {
 
    static String sourceId(Object source) {
       try {
-         return source instanceof Wc u ? u.ymo() : null;
+         return source instanceof Vu u ? u.E3() : null;
       } catch (Throwable t) {
          return null;
       }
@@ -701,8 +706,8 @@ public final class NocBrowser {
     */
    public static int hideEmpty(Object column, Object node) {
       try {
-         boolean collectionLike = node instanceof Hh || node instanceof yO;
-         if (!collectionLike && !(node instanceof Fn)) {
+         boolean collectionLike = node instanceof GW || node instanceof yF;
+         if (!collectionLike && !(node instanceof Ff)) {
             return -1;
          }
          Object src = currentSource(column);
@@ -712,7 +717,7 @@ public final class NocBrowser {
          if (stockSource(src)) {
             return -1;
          }
-         if ("music".equals(sourceId(src)) && node instanceof Fn) {
+         if ("music".equals(sourceId(src)) && node instanceof Ff) {
             return 0;
          }
          return 1;
@@ -722,15 +727,15 @@ public final class NocBrowser {
    }
 
    /** Removes section headings (My Library, Packages, …) left with nothing under them. */
-   static void pruneSections(Object column, KZ tree) {
+   static void pruneSections(Object column, KI tree) {
       try {
          Object src = currentSource(column);
          if (tree == null || src == SOURCE || stockSource(src)) {
             return;
          }
-         for (Object child : new java.util.ArrayList<Object>(tree.wLf())) {
-            if (child instanceof Ft section && section.wLf().isEmpty()) {
-               tree.BBg((Ek)section);
+         for (Object child : new java.util.ArrayList<Object>(tree.hbP())) {
+            if (child instanceof Fj section && section.hbP().isEmpty()) {
+               tree.IwV((DZ)section);
             }
          }
       } catch (Throwable t) {
@@ -740,8 +745,8 @@ public final class NocBrowser {
 
    static boolean sourceActive(Object column) {
       try {
-         Jy session = ((DL)column).IDq();
-         return session != null && (session.GKF() == SOURCE || session.Bqd() == SOURCE);
+         Jp session = ((DC)column).zpW();
+         return session != null && (session.Scv() == SOURCE || session.BDm() == SOURCE);
       } catch (Throwable t) {
          return false;
       }
@@ -754,6 +759,12 @@ public final class NocBrowser {
 
    private static File png(String icon) {
       return Browser.MOD.resource("icons").resolve("lucide-png/" + icon + ".png").toFile();
+   }
+
+   /** The command that opens a folder in the system's file manager. */
+   static String fileManager() {
+      String os = System.getProperty("os.name", "").toLowerCase(java.util.Locale.ROOT);
+      return os.contains("win") ? "explorer.exe" : os.contains("mac") ? "open" : "xdg-open";
    }
 
    static File stateDir() {

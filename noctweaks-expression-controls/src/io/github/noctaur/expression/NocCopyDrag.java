@@ -29,9 +29,9 @@ public final class NocCopyDrag {
 
    /** One note's part of the drag: its whole curve before the drag and which of its points are dragged. */
    private static final class Part {
-      final gum note;
-      final AGf clip;
-      final List<oq1> dragged = new ArrayList<>();
+      final dpB note;
+      final kPd clip;
+      final List<hMP> dragged = new ArrayList<>();
       double[] bt;   // the note's curve before the drag: times, normalized values, curvatures
       double[] bv;
       double[] bc;
@@ -39,25 +39,25 @@ public final class NocCopyDrag {
       double[] cv;
       double[] cc;
 
-      Part(gum note, AGf clip) {
+      Part(dpB note, kPd clip) {
          this.note = note;
          this.clip = clip;
       }
    }
 
    private static final class Drag {
-      final sre parameter;
+      final ucd parameter;
       final List<Part> parts;
       final Object key = new Object();   // the drag's undo step
-      final rBG selection;
-      final AGf fallbackClip;
+      final OjS selection;
+      final kPd fallbackClip;
       volatile double dt;
       volatile double dv;
       volatile boolean pending;
       long lastWrite;
       boolean written;
 
-      Drag(sre parameter, List<Part> parts, rBG selection, AGf fallbackClip) {
+      Drag(ucd parameter, List<Part> parts, OjS selection, kPd fallbackClip) {
          this.parameter = parameter;
          this.parts = parts;
          this.selection = selection;
@@ -72,22 +72,22 @@ public final class NocCopyDrag {
 
    public static void begin(Object action, Object event, List<?> events) {
       try {
-         if (disabled || events == null || events.isEmpty() || !(event instanceof dLc e) || e.ymo() == null || !e.ymo().sCA()) {
+         if (disabled || events == null || events.isEmpty() || !(event instanceof dJE e) || e.E3() == null || !e.E3().Hnt()) {
             return;
          }
-         lFl expression = NocShapePanel.expression();
-         sre parameter = expression != null ? cX.beI(expression) : null;
+         hJh expression = NocShapePanel.expression();
+         ucd parameter = expression != null ? cM.cfM(expression) : null;
          if (parameter == null) {
             return;
          }
          double[] range = NocShapes.mapping(parameter);
-         Map<gum, Part> byNote = new IdentityHashMap<>();
+         Map<dpB, Part> byNote = new IdentityHashMap<>();
          List<Part> parts = new ArrayList<>();
          for (Object o : NocShapes.unwrap(new ArrayList<>(events))) {
-            if (!(o instanceof oq1 c)) {
+            if (!(o instanceof hMP c)) {
                continue;
             }
-            gum note = NocShapes.noteOf(c);
+            dpB note = NocShapes.noteOf(c);
             if (note == null) {
                continue;   // automation, not a note expression
             }
@@ -109,8 +109,8 @@ public final class NocCopyDrag {
          }
          if (!loggedScale) {
             loggedScale = true;
-            oq1 c = parts.get(0).dragged.get(0);
-            Expr.log("Ctrl+drag copy: value scale check, Bitwig " + c.SQL() + " vs NocTweaks " + NocShapes.normalized(c.mEL(), range), null);
+            hMP c = parts.get(0).dragged.get(0);
+            Expr.log("Ctrl+drag copy: value scale check, Bitwig " + c.ODA() + " vs NocTweaks " + NocShapes.normalized(c.tp2(), range), null);
          }
          DRAGS.put(action, new Drag(parameter, parts, selection(action), clip(action)));
       } catch (Throwable t) {
@@ -121,20 +121,20 @@ public final class NocCopyDrag {
 
    /** The note's whole curve (same-time points included), and the dragged points in curve order. */
    private static void snapshot(Part p, double[] range) {
-      List<LCN> chain = NocShapes.curveOf(p.dragged.get(0));
-      Map<LCN, Integer> index = new IdentityHashMap<>();
+      List<dfo> chain = NocShapes.curveOf(p.dragged.get(0));
+      Map<dfo, Integer> index = new IdentityHashMap<>();
       for (int k = 0; k < chain.size(); k++) {
          index.put(chain.get(k), k);
       }
       List<double[]> pts = new ArrayList<>();
-      for (LCN q : chain) {
-         pts.add(new double[]{NocShapes.time(q), NocShapes.normalized(q.mEL(), range), curve(q)});
+      for (dfo q : chain) {
+         pts.add(new double[]{NocShapes.time(q), NocShapes.normalized(q.tp2(), range), curve(q)});
       }
       p.bt = column(pts, 0);
       p.bv = column(pts, 1);
       p.bc = column(pts, 2);
-      List<oq1> dragged = new ArrayList<>();
-      for (oq1 c : p.dragged) {
+      List<hMP> dragged = new ArrayList<>();
+      for (hMP c : p.dragged) {
          if (index.containsKey(c) && !dragged.contains(c)) {
             dragged.add(c);
          }
@@ -144,8 +144,8 @@ public final class NocCopyDrag {
       }
       dragged.sort(java.util.Comparator.comparingInt(c -> index.getOrDefault(c, 0)));
       List<double[]> copy = new ArrayList<>();
-      for (oq1 c : dragged) {
-         copy.add(new double[]{NocShapes.time(c), NocShapes.normalized(c.mEL(), range), curve(c)});
+      for (hMP c : dragged) {
+         copy.add(new double[]{NocShapes.time(c), NocShapes.normalized(c.tp2(), range), curve(c)});
       }
       p.ct = column(copy, 0);
       p.cv = column(copy, 1);
@@ -164,7 +164,7 @@ public final class NocCopyDrag {
 
    private static double curve(Object point) {
       try {
-         return ((oq1)point).dT_();
+         return ((hMP)point).dS_();
       } catch (Throwable t) {
          return 0;
       }
@@ -188,12 +188,12 @@ public final class NocCopyDrag {
             }
          };
          if (wait == 0) {
-            Fx.beI(run);
+            Fq.cfM(run);
          } else {
             new java.util.Timer(true).schedule(new java.util.TimerTask() {
                @Override
                public void run() {
-                  Fx.beI(run);
+                  Fq.cfM(run);
                }
             }, wait);
          }
@@ -217,7 +217,7 @@ public final class NocCopyDrag {
       } finally {
          ENDING.remove();
       }
-      Fx.beI(() -> draw(d, true));
+      Fq.cfM(() -> draw(d, true));
       return true;
    }
 
@@ -229,7 +229,7 @@ public final class NocCopyDrag {
       if (d != null && d.written) {
          d.dt = 0;
          d.dv = 0;
-         Fx.beI(() -> restore(d));
+         Fq.cfM(() -> restore(d));
       }
    }
 
@@ -368,32 +368,32 @@ public final class NocCopyDrag {
       return Math.max(0, Math.min(1, v));
    }
 
-   private static void write(Drag d, Part p, double[] times, double[] values, double[] curves, rBG selection) {
+   private static void write(Drag d, Part p, double[] times, double[] values, double[] curves, OjS selection) {
       if (times.length == 0) {
          return;
       }
-      AGf clip = p.clip != null ? p.clip : d.fallbackClip;
+      kPd clip = p.clip != null ? p.clip : d.fallbackClip;
       try {
-         p.note.beI(d.parameter, times, values, r1.Gef, curves, clip, false, true, 0.0, selection);
+         p.note.cfM(d.parameter, times, values, jRs.MRY, curves, clip, false, true, 0.0, selection);
       } catch (NullPointerException npe) {
          if (selection != null || d.selection == null) {
             throw npe;
          }
-         p.note.beI(d.parameter, times, values, r1.Gef, curves, clip, false, true, 0.0, d.selection);
+         p.note.cfM(d.parameter, times, values, jRs.MRY, curves, clip, false, true, 0.0, d.selection);
       }
    }
 
-   private static AGf clip(Object action) {
+   private static kPd clip(Object action) {
       try {
-         return action instanceof MoveValueEventsDragAction m && m.getParentClip() instanceof AGf c ? c : null;
+         return action instanceof MoveValueEventsDragAction m && m.getParentClip() instanceof kPd c ? c : null;
       } catch (Throwable t) {
          return null;
       }
    }
 
-   private static rBG selection(Object action) {
+   private static OjS selection(Object action) {
       try {
-         return action instanceof MoveValueEventsDragAction m ? m.getEditorSelection().mS_() : null;
+         return action instanceof MoveValueEventsDragAction m ? m.getEditorSelection().mR_() : null;
       } catch (Throwable t) {
          return null;
       }

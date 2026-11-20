@@ -1,7 +1,7 @@
 package io.github.noctaur.browser;
 
 import bitwig.obf.*;
-import com.bitwig.base.io.vQq;
+import com.bitwig.base.io.gJi;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -40,7 +40,7 @@ public final class NocFormats {
    private static final Set<String> LOGGED = java.util.concurrent.ConcurrentHashMap.newKeySet();
 
    /** Hook at the end of Ij.ExU(): wraps the browser's final query. */
-   public static jma query(jma q) {
+   public static M22 query(M22 q) {
       try {
          load();
          if (q == null || q instanceof Filter) {
@@ -87,14 +87,14 @@ public final class NocFormats {
 
    private static int kindFormat(Object p) {
       try {
-         Object kind = p instanceof MT li ? li.Anf() : null;
-         if (kind instanceof Om) {
+         Object kind = p instanceof MB li ? li.hUR() : null;
+         if (kind instanceof NR) {
             return CLAP;
          }
-         if (kind instanceof RE) {
+         if (kind instanceof QV) {
             return VST3;
          }
-         if (kind instanceof Rx) {
+         if (kind instanceof QN) {
             return VST2;
          }
       } catch (Throwable ignored) {
@@ -103,13 +103,13 @@ public final class NocFormats {
    }
 
    static int format(Object cursor) {
-      if (cursor instanceof Ok) {
+      if (cursor instanceof NQ) {
          return CLAP;
       }
-      if (cursor instanceof RD) {
+      if (cursor instanceof QT) {
          return VST3;
       }
-      if (cursor instanceof Ru) {
+      if (cursor instanceof QM) {
          return VST2;
       }
       return -1;
@@ -125,25 +125,25 @@ public final class NocFormats {
       final Map<String, String> entries = new HashMap<>();
    }
 
-   static Pass pass(oiy context) {
+   static Pass pass(Ihc context) {
       synchronized (context) {
-         Object p = context.beI(KEY);
+         Object p = context.cfM(KEY);
          if (p instanceof Pass pass) {
             return pass;
          }
          Pass pass = new Pass();
-         context.beI(KEY, pass);
+         context.cfM(KEY, pass);
          return pass;
       }
    }
 
    /** Called only for results that matched everything else: false if a copy already made the list. */
-   static boolean admit(Pass pass, ZWh cursor, int format) {
+   static boolean admit(Pass pass, pAe cursor, int format) {
       try {
          // Entry identity is the file path: two installs of one VST3 share Bitwig's item id (the plugin's
          // class id), so the id alone can't tell the copies apart.
-         String path = String.valueOf(cursor.BBg()) + "#" + cursor.scr();
-         return admit(pass, cursor.Anf().beI(), ((Qf)cursor).fmw(), path.hashCode() * 31L + path.length(), path, format);
+         String path = String.valueOf(cursor.IwV()) + "#" + cursor.wGc();
+         return admit(pass, cursor.hUR().cfM(), ((PF)cursor).OzW(), path.hashCode() * 31L + path.length(), path, format);
       } catch (Throwable t) {
          return true;
       }
@@ -183,22 +183,18 @@ public final class NocFormats {
    // ------------------------------------------------------------------ query + matcher
 
    /** The browser's query, unchanged, plus the once-per-plugin rule. Saves and compares as the original. */
-   static final class Filter extends jma {
-      final jma inner;
+   static final class Filter extends M22 {
+      final M22 inner;
 
-      Filter(jma inner) {
+      Filter(M22 inner) {
          this.inner = inner;
       }
 
       @Override
-      public AKW beI(ZWh cursor, oiy context) {
-         AKW m = inner.beI(cursor, context);
+      public nCp cfM(pAe cursor, Ihc context) {
+         nCp m = inner.cfM(cursor, context);
          if (m == null) {
             return m;
-         }
-         if (cursor instanceof NL) {
-            // Projects are listed only when they are track presets (0.9.2 lets the browser search projects).
-            return new Match(m, cursor, PRESET, null);
          }
          int f = format(cursor);
          if (!enabled || f < 0 || context == null) {
@@ -208,28 +204,28 @@ public final class NocFormats {
       }
 
       @Override
-      public void a_(vQq out) {
+      public void a_(gJi out) {
          inner.a_(out);
       }
 
       @Override
-      public boolean beI(jma other) {
+      public boolean cfM(M22 other) {
          return other instanceof Filter f && inner.equals(f.inner);
       }
 
       @Override
-      public int Gef() {
-         return inner.Gef();
+      public int MRY() {
+         return inner.MRY();
       }
 
       @Override
-      public void beI(List list) {
-         inner.beI(list);
+      public void cfM(List list) {
+         inner.cfM(list);
       }
 
       @Override
-      public Set beI(xme kind) {
-         return inner.beI(kind);
+      public Set cfM(flj kind) {
+         return inner.cfM(kind);
       }
    }
 
@@ -240,13 +236,13 @@ public final class NocFormats {
     * "some" here, and each file that the original query accepts is then checked against copies already
     * shown. Directories the original rejects stay rejected.
     */
-   static final class Match extends AKW {
-      private final AKW inner;
-      private final ZWh cursor;
+   static final class Match extends nCp {
+      private final nCp inner;
+      private final pAe cursor;
       private final int format;
       private final Pass pass;
 
-      Match(AKW inner, ZWh cursor, int format, Pass pass) {
+      Match(nCp inner, pAe cursor, int format, Pass pass) {
          this.inner = inner;
          this.cursor = cursor;
          this.format = format;
@@ -254,27 +250,24 @@ public final class NocFormats {
       }
 
       @Override
-      public void beI() {
-         inner.beI();
+      public void cfM() {
+         inner.cfM();
       }
 
       @Override
-      public QlC beI(QlC parent) {
-         QlC s = inner.unz();   // enter the directory in the original matcher
-         return s == QlC.beI ? QlC.Gef : s;
+      public INH cfM(INH parent) {
+         INH s = inner.UNj();   // enter the directory in the original matcher
+         return s == INH.cfM ? INH.MRY : s;
       }
 
       @Override
-      public void sCA() {
-         inner.Anf();           // leave the directory in the original matcher
+      public void Hnt() {
+         inner.hUR();           // leave the directory in the original matcher
       }
 
       @Override
-      public boolean Gef() {
-         if (format == PRESET) {
-            return inner.BBg() && NocTracks.isPreset(cursor);
-         }
-         return inner.BBg() && admit(pass, cursor, format);
+      public boolean MRY() {
+         return inner.IwV() && admit(pass, cursor, format);
       }
    }
 

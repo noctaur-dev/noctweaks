@@ -6,8 +6,8 @@ import bml.api.At;
 import bml.api.Hook;
 import bml.api.This;
 import com.bitwig.flt.widget.core.timeline.interaction.MoveValueEventsDragAction; // dragging points or notes
-import com.bitwig.flt.widget.core.timeline.ju1;                                    // a note editor's content widget
-import com.bitwig.graphics.ijY;                                                    // a graphics context
+import com.bitwig.flt.widget.core.timeline.wUk;                                    // a note editor's content widget
+import com.bitwig.graphics.SYo;                                                    // a graphics context
 
 import java.util.List;
 
@@ -19,20 +19,39 @@ public final class ExpressionHooks {
    // ------------------------------------------------------------------ icons
 
    /** dou.beI(String, double): a window loads an icon by name (from its cache, else from Bitwig's files). */
-   @Hook(target = dou.class, method = "beI(Ljava/lang/String;D)Lcom/bitwig/graphics/haN;", at = At.ENTRY, id = "icons")
-   public static void icon(@This dou window, @Arg(0) String name, @Arg(1) double scale) {
+   @Hook(target = dnf.class, method = "cfM(Ljava/lang/String;D)Lcom/bitwig/graphics/BrJ;", at = At.ENTRY, id = "icons")
+   public static void icon(@This dnf window, @Arg(0) String name, @Arg(1) double scale) {
       Icons.loading(window, name, scale);
    }
 
-   // ------------------------------------------------------------------ edit modes always visible
+   // ------------------------------------------------------------------ which expression the editor shows
 
-   /** dDG: an option button; beI(ijY) paints it. The editor's edit-mode button gets the strip beside it. */
-   @Hook(target = dDG.class, method = "beI(Lcom/bitwig/graphics/ijY;)V", at = At.ENTRY, id = "edit-modes")
-   public static void editModes(@This dDG button) {
+   /** Option buttons that turned out to be the note editor's edit-mode button (true) or something else. */
+   private static final java.util.Map<dCm, Boolean> MODE_BUTTONS =
+      java.util.Collections.synchronizedMap(new java.util.WeakHashMap<>());
+
+   /**
+    * An option button is painted. For the note editor's edit-mode button, its value is the expression being
+    * edited (Pressure, Timbre and so on), which the Inspector's shape panel follows.
+    */
+   @Hook(target = dCm.class, method = "cfM(Lcom/bitwig/graphics/SYo;)V", at = At.ENTRY, id = "edit-mode-seen")
+   public static void editModeSeen(@This dCm button) {
       try {
-         NocModes.drawn(button);
+         Boolean mode = MODE_BUTTONS.get(button);
+         if (mode == null) {
+            List<Object> options = new java.util.ArrayList<>();
+            button.cfM((java.util.function.Consumer<Object>)options::add);
+            if (options.isEmpty()) {
+               return;   // not filled in yet: ask again next time
+            }
+            mode = options.get(0) instanceof Xx1 || options.get(0) instanceof hJh;
+            MODE_BUTTONS.put(button, mode);
+         }
+         if (mode) {
+            NocShapePanel.seen(button);
+         }
       } catch (Throwable t) {
-         Expr.log("edit modes", t);
+         Expr.log("edit mode button", t);
       }
    }
 
@@ -44,18 +63,18 @@ public final class ExpressionHooks {
     */
    private static final ThreadLocal<Object[]> MENU_ARGS = new ThreadLocal<>();
 
-   @Hook(target = aOp.class, method = "beI(LdMt;Lcom/bitwig/flt/widget/core/timeline/ju1;LrBG;)V", at = At.ENTRY, id = "shapes-menu-args")
-   public static void shapesMenuArgs(@Arg(0) dMt menu, @Arg(1) ju1 target, @Arg(2) rBG selection) {
+   @Hook(target = aNj.class, method = "cfM(LdKW;Lcom/bitwig/flt/widget/core/timeline/wUk;LOjS;)V", at = At.ENTRY, id = "shapes-menu-args")
+   public static void shapesMenuArgs(@Arg(0) dKW menu, @Arg(1) wUk target, @Arg(2) OjS selection) {
       MENU_ARGS.set(new Object[]{menu, target, selection});
    }
 
-   @Hook(target = aOp.class, method = "beI(LdMt;Lcom/bitwig/flt/widget/core/timeline/ju1;LrBG;)V", at = At.BEFORE_RETURN, id = "shapes-menu")
-   public static void shapesMenu(@This aOp editor) {
+   @Hook(target = aNj.class, method = "cfM(LdKW;Lcom/bitwig/flt/widget/core/timeline/wUk;LOjS;)V", at = At.BEFORE_RETURN, id = "shapes-menu")
+   public static void shapesMenu(@This aNj editor) {
       Object[] a = MENU_ARGS.get();
       MENU_ARGS.remove();
       try {
          if (a != null) {
-            NocShapes.menu((dMt) a[0], editor, a[1], a[2]);
+            NocShapes.menu((dKW) a[0], editor, a[1], a[2]);
          }
       } catch (Throwable t) {
          Expr.log("shapes menu", t);
@@ -63,8 +82,8 @@ public final class ExpressionHooks {
    }
 
    /** bmh.beI(dMt, dwF, bju, yAn): the menu for selected notes and expression points. */
-   @Hook(target = bmh.class, method = "beI(LdMt;LdwF;Lbju;LyAn;)V", at = At.BEFORE_RETURN, id = "shapes-selection-menu")
-   public static void shapesSelectionMenu(@Arg(0) dMt menu, @Arg(1) dwF owner, @Arg(2) bju header) {
+   @Hook(target = bkS.class, method = "cfM(LdKW;Ldve;Lbig;LkbG;)V", at = At.BEFORE_RETURN, id = "shapes-selection-menu")
+   public static void shapesSelectionMenu(@Arg(0) dKW menu, @Arg(1) dve owner, @Arg(2) big header) {
       try {
          NocShapes.selectionMenu(menu, owner, header);
       } catch (Throwable t) {
@@ -73,8 +92,8 @@ public final class ExpressionHooks {
    }
 
    /** aMo.b_(dXL): the Inspector's note expression section is built. */
-   @Hook(target = aMo.class, method = "b_(LdXL;)V", at = At.BEFORE_RETURN, id = "shape-panel")
-   public static void shapePanel(@This aMo panel, @Arg(0) dXL box) {
+   @Hook(target = aLn.class, method = "b_(LdWb;)V", at = At.BEFORE_RETURN, id = "shape-panel")
+   public static void shapePanel(@This aLn panel, @Arg(0) dWb box) {
       try {
          NocShapePanel.inspector(panel, box);
       } catch (Throwable t) {
@@ -83,8 +102,8 @@ public final class ExpressionHooks {
    }
 
    /** aHH.beI(dXL): the Points Inspector is built. */
-   @Hook(target = aHH.class, method = "beI(LdXL;)V", at = At.BEFORE_RETURN, id = "shape-points")
-   public static void shapePoints(@This aHH panel, @Arg(0) dXL box) {
+   @Hook(target = aGI.class, method = "cfM(LdWb;)V", at = At.BEFORE_RETURN, id = "shape-points")
+   public static void shapePoints(@This aGI panel, @Arg(0) dWb box) {
       try {
          NocShapePanel.points(panel, box);
       } catch (Throwable t) {
@@ -99,8 +118,8 @@ public final class ExpressionHooks {
     * candidate, offered when the track has a drum machine. Leaving it out opens the piano roll. Picking the
     * grid by hand still works.
     */
-   @Hook(target = Q3V.class, method = "beI(LAWo;LHSH;)V", at = At.REPLACE_CALL, callOwner = VXQ.class, call = "y3f()LFGV;", id = "piano-roll-default")
-   public static FGV drumGrid(VXQ editors) {
+   @Hook(target = SEC.class, method = "cfM(Lhqk;LPUL;)V", at = At.REPLACE_CALL, callOwner = WuN.class, call = "uWE()LZDO;", id = "piano-roll-default")
+   public static ZDO drumGrid(WuN editors) {
       return null;
    }
 
@@ -109,9 +128,9 @@ public final class ExpressionHooks {
    private static final String M = "com/bitwig/flt/widget/core/timeline/interaction/MoveValueEventsDragAction";
    private static final ThreadLocal<Boolean> MINE = new ThreadLocal<>();
 
-   @Hook(target = MoveValueEventsDragAction.class, method = "beginEventEditing(LdLi;Lcom/bitwig/ramona/core/IqI;Ljava/util/List;)V",
+   @Hook(target = MoveValueEventsDragAction.class, method = "beginEventEditing(LdJK;Lcom/bitwig/ramona/core/OLR;Ljava/util/List;)V",
          at = At.ENTRY, id = "copy-drag-begin")
-   public static void copyDragBegin(@This MoveValueEventsDragAction action, @Arg(0) dLi event, @Arg(2) List<?> events) {
+   public static void copyDragBegin(@This MoveValueEventsDragAction action, @Arg(0) dJK event, @Arg(2) List<?> events) {
       try {
          NocCopyDrag.begin(action, event, events);
       } catch (Throwable t) {
@@ -131,31 +150,31 @@ public final class ExpressionHooks {
       MINE.set(mine);
    }
 
-   @Hook(target = MoveValueEventsDragAction.class, method = "updateEditEvents", at = At.REPLACE_CALL, callOwner = vVA.class, call = "beI(Z)V", id = "copy-drag-boundary")
-   public static void moveBoundary(vVA op, boolean boundary) {
+   @Hook(target = MoveValueEventsDragAction.class, method = "updateEditEvents", at = At.REPLACE_CALL, callOwner = JAH.class, call = "cfM(Z)V", id = "copy-drag-boundary")
+   public static void moveBoundary(JAH op, boolean boundary) {
       if (!mine()) {
-         op.beI(boundary); // create boundary points
+         op.cfM(boundary); // create boundary points
       }
    }
 
-   @Hook(target = MoveValueEventsDragAction.class, method = "updateEditEvents", at = At.REPLACE_CALL, callOwner = vVA.class, call = "beI(D)V", id = "copy-drag-time")
-   public static void moveTime(vVA op, double dt) {
+   @Hook(target = MoveValueEventsDragAction.class, method = "updateEditEvents", at = At.REPLACE_CALL, callOwner = JAH.class, call = "cfM(D)V", id = "copy-drag-time")
+   public static void moveTime(JAH op, double dt) {
       if (!mine()) {
-         op.beI(dt); // the time offset
+         op.cfM(dt); // the time offset
       }
    }
 
-   @Hook(target = MoveValueEventsDragAction.class, method = "updateEditEvents", at = At.REPLACE_CALL, callOwner = vVA.class, call = "Gef(D)V", id = "copy-drag-value")
-   public static void moveValue(vVA op, double dv) {
+   @Hook(target = MoveValueEventsDragAction.class, method = "updateEditEvents", at = At.REPLACE_CALL, callOwner = JAH.class, call = "MRY(D)V", id = "copy-drag-value")
+   public static void moveValue(JAH op, double dv) {
       if (!mine()) {
-         op.Gef(dv); // the value offset
+         op.MRY(dv); // the value offset
       }
    }
 
-   @Hook(target = MoveValueEventsDragAction.class, method = "updateEditEvents", at = At.REPLACE_CALL, callOwner = vVA.class, call = "unz()V", id = "copy-drag-apply")
-   public static void moveApply(vVA op) {
+   @Hook(target = MoveValueEventsDragAction.class, method = "updateEditEvents", at = At.REPLACE_CALL, callOwner = JAH.class, call = "UNj()V", id = "copy-drag-apply")
+   public static void moveApply(JAH op) {
       if (!mine()) {
-         op.unz(); // apply the move
+         op.UNj(); // apply the move
       }
    }
 
@@ -175,11 +194,11 @@ public final class ExpressionHooks {
       MINE.set(mine);
    }
 
-   @Hook(target = MoveValueEventsDragAction.class, method = "finishEventEditing", at = At.REPLACE_CALL, callOwner = vVA.class, call = "byf()V", id = "copy-drag-commit")
-   public static void commit(vVA op) {
+   @Hook(target = MoveValueEventsDragAction.class, method = "finishEventEditing", at = At.REPLACE_CALL, callOwner = JAH.class, call = "TMF()V", id = "copy-drag-commit")
+   public static void commit(JAH op) {
       try {
          if (!mine()) {
-            op.byf(); // commit the move
+            op.TMF(); // commit the move
          }
       } finally {
          MINE.remove();

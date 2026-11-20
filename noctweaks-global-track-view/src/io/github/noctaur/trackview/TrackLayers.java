@@ -2,9 +2,9 @@ package io.github.noctaur.trackview;
 
 import bitwig.obf.*;
 import bml.api.Bml;
-import com.bitwig.flt.document.core.master.CmH; // a project document
-import com.bitwig.flt.document.core.master.GJy; // a group of tracks (the project's top level is one)
-import com.bitwig.flt.document.core.iface.qAF; // something with a name (tracks are)
+import com.bitwig.flt.document.core.master.g2L; // a project document
+import com.bitwig.flt.document.core.master.ruS; // a group of tracks (the project's top level is one)
+import com.bitwig.flt.document.core.iface.iYN; // something with a name (tracks are)
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -35,11 +35,11 @@ public final class TrackLayers {
 
    // ------------------------------------------------------------------ the project's track views
 
-   private static final Set<GRp> VIEWS = Collections.synchronizedSet(Collections.newSetFromMap(new WeakHashMap<>()));
-   private static volatile WeakReference<GRp> lastView = new WeakReference<>(null);
+   private static final Set<ICh> VIEWS = Collections.synchronizedSet(Collections.newSetFromMap(new WeakHashMap<>()));
+   private static volatile WeakReference<ICh> lastView = new WeakReference<>(null);
 
    /** A track view (arranger, mixer, ...) was made for a project. */
-   static void viewMade(GRp view) {
+   static void viewMade(ICh view) {
       if (view != null) {
          VIEWS.add(view);
          lastView = new WeakReference<>(view);
@@ -47,12 +47,12 @@ public final class TrackLayers {
    }
 
    /** The views, the most recent last. */
-   private static List<GRp> views() {
-      List<GRp> out;
+   private static List<ICh> views() {
+      List<ICh> out;
       synchronized (VIEWS) {
          out = new ArrayList<>(VIEWS);
       }
-      GRp last = lastView.get();
+      ICh last = lastView.get();
       if (last != null) {
          out.remove(last);
          out.add(last);
@@ -61,13 +61,13 @@ public final class TrackLayers {
    }
 
    /** The view whose selection the editor follows: the most recent one with tracks selected, else the most recent one. */
-   private static GRp view() {
-      List<GRp> views = views();
-      GRp fallback = null;
+   private static ICh view() {
+      List<ICh> views = views();
+      ICh fallback = null;
       for (int i = views.size() - 1; i >= 0; i--) {
-         GRp v = views.get(i);
+         ICh v = views.get(i);
          try {
-            if (v.kys() == null) { // the view's project document
+            if (v.pYg() == null) { // the view's project document
                continue;
             }
          } catch (Throwable t) {
@@ -88,29 +88,29 @@ public final class TrackLayers {
    private static volatile boolean menuOff;
 
    /** The editor's track list built its right-click menu: add "Edit Tracks". */
-   static void menu(dMt menu) {
+   static void menu(dKW menu) {
       try {
          if (menuOff || menu == null) {
             return;
          }
-         GRp view = view();
+         ICh view = view();
          if (view == null) {
             return;
          }
-         Object d = view.kys(); // the view's project document
-         if (!(d instanceof CmH doc)) {
+         Object d = view.pYg(); // the view's project document
+         if (!(d instanceof g2L doc)) {
             return;
          }
          List<Object> tracks = new ArrayList<>();
-         collect(doc.svk(), tracks, 0); // svk: the project's top-level group
+         collect(doc.spd(), tracks, 0); // svk: the project's top-level group
          if (tracks.isEmpty()) {
             return;
          }
-         dMt sub = menu.sCA("Edit Tracks"); // a submenu
+         dKW sub = menu.Hnt("Edit Tracks"); // a submenu
          for (Object t : tracks) {
-            sub.beI(name(t), new Toggle(view, t)); // a checkbox row
+            sub.cfM(name(t), new Toggle(view, t)); // a checkbox row
          }
-         sub.beI("Edit All Tracks", () -> select(view, new ArrayList<>(tracks))); // a plain row
+         sub.cfM("Edit All Tracks", () -> select(view, new ArrayList<>(tracks))); // a plain row
       } catch (Throwable t) {
          menuOff = true;
          MOD.log("Edit Tracks menu switched off", t);
@@ -118,13 +118,13 @@ public final class TrackLayers {
    }
 
    /** Every track in the project, groups opened up (groups themselves aren't edited in the piano roll). */
-   private static void collect(GJy group, List<Object> out, int depth) {
+   private static void collect(ruS group, List<Object> out, int depth) {
       if (group == null || depth > 16) {
          return;
       }
-      for (int i = 0; i < group.qaW(); i++) { // qaW: number of tracks in the group
-         Object t = group.MgQ(i);             // MgQ: the track at an index
-         if (t instanceof GJy sub) {
+      for (int i = 0; i < group.ugU(); i++) { // qaW: number of tracks in the group
+         Object t = group.FzB(i);             // MgQ: the track at an index
+         if (t instanceof ruS sub) {
             collect(sub, out, depth + 1);
          } else if (t != null) {
             out.add(t);
@@ -134,7 +134,7 @@ public final class TrackLayers {
 
    private static String name(Object track) {
       try {
-         String n = ((qAF) track).cc_(); // the track's name
+         String n = ((iYN) track).cb_(); // the track's name
          return n == null || n.isBlank() ? "Track" : n;
       } catch (Throwable t) {
          return "Track";
@@ -142,11 +142,11 @@ public final class TrackLayers {
    }
 
    /** The tracks selected in the arranger. */
-   static List<Object> selection(GRp view) {
+   static List<Object> selection(ICh view) {
       List<Object> out = new ArrayList<>();
       try {
-         if (view instanceof Muq x) { // a view with a track selection
-            for (Object o : x.MgQ()) {  // the selected tracks
+         if (view instanceof zRo x) { // a view with a track selection
+            for (Object o : x.FzB()) {  // the selected tracks
                out.add(o);
             }
          }
@@ -156,20 +156,20 @@ public final class TrackLayers {
       return out;
    }
 
-   static void select(GRp view, List<Object> tracks) {
+   static void select(ICh view, List<Object> tracks) {
       try {
-         view.beI(tracks); // select exactly these tracks
+         view.cfM(tracks); // select exactly these tracks
       } catch (Throwable t) {
          MOD.log("could not change the track selection", t);
       }
    }
 
    /** A menu checkbox: ticked when the track is being edited; clicking adds or removes it. */
-   static final class Toggle implements lIU { // a boolean value a menu row can show and set
-      private final GRp view;
+   static final class Toggle implements AQw { // a boolean value a menu row can show and set
+      private final ICh view;
       private final Object track;
 
-      Toggle(GRp view, Object track) {
+      Toggle(ICh view, Object track) {
          this.view = view;
          this.track = track;
       }
@@ -215,24 +215,24 @@ public final class TrackLayers {
       }
 
       @Override
-      public void addListener(NVD l) { // NVD: a value listener
+      public void addListener(foz l) { // NVD: a value listener
       }
 
       @Override
-      public void removeListener(NVD l) {
+      public void removeListener(foz l) {
       }
    }
 
    // ------------------------------------------------------------------ layer list and layered editing
 
-   private static volatile WeakReference<RDV> editorSettings = new WeakReference<>(null);
+   private static volatile WeakReference<hAU> editorSettings = new WeakReference<>(null);
    private static volatile int lastLayerCount;
 
    /** An editor built its layer list: remember its settings (the layered-editing switch). */
-   static void editorSeen(aNi editor) {
+   static void editorSeen(aMh editor) {
       try {
-         if (editor != null && editor.sM3() != null && editor.sM3().scr() != null) { // the editor's settings
-            editorSettings = new WeakReference<>(editor.sM3().scr());
+         if (editor != null && editor.Coi() != null && editor.Coi().wGc() != null) { // the editor's settings
+            editorSettings = new WeakReference<>(editor.Coi().wGc());
          }
       } catch (Throwable t) {
          MOD.log("could not read the editor settings", t);
@@ -251,12 +251,12 @@ public final class TrackLayers {
       int before = lastLayerCount;
       lastLayerCount = n;
       if (n >= 2 && before < 2) {
-         RDV settings = editorSettings.get(); // the editor's settings
+         hAU settings = editorSettings.get(); // the editor's settings
          if (settings != null) {
-            Fx.beI(() -> { // later, on Bitwig's UI thread
+            Fq.cfM(() -> { // later, on Bitwig's UI thread
                try {
-                  if (!settings.ZRB()) {     // layered editing off
-                     settings.sCA(true);     // switch it on
+                  if (!settings.qoU()) {     // layered editing off
+                     settings.Hnt(true);     // switch it on
                   }
                } catch (Throwable t) {
                   MOD.log("could not switch layered editing on", t);
@@ -274,18 +274,18 @@ public final class TrackLayers {
     * panel, still in Bitwig but in no layout, to its left, so the footer gets its button back and "Toggle
     * Track List" works again.
     */
-   static Object editLayout(alv content) { // alv: a layout node
+   static Object editLayout(akw content) { // alv: a layout node
       try {
          if (content == null) {
             return null;
          }
-         ami list = new ami();         // a panel node
-         list.BBg("track_list");       // the panel's ID: Bitwig's Track List
-         list.wGt = true;              // a show/hide button in the footer
-         list.SQL = "track_list.svg";  // Bitwig's own icon for it
-         list.I_();                    // finish the node
-         alX split = alX.beI("track_list_and_editor_splitter", true, list, content); // a left/right splitter
-         split.beI(dXg.beI);           // the list keeps its width when the window resizes
+         alk list = new alk();         // a panel node
+         list.IwV("track_list");       // the panel's ID: Bitwig's Track List
+         list.eLY = true;              // a show/hide button in the footer
+         list.ODA = "track_list.svg";  // Bitwig's own icon for it
+         list.H_();                    // finish the node
+         akZ split = akZ.cfM("track_list_and_editor_splitter", true, list, content); // a left/right splitter
+         split.cfM(dVx.cfM);           // the list keeps its width when the window resizes
          return split;
       } catch (Throwable t) {
          MOD.log("Track List panel could not be added", t);
@@ -302,7 +302,7 @@ public final class TrackLayers {
    /** A layer's note expressions are about to be visited (painted or hit tested). */
    static void visit(Object layer, Object visitor) {
       boolean filtered = filteredOut(layer);
-      boolean painter = visitor instanceof btz; // the expression painter
+      boolean painter = visitor instanceof bsk; // the expression painter
       dots = filtered && painter;
       skip = filtered && !painter;
    }
@@ -323,7 +323,7 @@ public final class TrackLayers {
    /** True for a layer the editor's "edit selected layers only" filter has greyed out. */
    private static boolean filteredOut(Object layer) {
       try {
-         return !filterOff && layer instanceof bpl r && r.mEL(); // the test that greys its notes out
+         return !filterOff && layer instanceof bnZ r && r.tp2(); // the test that greys its notes out
       } catch (Throwable t) {
          filterOff = true;
          MOD.log("layer filter for expressions switched off", t);

@@ -1,0 +1,30 @@
+{
+  "manifest_version": 2,
+  "mod": {
+    "id": "noctweaks-edit-modes",
+    "name": "Editor: Edit Modes Strip",
+    "version": "0.2.0-dev.1",
+    "author": "noctaur",
+    "description": "Shows the editor's edit modes (note expressions, or the audio editor's Stretch, Gain, Pan and so on) as a strip of buttons beside the hold-to-open mode button, so each one is a single click away.",
+    "area": "Editor",
+    "documentation": "readme",
+    "tags": [
+      "noctweaks",
+      "editor",
+      "piano roll",
+      "edit modes"
+    ]
+  },
+  "built_against": {
+    "bitwig_version": "6.1.4",
+    "platform": "windows",
+    "architecture": "x64"
+  },
+  "resources": {
+    "readme": {
+      "kind": "file",
+      "path": "README.md",
+      "media_type": "text/markdown"
+    }
+  }
+}

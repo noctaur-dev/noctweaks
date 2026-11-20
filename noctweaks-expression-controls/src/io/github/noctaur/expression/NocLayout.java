@@ -1,6 +1,6 @@
 package io.github.noctaur.expression;
 
-import bitwig.obf.dPg; // how a number field splits its value into parts (time fields: minutes, seconds, ...)
+import bitwig.obf.dNH; // how a number field splits its value into parts (time fields: minutes, seconds, ...)
 
 import java.util.function.DoubleFunction;
 
@@ -8,7 +8,7 @@ import java.util.function.DoubleFunction;
  * A number field layout with one part: the whole value as one piece of text ("4", "35 %", "Grow 40 %").
  * Bitwig's Inspector number field otherwise shows and drags its value in time parts (0:12.000).
  */
-final class NocLayout implements dPg {
+final class NocLayout implements dNH {
    private final DoubleFunction<String> text;
    private final double step;
    private final String widest;
@@ -21,19 +21,19 @@ final class NocLayout implements dPg {
 
    /** How many parts. */
    @Override
-   public int beI() {
+   public int cfM() {
       return 1;
    }
 
    /** A part's name. */
    @Override
-   public String beI(int part) {
+   public String cfM(int part) {
       return "value";
    }
 
    /** A part's text for this value. */
    @Override
-   public String beI(double value, int part) {
+   public String cfM(double value, int part) {
       try {
          return text.apply(value);
       } catch (Throwable t) {
@@ -43,13 +43,13 @@ final class NocLayout implements dPg {
 
    /** How much one step of dragging a part changes the value. */
    @Override
-   public double Gef(int part) {
+   public double MRY(int part) {
       return step;
    }
 
    /** The widest text a part can show (sizes the field). */
    @Override
-   public String sCA(int part) {
+   public String Hnt(int part) {
       return widest;
    }
 }

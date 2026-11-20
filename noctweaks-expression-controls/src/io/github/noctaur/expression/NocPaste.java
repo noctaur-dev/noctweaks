@@ -59,28 +59,28 @@ final class NocPaste {
    // ------------------------------------------------------------------ copy
 
    /** Copies the stretch of these expression points (the first note's, if several notes are selected). */
-   static boolean copy(List<Object> items, lFl expression, sre parameter) {
+   static boolean copy(List<Object> items, hJh expression, ucd parameter) {
       try {
-         java.util.Map<gum, List<oq1>> picked = NocShapes.byNote(items);
+         java.util.Map<dpB, List<hMP>> picked = NocShapes.byNote(items);
          if (picked.isEmpty()) {
             NocShapePanel.status("Select expression points to copy");
             return false;
          }
          // Every selected point, in time order. (Grouping them by note split one curve into pieces, so they
          // are all taken; with several notes selected, the one with the most points.)
-         java.util.Set<oq1> all = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+         java.util.Set<hMP> all = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
          int kinds = 0;
          for (Object o : NocShapes.unwrap(items)) {
-            if (o instanceof oq1 p) {
+            if (o instanceof hMP p) {
                all.add(p);
             } else {
                kinds++;
             }
          }
-         List<oq1> pts = new ArrayList<>(all);
+         List<hMP> pts = new ArrayList<>(all);
          if (picked.size() > 1) {
-            List<oq1> best = null;
-            for (List<oq1> g : picked.values()) {
+            List<hMP> best = null;
+            for (List<hMP> g : picked.values()) {
                if (best == null || g.size() > best.size()) {
                   best = g;
                }
@@ -100,10 +100,10 @@ final class NocPaste {
             v = new double[n];
             c = new double[n];
             for (int i = 0; i < n; i++) {
-               oq1 p = pts.get(i);
+               hMP p = pts.get(i);
                t[i] = NocShapes.time(p);
-               v[i] = NocShapes.normalized(p.mEL(), range);  // the point's value, 0..1 of the expression's range
-               c[i] = i < n - 1 ? p.dT_() : 0;               // the curvature of the segment after it
+               v[i] = NocShapes.normalized(p.tp2(), range);  // the point's value, 0..1 of the expression's range
+               c[i] = i < n - 1 ? p.dS_() : 0;               // the curvature of the segment after it
             }
          } else {
             // One point: from it to the next point (or the note's end).
@@ -143,10 +143,10 @@ final class NocPaste {
    // ------------------------------------------------------------------ paste
 
    /** The selected automation points (points not on a note). */
-   static List<oq1> automationPoints(List<Object> items) {
-      List<oq1> out = new ArrayList<>();
+   static List<hMP> automationPoints(List<Object> items) {
+      List<hMP> out = new ArrayList<>();
       for (Object o : NocShapes.unwrap(items)) {
-         if (o instanceof oq1 p && NocShapes.noteOf(p) == null) {
+         if (o instanceof hMP p && NocShapes.noteOf(p) == null) {
             out.add(p);
          }
       }
@@ -154,7 +154,7 @@ final class NocPaste {
    }
 
    /** Pastes at a depth in percent (0 = as copied). */
-   static void paste(List<oq1> points, int percent) {
+   static void paste(List<hMP> points, int percent) {
       if (percent <= 0) {
          paste(points, Depth.AS_COPIED);
       } else {
@@ -163,11 +163,11 @@ final class NocPaste {
    }
 
    /** Pastes the copied shape from the earliest of these automation points, at this depth. */
-   static void paste(List<oq1> points, Depth depth) {
+   static void paste(List<hMP> points, Depth depth) {
       paste(points, depth.label, depth.swing);
    }
 
-   static void paste(List<oq1> points, String label, double depthSwing) {
+   static void paste(List<hMP> points, String label, double depthSwing) {
       try {
          if (!has()) {
             NocShapePanel.status("Copy an expression shape first");
@@ -177,22 +177,22 @@ final class NocPaste {
             NocShapePanel.status("Select an automation point to paste from");
             return;
          }
-         oq1 anchor = points.get(0);
-         for (oq1 p : points) {
+         hMP anchor = points.get(0);
+         for (hMP p : points) {
             if (NocShapes.time(p) < NocShapes.time(anchor)) {
                anchor = p;
             }
          }
-         tvm lane = anchor.mYH();        // the automation lane (its events) the point is on
+         bma lane = anchor.emh();        // the automation lane (its events) the point is on
          if (lane == null) {
             NocShapePanel.status("This point isn't on an automation lane");
             return;
          }
-         NSu mapping = lane.bT_();       // how the lane maps values
-         double raw = anchor.mEL();      // the point's value, in the parameter's own units (Hz, dB, …)
+         vcm mapping = lane.bS_();       // how the lane maps values
+         double raw = anchor.tp2();      // the point's value, in the parameter's own units (Hz, dB, …)
          double level;
          try {
-            level = mapping.beI((LCN) anchor);   // the same value as 0..1 of the parameter's range
+            level = mapping.cfM((dfo) anchor);   // the same value as 0..1 of the parameter's range
          } catch (Throwable e) {
             level = Math.max(0, Math.min(1, raw));
          }
@@ -213,9 +213,9 @@ final class NocPaste {
             t[i] = t0 + st[i];
             v[i] = Math.max(0, Math.min(1, level + (sv[i] - sv[0]) * scale));
          }
-         final oq1 from = anchor;
+         final hMP from = anchor;
          NocShapes.undoable(lane, "Paste Expression Shape", new Object(), () ->
-            lane.beI(t, v, r1.Gef, c, false, true, mapping, null)); // write the points (replaces that stretch)
+            lane.cfM(t, v, jRs.MRY, c, false, true, mapping, null)); // write the points (replaces that stretch)
          NocShapePanel.status("Pasted " + n + " points (" + label + ")");
          Expr.log("Paste: " + n + " points at " + t0 + " from level " + raw + " (" + label + ", scale " + scale
             + ") normalized " + level + " onto " + lane.getClass().getName() + " via " + from.getClass().getName(), null);
@@ -226,19 +226,19 @@ final class NocPaste {
    }
 
    /** "Paste Expression Shape" with its depths, in a right-click menu. */
-   static void pasteMenu(dMt menu, List<oq1> points) {
+   static void pasteMenu(dKW menu, List<hMP> points) {
       if (points.isEmpty()) {
          return;
       }
-      menu.fpX();
+      menu.ELS();
       if (!has()) {
-         menu.beI("Paste Expression Shape (copy one first)", () -> {
+         menu.cfM("Paste Expression Shape (copy one first)", () -> {
          });
          return;
       }
-      dMt sub = menu.sCA("Paste Expression Shape");
+      dKW sub = menu.Hnt("Paste Expression Shape");
       for (Depth d : DEPTHS) {
-         sub.beI(d.label, () -> paste(points, d));
+         sub.cfM(d.label, () -> paste(points, d));
       }
    }
 }

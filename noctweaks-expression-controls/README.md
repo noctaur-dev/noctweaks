@@ -45,16 +45,14 @@ starts there.
 - Shape items in the note editor's right-click menu and in the menu for selected notes and points.
 - **Ctrl+drag copies expression points**, like notes: the originals stay put, a preview of the copy follows
   the mouse, and on release the copied shape is written where you drop it, smoothed into the points around it.
-- The editor's **edit modes** as a strip of buttons beside the mode button, so each is one click away.
-
-  ![The edit modes strip](images/exp-edit-modes.gif)
-
 - The note editor opens on the **piano roll** instead of the drum grid on tracks with a drum machine
   (picking the drum grid by hand still works).
 
 ## Notes
 
-- Bitwig 6.1.7 (Windows) only for now; on other versions Patchbay shows it as
-  not available.
+- Built against Bitwig 6.1.4, Patchbay's reference version, so Patchbay can run it on every Bitwig version it
+  supports (6.0 to 6.1.7) on Windows, macOS and Linux. So far it has only been tested on Windows with 6.1.7.
+- The edit modes strip that used to be part of this mod is now its own mod:
+  [Edit Modes Strip](../noctweaks-edit-modes).
 - The shape icons are the mod's own SVGs (in `icons/`).
 - Not affiliated with Bitwig: an unofficial community project, not made, endorsed or supported by Bitwig GmbH.

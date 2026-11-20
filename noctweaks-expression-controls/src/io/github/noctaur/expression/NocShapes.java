@@ -1,8 +1,8 @@
 package io.github.noctaur.expression;
 
 import bitwig.obf.*;
-import com.bitwig.ramona.core.tIb;
-import com.bitwig.ramona.core.ytz;
+import com.bitwig.ramona.core.FDA;
+import com.bitwig.ramona.core.oDc;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -58,23 +58,23 @@ public final class NocShapes {
    /** Slides the wobbles toward the start (negative) or the end (positive) of the note, -1..1. */
    static volatile double skew;
    /** How far a shape goes, per expression: semitones for Transpose, percent of the range otherwise. */
-   static final java.util.Map<lFl, Double> AMOUNT = new java.util.concurrent.ConcurrentHashMap<>();
+   static final java.util.Map<hJh, Double> AMOUNT = new java.util.concurrent.ConcurrentHashMap<>();
    private static final double[] SEMITONES = {0.1, 0.25, 0.5, 1, 2, 3, 5, 7, 12, 24};
    private static final double[] PERCENT = {5, 10, 25, 50, 75, 100};
 
-   static boolean isTranspose(lFl e) {
+   static boolean isTranspose(hJh e) {
       return "TRANSPOSE".equals(e.name());
    }
 
-   static boolean isGain(lFl e) {
+   static boolean isGain(hJh e) {
       return "GAIN".equals(e.name());
    }
 
-   static double amount(lFl e) {
+   static double amount(hJh e) {
       return AMOUNT.getOrDefault(e, isTranspose(e) ? 1.0 : isGain(e) ? 100.0 : 25.0);
    }
 
-   static String amountLabel(lFl e, double v) {
+   static String amountLabel(hJh e, double v) {
       if (isTranspose(e)) {
          String n = v == Math.rint(v) ? String.valueOf((int)v) : String.valueOf(v);
          return "±" + n + (v == 1 ? " semitone" : " semitones");
@@ -86,7 +86,7 @@ public final class NocShapes {
    }
    private static volatile boolean loggedMapping;
    private static volatile Object lastTarget;
-   private static volatile rBG lastSelection;
+   private static volatile OjS lastSelection;
    private static int diagnostics;
 
    // ------------------------------------------------------------------ menu
@@ -99,16 +99,16 @@ public final class NocShapes {
     * Hook at the end of bkI.IYM(dKG, duK, bhW, gC): the menu for selected notes or expression points
     * (Bitwig shows it instead of the background menu when you right-click a selection).
     */
-   public static void selectionMenu(dMt menu, Object owner, Object header) {
+   public static void selectionMenu(dKW menu, Object owner, Object header) {
       try {
-         if (!(header instanceof bju h)) {
+         if (!(header instanceof big h)) {
             return;
          }
-         List<Object> items = unwrap(new ArrayList<>(h.unz().MgQ()));
+         List<Object> items = unwrap(new ArrayList<>(h.UNj().FzB()));
          pasteItems(menu, items);
          boolean editable = false;
          for (Object o : items) {
-            if (o instanceof Vxa || o instanceof gum || o instanceof oq1) {
+            if (o instanceof bOw || o instanceof dpB || o instanceof hMP) {
                editable = true;
                break;
             }
@@ -124,30 +124,30 @@ public final class NocShapes {
             return;
          }
          Object w = owner;
-         for (int i = 0; i < 30 && w != null && !(w instanceof aOp); i++) {
+         for (int i = 0; i < 30 && w != null && !(w instanceof aNj); i++) {
             Object up = null;
             try {
-               up = ((dxu)w).oRH();
+               up = ((dvW)w).RbC();
             } catch (Throwable ignored) {
             }
             w = up == w ? null : up;
          }
-         if (!(w instanceof aOp)) {
+         if (!(w instanceof aNj)) {
             Expr.log("Expression shapes: selection menu outside the note editor (" + (owner == null ? "null" : owner.getClass().getName()) + ")", null);
             return;
          }
          picked = items;
-         NocShapePanel.remember((aOp)w);
-         build(menu, (aOp)w);
+         NocShapePanel.remember((aNj)w);
+         build(menu, (aNj)w);
       } catch (Throwable t) {
          Expr.log("Expression shapes: could not extend the selection menu", t);
       }
    }
 
    /** Selected automation points: "Paste Expression Shape" (wherever the menu is). */
-   private static void pasteItems(dMt menu, List<Object> items) {
+   private static void pasteItems(dKW menu, List<Object> items) {
       try {
-         List<oq1> auto = NocPaste.automationPoints(items);
+         List<hMP> auto = NocPaste.automationPoints(items);
          if (!auto.isEmpty() && PASTE_MENUS.add(menu)) {
             NocPaste.pasteMenu(menu, auto);
          }
@@ -156,141 +156,141 @@ public final class NocShapes {
       }
    }
 
-   public static void menu(dMt menu, Object editorWidget, Object target, Object selectionParam) {
+   public static void menu(dKW menu, Object editorWidget, Object target, Object selectionParam) {
       picked = null;
       lastTarget = target;
-      lastSelection = selectionParam instanceof rBG y ? y : null;
-      if (editorWidget instanceof aOp editor) {
+      lastSelection = selectionParam instanceof OjS y ? y : null;
+      if (editorWidget instanceof aNj editor) {
          NocShapePanel.remember(editor);
          build(menu, editor);
       }
    }
 
-   private static void build(dMt menu, aOp editor) {
+   private static void build(dKW menu, aNj editor) {
       try {
          if (!MENUS.add(menu)) {
             return;
          }
          try {
-            pasteItems(menu, picked != null ? picked : selectionItems(editor.sM3().GwM().mS_()));
+            pasteItems(menu, picked != null ? picked : selectionItems(editor.nfq().iCS().mR_()));
          } catch (Throwable t) {
             Expr.log("Paste: could not read the selection", t);
          }
-         nNL overlay = editor.QDQ().UnB().tWW();
-         if (overlay == null || overlay.IvP() == null || !overlay.IvP().getBoolValue()) {
+         XtM overlay = editor.ifN().EUG().LaE();
+         if (overlay == null || overlay.HL() == null || !overlay.HL().getBoolValue()) {
             return;   // not editing a note expression
          }
-         Object current = overlay.iFu() == null ? null : overlay.iFu().getValue();
-         if (!(current instanceof lFl expression)) {
+         Object current = overlay.MJ() == null ? null : overlay.MJ().getValue();
+         if (!(current instanceof hJh expression)) {
             return;
          }
-         sre parameter;
+         ucd parameter;
          try {
-            parameter = cX.beI(expression);
+            parameter = cM.cfM(expression);
          } catch (Throwable t) {
             return;   // velocity, chance…: not a curve
          }
          if (parameter == null) {
             return;
          }
-         bpn notes = editor.sM3().GwM();
+         bob notes = editor.nfq().iCS();
          final List<Object> items = picked;
-         if (!hasPoints(items != null ? items : selectionItems(notes.mS_()))) {
+         if (!hasPoints(items != null ? items : selectionItems(notes.mR_()))) {
             return;   // shapes run from expression points; nothing to start from
          }
 
-         menu.fpX();
-         menu.beI("Copy Expression Shape", () -> NocPaste.copy(items != null ? items : selectionItems(notes.mS_()), expression, parameter));
-         menu.beI("Melt Between Points", () -> {
+         menu.ELS();
+         menu.cfM("Copy Expression Shape", () -> NocPaste.copy(items != null ? items : selectionItems(notes.mR_()), expression, parameter));
+         menu.cfM("Melt Between Points", () -> {
             if (meltAmount < 0.005) {
                meltAmount = 0.6;   // the menu has no slider: a sensible softness when the panel's Melt is Off
             }
-            melt(notes, expression, parameter, items != null ? items : selectionItems(notes.mS_()));
+            melt(notes, expression, parameter, items != null ? items : selectionItems(notes.mR_()));
          });
-         dMt insert = menu.sCA("Insert Shape (" + title(expression) + ")");
+         dKW insert = menu.Hnt("Insert Shape (" + title(expression) + ")");
          for (Shape s : Shape.values()) {
             if (s.repeats) {
-               dMt sub = insert.sCA(s.label);
+               dKW sub = insert.Hnt(s.label);
                for (int cycles : new int[]{1, 2, 4, 8, 16}) {
-                  sub.beI(cycles + (cycles == 1 ? " Cycle" : " Cycles"), () -> apply(notes, expression, parameter, s, cycles, items));
+                  sub.cfM(cycles + (cycles == 1 ? " Cycle" : " Cycles"), () -> apply(notes, expression, parameter, s, cycles, items));
                }
             } else {
-               insert.beI(s.label, () -> apply(notes, expression, parameter, s, 1, items));
+               insert.cfM(s.label, () -> apply(notes, expression, parameter, s, 1, items));
             }
          }
-         insert.fpX();
-         dMt env = insert.sCA("Over the Note: " + envelope.label);
+         insert.ELS();
+         dKW env = insert.Hnt("Over the Note: " + envelope.label);
          for (Envelope e : Envelope.values()) {
-            env.beI((e == envelope ? "✓ " : "    ") + e.label, () -> {
+            env.cfM((e == envelope ? "✓ " : "    ") + e.label, () -> {
                envelope = e;
                growth = e == Envelope.GROW ? 1 : e == Envelope.FADE ? -1 : 0;
             });
          }
          double now = amount(expression);
-         dMt amount = insert.sCA("Amount: " + amountLabel(expression, now));
+         dKW amount = insert.Hnt("Amount: " + amountLabel(expression, now));
          for (double v : isTranspose(expression) ? SEMITONES : PERCENT) {
-            amount.beI((v == now ? "✓ " : "    ") + amountLabel(expression, v), () -> AMOUNT.put(expression, v));
+            amount.cfM((v == now ? "✓ " : "    ") + amountLabel(expression, v), () -> AMOUNT.put(expression, v));
          }
       } catch (Throwable t) {
          Expr.log("Expression shapes: could not build the menu", t);
       }
    }
 
-   static String titleOf(lFl e) {
+   static String titleOf(hJh e) {
       return title(e);
    }
 
    /** Menus that already got "Paste Expression Shape". */
    static final Set<Object> PASTE_MENUS = java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
 
-   private static String title(lFl e) {
+   private static String title(hJh e) {
       String n = e.name().toLowerCase(java.util.Locale.ROOT).replace('_', ' ');
       return Character.toUpperCase(n.charAt(0)) + n.substring(1);
    }
 
    // ------------------------------------------------------------------ apply
 
-   static void apply(bpn editor, lFl expression, sre parameter, Shape shape, int cycles, List<Object> given) {
+   static void apply(bob editor, hJh expression, ucd parameter, Shape shape, int cycles, List<Object> given) {
       mergeKey = null;   // a menu pick is its own undo step
-      apply(editor, expression, parameter, shape, cycles, given, lastSelection != null ? lastSelection : editor.mS_(), lastTarget);
+      apply(editor, expression, parameter, shape, cycles, given, lastSelection != null ? lastSelection : editor.mR_(), lastTarget);
    }
 
    /** The inspector panel: the editor's current selection, nothing remembered from a menu. */
-   static void applyNow(bpn editor, lFl expression, sre parameter, Shape shape, int cycles) {
-      apply(editor, expression, parameter, shape, cycles, null, editor.mS_(), null);
+   static void applyNow(bob editor, hJh expression, ucd parameter, Shape shape, int cycles) {
+      apply(editor, expression, parameter, shape, cycles, null, editor.mR_(), null);
    }
 
    /** The Points Inspector panel: its own selected points (the editor's selection holds the note, not the point). */
-   static void applyPoints(bpn editor, lFl expression, sre parameter, Shape shape, int cycles, List<Object> points) {
+   static void applyPoints(bob editor, hJh expression, ucd parameter, Shape shape, int cycles, List<Object> points) {
       // All selected points from the editor (the Points Inspector itself only lists the last one clicked).
-      List<Object> all = new ArrayList<>(selectionItems(editor.mS_()));
+      List<Object> all = new ArrayList<>(selectionItems(editor.mR_()));
       for (Object o : points) {
          if (!all.contains(o)) {
             all.add(o);
          }
       }
-      apply(editor, expression, parameter, shape, cycles, all, editor.mS_(), null);
+      apply(editor, expression, parameter, shape, cycles, all, editor.mR_(), null);
    }
 
    /** Whether any expression point (of a note) is among these selection items. */
    static boolean hasPoints(List<Object> items) {
       for (Object o : unwrap(items)) {
-         if (o instanceof oq1 c && noteOf(c) != null) {
+         if (o instanceof hMP c && noteOf(c) != null) {
             return true;
          }
       }
       return false;
    }
 
-   static void apply(bpn editor, lFl expression, sre parameter, Shape shape, int cycles, List<Object> given, rBG selection, Object target) {
+   static void apply(bob editor, hJh expression, ucd parameter, Shape shape, int cycles, List<Object> given, OjS selection, Object target) {
       try {
-         AGf clip = editor.mW_();
+         kPd clip = editor.mV_();
          List<Object> picked = unwrap(given != null ? given : selectionItems(selection));
-         java.util.Map<gum, List<oq1>> spans = byNote(picked);
+         java.util.Map<dpB, List<hMP>> spans = byNote(picked);
          if (!spans.isEmpty()) {
             if (diagnostics < 40) {
                StringBuilder b = new StringBuilder("Expression shapes: selected points per note:");
-               for (List<oq1> l : spans.values()) {
+               for (List<hMP> l : spans.values()) {
                   b.append(' ').append(l.size());
                }
                Expr.log(b.toString(), null);
@@ -330,7 +330,7 @@ public final class NocShapes {
     *            which Melt turns into soft S-curves
     * Every later tweak in the session is worked out from this, never from what Bitwig selects after a write.
     */
-   record Span(gum note, double ta, double tb, double[] bt, double[] bv, double[] curve, boolean[] hold,
+   record Span(dpB note, double ta, double tb, double[] bt, double[] bv, double[] curve, boolean[] hold,
          double[] ht, double[] hv, double[] at, double[] av) {
       /** The curve to ride: the heartline if there is one, else the curve as it was. */
       double base(double t) {
@@ -397,7 +397,7 @@ public final class NocShapes {
          }
          t = Math.max(t0, Math.min(t1, t));
          try {
-            return cX.beI(t, t0, t1, v0, v1, c);   // Bitwig's own segment shape
+            return cM.cfM(t, t0, t1, v0, v1, c);   // Bitwig's own segment shape
          } catch (Throwable e) {
             return v0 + (v1 - v0) * (t - t0) / (t1 - t0);
          }
@@ -439,13 +439,13 @@ public final class NocShapes {
    }
 
    /** Whether every selected point lies in a stretch already being shaped (on the same note). */
-   static boolean insideHeld(java.util.Map<gum, List<oq1>> spans) {
+   static boolean insideHeld(java.util.Map<dpB, List<hMP>> spans) {
       List<Span> held = heldSpans;
       if (held == null || held.isEmpty()) {
          return false;
       }
-      for (java.util.Map.Entry<gum, List<oq1>> e : spans.entrySet()) {
-         for (oq1 c : e.getValue()) {
+      for (java.util.Map.Entry<dpB, List<hMP>> e : spans.entrySet()) {
+         for (hMP c : e.getValue()) {
             double t = time(c);
             boolean in = false;
             for (Span sp : held) {
@@ -475,10 +475,10 @@ public final class NocShapes {
    }
 
    /** The point after this one on its curve (by time; Bitwig's own links aren't consistently forward). */
-   static LCN after(LCN p) {
+   static dfo after(dfo p) {
       double t = time(p);
-      LCN best = null;
-      for (LCN c : new LCN[]{p.LYs(), p.GwM()}) {
+      dfo best = null;
+      for (dfo c : new dfo[]{p.MIO(), p.iCS()}) {
          if (c != null && c != p && time(c) > t && (best == null || time(c) < time(best))) {
             best = c;
          }
@@ -491,16 +491,16 @@ public final class NocShapes {
     * vertical jump is two points at the same time, which walking by time skips). The points are linked to
     * their neighbours (NFl/oP, not always the same way round), so this walks the links to one end and back.
     */
-   static List<LCN> curveOf(LCN p) {
-      List<LCN> out = new ArrayList<>();
+   static List<dfo> curveOf(dfo p) {
+      List<dfo> out = new ArrayList<>();
       try {
-         gum note = noteOf(p);
-         java.util.Set<LCN> seen = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
-         LCN prev = null;
-         LCN cur = p;
+         dpB note = noteOf(p);
+         java.util.Set<dfo> seen = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+         dfo prev = null;
+         dfo cur = p;
          seen.add(cur);
          for (int guard = 0; guard < 100000; guard++) {
-            LCN next = other(cur, prev, seen, note);
+            dfo next = other(cur, prev, seen, note);
             if (next == null) {
                break;
             }
@@ -513,7 +513,7 @@ public final class NocShapes {
          out.add(cur);
          seen.add(cur);
          for (int guard = 0; guard < 100000; guard++) {
-            LCN next = other(cur, prev, seen, note);
+            dfo next = other(cur, prev, seen, note);
             if (next == null) {
                break;
             }
@@ -549,8 +549,8 @@ public final class NocShapes {
 
    private static int curveLogged;
 
-   private static LCN other(LCN cur, LCN prev, java.util.Set<LCN> seen, gum note) {
-      for (LCN c : new LCN[]{cur.LYs(), cur.GwM()}) {
+   private static dfo other(dfo cur, dfo prev, java.util.Set<dfo> seen, dpB note) {
+      for (dfo c : new dfo[]{cur.MIO(), cur.iCS()}) {
          if (c != null && c != cur && c != prev && !seen.contains(c) && (note == null || noteOf(c) == note)) {
             return c;
          }
@@ -558,10 +558,10 @@ public final class NocShapes {
       return null;
    }
 
-   static LCN before(LCN p) {
+   static dfo before(dfo p) {
       double t = time(p);
-      LCN best = null;
-      for (LCN c : new LCN[]{p.LYs(), p.GwM()}) {
+      dfo best = null;
+      for (dfo c : new dfo[]{p.MIO(), p.iCS()}) {
          if (c != null && c != p && time(c) < t && (best == null || time(c) > time(best))) {
             best = c;
          }
@@ -570,11 +570,11 @@ public final class NocShapes {
    }
 
    /** The selected points, per note (by note object: notes at the same time can be "equal"). */
-   static java.util.Map<gum, List<oq1>> byNote(List<Object> items) {
-      java.util.Map<gum, List<oq1>> spans = new java.util.IdentityHashMap<>();
+   static java.util.Map<dpB, List<hMP>> byNote(List<Object> items) {
+      java.util.Map<dpB, List<hMP>> spans = new java.util.IdentityHashMap<>();
       for (Object o : unwrap(items)) {
-         if (o instanceof oq1 c) {
-            gum owner = noteOf(c);
+         if (o instanceof hMP c) {
+            dpB owner = noteOf(c);
             if (owner != null) {
                spans.computeIfAbsent(owner, k -> new ArrayList<>()).add(c);
             }
@@ -588,7 +588,7 @@ public final class NocShapes {
     * point (or to the end of the note when there's none after it); several run from the first selected
     * to the last selected. Each note keeps its own level and slides.
     */
-   static List<Span> startSession(java.util.Map<gum, List<oq1>> spans, sre parameter) {
+   static List<Span> startSession(java.util.Map<dpB, List<hMP>> spans, ucd parameter) {
       List<Span> list = readSpans(spans, parameter);
       if (mergeKey == null) {
          mergeKey = new Object();   // a fresh session: its own undo step
@@ -600,22 +600,22 @@ public final class NocShapes {
    }
 
    /** The selected stretches, one per note (from its first selected point to its last; one point: to the next). */
-   static List<Span> readSpans(java.util.Map<gum, List<oq1>> spans, sre parameter) {
+   static List<Span> readSpans(java.util.Map<dpB, List<hMP>> spans, ucd parameter) {
       List<Span> list = new ArrayList<>();
       double[] r = mapping(parameter);
-      for (java.util.Map.Entry<gum, List<oq1>> e : spans.entrySet()) {
+      for (java.util.Map.Entry<dpB, List<hMP>> e : spans.entrySet()) {
          try {
-            gum note = e.getKey();
-            List<oq1> picked = new ArrayList<>(e.getValue());
+            dpB note = e.getKey();
+            List<hMP> picked = new ArrayList<>(e.getValue());
             // The whole curve in order (same-time points included); the stretch runs from the first
             // selected point to the last one (one selected: to the point after it).
-            List<LCN> chain = curveOf(picked.get(0));
-            java.util.Map<LCN, Integer> index = new java.util.IdentityHashMap<>();
+            List<dfo> chain = curveOf(picked.get(0));
+            java.util.Map<dfo, Integer> index = new java.util.IdentityHashMap<>();
             for (int k = 0; k < chain.size(); k++) {
                index.put(chain.get(k), k);
             }
             int ia = Integer.MAX_VALUE, ib = -1;
-            for (oq1 c : picked) {
+            for (hMP c : picked) {
                Integer k = index.get(c);
                if (k != null) {
                   ia = Math.min(ia, k);
@@ -630,11 +630,11 @@ public final class NocShapes {
             }
             Expr.log("Expression shapes: " + picked.size() + " selected point(s), curve of " + chain.size()
                + ", stretch " + ia + ".." + ib, null);
-            oq1 a = (oq1)chain.get(ia);
-            LCN b = ib > ia ? chain.get(ib) : (ia + 1 < chain.size() ? chain.get(ia + 1) : null);
-            final List<LCN> walk = chain;
+            hMP a = (hMP)chain.get(ia);
+            dfo b = ib > ia ? chain.get(ib) : (ia + 1 < chain.size() ? chain.get(ia + 1) : null);
+            final List<dfo> walk = chain;
             final int from = ia;
-            List<oq1> pts = new ArrayList<>(picked);
+            List<hMP> pts = new ArrayList<>(picked);
             pts.sort(java.util.Comparator.comparingInt(c -> index.getOrDefault(c, 0)));
             for (int k = pts.size() - 1; k > 0; k--) {
                if (pts.get(k) == pts.get(k - 1)) {
@@ -642,8 +642,8 @@ public final class NocShapes {
                }
             }
             double ta = time(a);
-            double len = ((bzn)note).ckt();
-            double start = note.qJX();
+            double len = ((iCu)note).nfq();
+            double start = note.NC();
             // Point times are either clip times or note-relative: take the note's end in the same terms.
             double end = (ta >= start - 1e-9 && ta <= start + len + 1e-9) ? start + len : len;
             double tb = b != null ? Math.min(time(b), end) : end;
@@ -654,7 +654,7 @@ public final class NocShapes {
             // The curve in that stretch: the points from a up to b.
             List<double[]> curve = new ArrayList<>();
             for (int k = from; k < walk.size(); k++) {
-               LCN p = walk.get(k);
+               dfo p = walk.get(k);
                double t = time(p);
                if (t > tb + 1e-9) {
                   break;
@@ -662,19 +662,19 @@ public final class NocShapes {
                double c = 0;
                boolean h = false;
                try {
-                  c = ((oq1)p).dT_();   // the point's curvature (bends the segment after it)
+                  c = ((hMP)p).dS_();   // the point's curvature (bends the segment after it)
                } catch (Throwable ignored) {
                }
                try {
-                  h = p.ZRB();   // hold: the value steps at the next point
+                  h = p.qoU();   // hold: the value steps at the next point
                } catch (Throwable ignored) {
                }
-               curve.add(new double[]{t, normalized(p.mEL(), r), c, h ? 1 : 0});
+               curve.add(new double[]{t, normalized(p.tp2(), r), c, h ? 1 : 0});
                if (p == b) {
                   break;
                }
             }
-            double vb = b != null ? normalized(b.mEL(), r) : (curve.isEmpty() ? normalized(a.mEL(), r) : curve.get(curve.size() - 1)[1]);
+            double vb = b != null ? normalized(b.tp2(), r) : (curve.isEmpty() ? normalized(a.tp2(), r) : curve.get(curve.size() - 1)[1]);
             // Always end on the end point itself (walking the links can stop short).
             if (curve.isEmpty() || curve.get(curve.size() - 1)[0] < tb - 1e-9) {
                curve.add(new double[]{tb, vb, 0, 0});
@@ -690,8 +690,8 @@ public final class NocShapes {
             }
             // The selected nodes (Melt works between these); one node: it and the next node / note end.
             List<double[]> anchors = new ArrayList<>();
-            for (oq1 q : pts) {
-               anchors.add(new double[]{time(q), normalized(q.mEL(), r)});
+            for (hMP q : pts) {
+               anchors.add(new double[]{time(q), normalized(q.tp2(), r)});
             }
             if (pts.size() == 1) {
                anchors.add(new double[]{tb, vb});
@@ -715,7 +715,7 @@ public final class NocShapes {
             double wa = ta + eps;
             double wb = b != null ? tb - eps : tb;
             Expr.log("Expression shapes: session span " + ta + ".." + tb + " over " + n + " point(s), "
-               + at.length + " node(s), level " + a.mEL() + " (note " + start + "+" + len + ")", null);
+               + at.length + " node(s), level " + a.tp2() + " (note " + start + "+" + len + ")", null);
             list.add(new Span(note, wa, wb, bt, bv, cv, hv, ht, hvv, at, av));
          } catch (Throwable t) {
             Expr.log("Expression shapes: a span could not be read", t);
@@ -725,7 +725,7 @@ public final class NocShapes {
    }
 
    /** Writes a shape over the session's stretches (on the melted line when Melt is on). */
-   static void writeSpans(List<Span> list, bpn editor, rBG selection, AGf clip, lFl expression, sre parameter, Shape shape, int cycles) {
+   static void writeSpans(List<Span> list, bob editor, OjS selection, kPd clip, hJh expression, ucd parameter, Shape shape, int cycles) {
       lastShape = shape;
       lastCycles = cycles;
       sessionShaped = true;
@@ -736,7 +736,7 @@ public final class NocShapes {
     * Writes the session's stretches as they should look now: with a shape, the shape on the line
     * (melted or not); without one yet, just the melted S-curves (as a few editable points).
     */
-   static void render(List<Span> list, bpn editor, rBG selection, AGf clip, lFl expression, sre parameter) {
+   static void render(List<Span> list, bob editor, OjS selection, kPd clip, hJh expression, ucd parameter) {
       if (list.isEmpty()) {
          NocShapePanel.status("Nothing after the selected point");
          return;
@@ -748,7 +748,7 @@ public final class NocShapes {
       Shape shape = lastShape;
       int cycles = shape.repeats ? lastCycles : 1;
       try {
-         editor.iMb().FCy();
+         editor.fJR().hQm();
       } catch (Throwable ignored) {
       }
       int[] count = {0};
@@ -779,11 +779,11 @@ public final class NocShapes {
                }
                // The clip that owns this note: with several tracks layered in the editor it isn't the
                // editor's own clip, and writing with the wrong one leaves points stuck and uneditable.
-               AGf owner = clipOf(sp.note());
+               kPd owner = clipOf(sp.note());
                if (owner == null) {
                   owner = clip;   // the editor's clip (fine when editing a single track)
                }
-               sp.note().beI(parameter, t, v, r1.Gef, c, owner, false, true, 0.0, selection);
+               sp.note().cfM(parameter, t, v, jRs.MRY, c, owner, false, true, 0.0, selection);
                count[0]++;
             } catch (Throwable t) {
                Expr.log("Expression shapes: a span failed", t);
@@ -1035,7 +1035,7 @@ public final class NocShapes {
       fit(st, sv, worst, b, tol, keep, curves, depth + 1);
    }
 
-   static void melt(bpn editor, lFl expression, sre parameter, List<Object> items) {
+   static void melt(bob editor, hJh expression, ucd parameter, List<Object> items) {
       melt(editor, expression, parameter, items, false);
    }
 
@@ -1043,16 +1043,16 @@ public final class NocShapes {
     * Melt: the lines between the selected nodes become soft S-curves (like auto-fades). live: from the
     * panel's Melt value, on the panel's session (a shape already written is redrawn on the melted line).
     */
-   static void melt(bpn editor, lFl expression, sre parameter, List<Object> items, boolean live) {
+   static void melt(bob editor, hJh expression, ucd parameter, List<Object> items, boolean live) {
       try {
-         rBG selection = editor.mS_();
-         AGf clip = editor.mW_();
+         OjS selection = editor.mR_();
+         kPd clip = editor.mV_();
          List<Span> list;
-         java.util.Map<gum, List<oq1>> picked = byNote(items);
+         java.util.Map<dpB, List<hMP>> picked = byNote(items);
          if (live && sessionActive() && (picked.isEmpty() || insideHeld(picked))) {
             list = heldSpans;   // still the same stretch (or Bitwig dropped the selection after a write)
          } else {
-            java.util.Map<gum, List<oq1>> spans = picked;
+            java.util.Map<dpB, List<hMP>> spans = picked;
             if (spans.isEmpty()) {
                NocShapePanel.status("Select expression points to melt between");
                return;
@@ -1072,9 +1072,9 @@ public final class NocShapes {
    static List<Object> unwrap(List<Object> items) {
       List<Object> out = new ArrayList<>(items.size());
       for (Object o : items) {
-         if (o instanceof rzQ m) {
+         if (o instanceof jvK m) {
             try {
-               oq1 c = m.BCC();
+               hMP c = m.lYc();
                if (c != null) {
                   rememberClip(c, m);
                }
@@ -1102,8 +1102,8 @@ public final class NocShapes {
       NocUndo edit = new NocUndo();
       boolean began = false;
       try {
-         if (document instanceof ytz doc) {
-            began = edit.beI(doc, name, new tIb(key, 0));
+         if (document instanceof oDc doc) {
+            began = edit.cfM(doc, name, new FDA(key, 0));
          }
       } catch (Throwable t) {
          Expr.log("Expression shapes: could not start an undo step", t);
@@ -1113,7 +1113,7 @@ public final class NocShapes {
       } finally {
          if (began) {
             try {
-               edit.Gef();
+               edit.MRY();
             } catch (Throwable t) {
                Expr.log("Expression shapes: could not finish the undo step", t);
             }
@@ -1121,14 +1121,14 @@ public final class NocShapes {
       }
    }
 
-   static List<gum> notesIn(List<Object> items) {
-      Set<gum> out = new LinkedHashSet<>();
+   static List<dpB> notesIn(List<Object> items) {
+      Set<dpB> out = new LinkedHashSet<>();
       for (Object o : items) {
-         if (o instanceof gum w) {
+         if (o instanceof dpB w) {
             out.add(w);
-         } else if (o instanceof Vxa m) {
+         } else if (o instanceof bOw m) {
             try {
-               out.add(m.beI());
+               out.add(m.cfM());
             } catch (Throwable ignored) {
             }
          }
@@ -1137,29 +1137,29 @@ public final class NocShapes {
    }
 
    /** Selected notes from the editor selection (whatever form the selection holds them in). */
-   static List<gum> selectedNotes(rBG selection) {
-      Set<gum> out = new LinkedHashSet<>();
+   static List<dpB> selectedNotes(OjS selection) {
+      Set<dpB> out = new LinkedHashSet<>();
       List<Object> items = selectionItems(selection);
       try {
-         items.addAll(selection.TaR().ymo());
+         items.addAll(selection.TgI().E3());
       } catch (Throwable ignored) {
       }
       try {
-         items.addAll(selection.yX3().BBg());
+         items.addAll(selection.RDJ().IwV());
       } catch (Throwable ignored) {
       }
       try {
-         items.addAll(selection.yX3().unz());
+         items.addAll(selection.RDJ().UNj());
       } catch (Throwable ignored) {
       }
       for (Object o : items) {
-         if (o instanceof gum w) {
+         if (o instanceof dpB w) {
             out.add(w);
-         } else if (o instanceof oq1) {
+         } else if (o instanceof hMP) {
             // a selected expression point: handled as a span (see apply)
-         } else if (o instanceof Vxa m) {
+         } else if (o instanceof bOw m) {
             try {
-               out.add(m.beI());
+               out.add(m.cfM());
             } catch (Throwable ignored) {
             }
          }
@@ -1168,18 +1168,18 @@ public final class NocShapes {
    }
 
    /** Everything in the editor's event selection (notes, expression points…). */
-   static List<Object> selectionItems(rBG selection) {
+   static List<Object> selectionItems(OjS selection) {
       List<Object> items = new ArrayList<>();
       try {
-         if (selection instanceof MnL j) {
-            YLc ev = j.XUO();   // the editor's event selection (notes, expression points…)
+         if (selection instanceof jdO j) {
+            iGx ev = j.dnz();   // the editor's event selection (notes, expression points…)
             if (ev != null) {
-               items.addAll(ev.MgQ());
+               items.addAll(ev.FzB());
             }
-         } else if (selection instanceof Pws f) {
-            Object ev = f.jOe();
-            if (ev instanceof GRp s) {
-               items.addAll(s.MgQ());
+         } else if (selection instanceof Bz f) {
+            Object ev = f.zxZ();
+            if (ev instanceof ICh s) {
+               items.addAll(s.FzB());
             }
          }
       } catch (Throwable t) {
@@ -1189,14 +1189,14 @@ public final class NocShapes {
    }
 
    /** The note an expression point belongs to (its owner chain). */
-   static gum noteOf(Object point) {
+   static dpB noteOf(Object point) {
       Object o = point;
       for (int i = 0; i < 12 && o != null; i++) {
-         if (o instanceof gum w) {
+         if (o instanceof dpB w) {
             return w;
          }
          try {
-            o = ((ytz)o).L_();
+            o = ((oDc)o).K_();
          } catch (Throwable t) {
             return null;
          }
@@ -1207,13 +1207,13 @@ public final class NocShapes {
    private static int chainLogged;
 
    /** Each note's clip, as told by the point views the editor selected (MGc.QmZ()); by note object. */
-   private static final java.util.Map<Object, AGf> NOTE_CLIPS = java.util.Collections.synchronizedMap(new java.util.IdentityHashMap<>());
+   private static final java.util.Map<Object, kPd> NOTE_CLIPS = java.util.Collections.synchronizedMap(new java.util.IdentityHashMap<>());
 
-   private static void rememberClip(oq1 point, rzQ view) {
+   private static void rememberClip(hMP point, jvK view) {
       try {
-         Object clip = view.fmw();
-         gum note = noteOf(point);
-         if (note != null && clip instanceof AGf c) {
+         Object clip = view.dnz();
+         dpB note = noteOf(point);
+         if (note != null && clip instanceof kPd c) {
             if (NOTE_CLIPS.size() > 512) {
                NOTE_CLIPS.clear();
             }
@@ -1224,20 +1224,20 @@ public final class NocShapes {
    }
 
    /** The clip a note belongs to (from its selected points, else walking up its owners); null when unknown. */
-   static AGf clipOf(Object note) {
-      AGf known = NOTE_CLIPS.get(note);
+   static kPd clipOf(Object note) {
+      kPd known = NOTE_CLIPS.get(note);
       if (known != null) {
          return known;
       }
       Object o = note;
       StringBuilder chain = new StringBuilder();
       for (int i = 0; i < 16 && o != null; i++) {
-         if (o instanceof AGf c) {
+         if (o instanceof kPd c) {
             return c;
          }
          chain.append(o.getClass().getName()).append(" > ");
          try {
-            Object up = ((ytz)o).L_();
+            Object up = ((oDc)o).K_();
             o = up == o ? null : up;
          } catch (Throwable t) {
             chain.append("(").append(t.getClass().getSimpleName()).append(")");
@@ -1251,20 +1251,20 @@ public final class NocShapes {
    }
 
    static double time(Object point) {
-      return ((AwH)point).ie();
+      return ((vFg)point).x3t();
    }
 
    /** Notes reachable from the right-clicked object or the editor's own selection model. */
-   static List<gum> notesFrom(bpn editor, Object target) {
-      Set<gum> out = new LinkedHashSet<>();
+   static List<dpB> notesFrom(bob editor, Object target) {
+      Set<dpB> out = new LinkedHashSet<>();
       try {
-         dDL sel = ((bpF)editor).ccv();
-         sel.dvk().forEach(o -> {
-            if (o instanceof gum w) {
+         yXG sel = ((bos)editor).fFs();
+         sel.Grk().forEach(o -> {
+            if (o instanceof dpB w) {
                out.add(w);
-            } else if (o instanceof Vxa m) {
+            } else if (o instanceof bOw m) {
                try {
-                  out.add(m.beI());
+                  out.add(m.cfM());
                } catch (Throwable ignored) {
                }
             }
@@ -1302,22 +1302,22 @@ public final class NocShapes {
       }
    }
 
-   static void diagnose(bpn editor, rBG selection, Object target) {
+   static void diagnose(bob editor, OjS selection, Object target) {
       try {
          StringBuilder b = new StringBuilder("Expression shapes diagnostics: target ").append(describe(target));
          b.append(" | selection ").append(describe(selection));
          b.append(" | events ").append(items(() -> selectionItems(selection)));
-         for (rBG y : new rBG[]{selection, editor.mS_()}) {
+         for (OjS y : new OjS[]{selection, editor.mR_()}) {
             if (y == null) {
                continue;
             }
-            b.append(" | Sjw ").append(items(() -> y.TaR().ymo()));
-            b.append(" a3J.xeZ ").append(items(() -> y.yX3().BBg()));
-            b.append(" a3J.KF3 ").append(items(() -> y.yX3().unz()));
+            b.append(" | Sjw ").append(items(() -> y.TgI().E3()));
+            b.append(" a3J.xeZ ").append(items(() -> y.RDJ().IwV()));
+            b.append(" a3J.KF3 ").append(items(() -> y.RDJ().UNj()));
          }
          try {
-            dDL sel = ((bpF)editor).ccv();
-            b.append(" | PaR ").append(describe(sel)).append(" Klm ").append(items(() -> sel.dvk().toList()));
+            yXG sel = ((bos)editor).fFs();
+            b.append(" | PaR ").append(describe(sel)).append(" Klm ").append(items(() -> sel.Grk().toList()));
          } catch (Throwable t) {
             b.append(" | PaR err ").append(t);
          }
@@ -1337,14 +1337,14 @@ public final class NocShapes {
    }
 
    /** Where the parameter rests, as a normalized value, and whether it only goes one way from there. */
-   static double[] mapping(sre parameter) {
+   static double[] mapping(ucd parameter) {
       double center = 0.5;
       boolean unipolar = false;
       double lo = 0, hi = 1;
       try {
-         Object m = cX.beI(parameter);
-         if (m instanceof aG a) {
-            double min = a.MgQ(), max = a.unz(), def = a.VNw();
+         Object m = cM.cfM(parameter);
+         if (m instanceof aL a) {
+            double min = a.FzB(), max = a.UNj(), def = a.dvk();
             lo = min;
             hi = max;
             if (max > min) {
@@ -1369,7 +1369,7 @@ public final class NocShapes {
       RAW        // offsets in normalized units, centred on 0 (spans between points)
    }
 
-   static Mode mode(lFl e, double[] range) {
+   static Mode mode(hJh e, double[] range) {
       if (isGain(e)) {
          return Mode.DOWN;
       }
@@ -1380,7 +1380,7 @@ public final class NocShapes {
    }
 
    /** The chosen amount as a normalized offset. */
-   static double amplitude(lFl e, double[] range) {
+   static double amplitude(hJh e, double[] range) {
       double a = amount(e);
       if (isTranspose(e)) {
          double span = range[3] - range[2];

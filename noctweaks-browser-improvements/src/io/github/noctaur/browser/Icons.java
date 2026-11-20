@@ -1,7 +1,7 @@
 package io.github.noctaur.browser;
 
-import bitwig.obf.dou;           // a window's image loader and cache (icons by name)
-import com.bitwig.graphics.haN;  // a loaded image
+import bitwig.obf.dnf;           // a window's image loader and cache (icons by name)
+import com.bitwig.graphics.BrJ;  // a loaded image
 
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -27,13 +27,13 @@ final class Icons {
 
    /** A window is about to load an icon: put ours in its cache first. */
    @SuppressWarnings("unchecked")
-   static void loading(dou window, String name, double scale) {
+   static void loading(dnf window, String name, double scale) {
       if (name == null || !name.startsWith(PREFIX) || window == null) {
          return;
       }
       try {
-         Map<Object, Object> cache = window.Anf;  // icons already loaded, by name and scale
-         String key = window.unz(name, scale);    // the cache key for this name and scale
+         Map<Object, Object> cache = window.UNj;  // icons already loaded, by name and scale
+         String key = window.UNj(name, scale);    // the cache key for this name and scale
          if (cache.containsKey(key)) {
             return;
          }
@@ -42,7 +42,7 @@ final class Icons {
             ? new java.io.File(new java.io.File(NocBrowser.stateDir(), "cache/icons"), rest.substring("coloured/".length())).toPath()
             : Browser.MOD.resource("icons").resolve(rest);
          try (InputStream in = Files.newInputStream(file)) {
-            haN image = window.Anf().beI(in, null, scale); // Bitwig's SVG renderer, as for its own icons
+            BrJ image = window.hUR().cfM(in, null, scale); // Bitwig's SVG renderer, as for its own icons
             if (image != null) {
                cache.put(key, image);
             }

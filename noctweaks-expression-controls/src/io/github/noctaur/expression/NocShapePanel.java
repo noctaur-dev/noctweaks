@@ -16,15 +16,15 @@ import java.util.function.Consumer;
  *
  * Hooks:
  *   aLg.b_(dWe)               -> inspector(panel, box)   (the note Inspector is built; patcher)
- *   NocModes.drawn(...)     -> seen(button)            (the editor's edit mode button repaints)
+ *   ExpressionHooks.editModeSeen -> seen(button)       (the editor's edit mode button repaints)
  *   NocShapes.menu(...)     -> remember(editor)        (the note editor's right-click menu)
  */
 public final class NocShapePanel {
    private NocShapePanel() {
    }
 
-   private static volatile WeakReference<dDG> button = new WeakReference<>(null);
-   private static volatile WeakReference<aOp> editor = new WeakReference<>(null);
+   private static volatile WeakReference<dCm> button = new WeakReference<>(null);
+   private static volatile WeakReference<aNj> editor = new WeakReference<>(null);
    private static volatile Object lastExpression;
    private static volatile boolean disabled;
    private static volatile boolean loggedSearch;
@@ -44,14 +44,14 @@ public final class NocShapePanel {
 
    /** The Amount field of the panel on screen (its range follows the expression). */
    private static volatile WeakReference<NocNumber> amountValue = new WeakReference<>(null);
-   private static volatile WeakReference<dPc> amountField = new WeakReference<>(null);
+   private static volatile WeakReference<dND> amountField = new WeakReference<>(null);
 
    // ------------------------------------------------------------------ editor tracking
 
    /** The note editor's edit mode button repainted: remember that editor and its expression. */
-   static void seen(dDG n) {
+   static void seen(dCm n) {
       try {
-         if (!(n.vYz() instanceof lFl now)) {
+         if (!(n.urM() instanceof hJh now)) {
             return;   // the audio editor's modes
          }
          if (!now.equals(lastExpression)) {
@@ -61,11 +61,11 @@ public final class NocShapePanel {
          if (button.get() == n && editor.get() != null) {
             return;
          }
-         dDG current = button.get();
-         if (current != null && current != n && current.mm2() && !n.mm2()) {
+         dCm current = button.get();
+         if (current != null && current != n && current.wuu() && !n.wuu()) {
             return;   // keep the editor whose expression editing is switched on
          }
-         aOp found = find(n);
+         aNj found = find(n);
          button = new WeakReference<>(n);
          if (found != null) {
             editor = new WeakReference<>(found);
@@ -76,18 +76,18 @@ public final class NocShapePanel {
    }
 
    /** The note editor this button belongs to: up its parents, then down each one looking for the editor. */
-   private static aOp find(dDG n) {
+   private static aNj find(dCm n) {
       StringBuilder chain = new StringBuilder();
       Object w = n;
       for (int i = 0; i < 40 && w != null; i++) {
-         if (w instanceof aOp a) {
+         if (w instanceof aNj a) {
             return a;
          }
-         if (w instanceof dwF d) {
+         if (w instanceof dve d) {
             try {
-               List<?> below = d.ymo(aOp.class);
+               List<?> below = d.E3(aNj.class);
                if (!below.isEmpty()) {
-                  return (aOp)below.get(0);
+                  return (aNj)below.get(0);
                }
             } catch (Throwable ignored) {
             }
@@ -95,7 +95,7 @@ public final class NocShapePanel {
          chain.append(w.getClass().getName()).append(" > ");
          Object up;
          try {
-            up = ((dxu)w).oRH();
+            up = ((dvW)w).RbC();
          } catch (Throwable t) {
             up = null;
          }
@@ -109,7 +109,7 @@ public final class NocShapePanel {
    }
 
    /** The note editor's right-click menu opened (also a sure way to know the editor). */
-   static void remember(aOp a) {
+   static void remember(aNj a) {
       if (a != null) {
          editor = new WeakReference<>(a);
       }
@@ -126,15 +126,15 @@ public final class NocShapePanel {
       }
    }
 
-   private static void expressionChanged(lFl e) {
+   private static void expressionChanged(hJh e) {
       try {
          NocNumber v = amountValue.get();
          if (v != null) {
             double max = amountMax(e);
             v.range(0, max);
-            dPc f = amountField.get();
+            dND f = amountField.get();
             if (f != null) {
-               f.IvP(max);
+               f.HL(max);
             }
             v.show(NocShapes.amount(e));
          }
@@ -144,22 +144,22 @@ public final class NocShapePanel {
    }
 
    /** The expression the editor is showing (or was last showing). */
-   static lFl expression() {
+   static hJh expression() {
       try {
-         dDG n = button.get();
-         if (n != null && n.vYz() instanceof lFl e) {
+         dCm n = button.get();
+         if (n != null && n.urM() instanceof hJh e) {
             return e;
          }
-         aOp a = editor.get();
+         aNj a = editor.get();
          if (a != null) {
-            nNL overlay = a.QDQ().UnB().tWW();
-            if (overlay != null && overlay.iFu() != null && overlay.iFu().getValue() instanceof lFl e) {
+            XtM overlay = a.ifN().EUG().LaE();
+            if (overlay != null && overlay.MJ() != null && overlay.MJ().getValue() instanceof hJh e) {
                return e;
             }
          }
       } catch (Throwable ignored) {
       }
-      return lastExpression instanceof lFl e ? e : null;
+      return lastExpression instanceof hJh e ? e : null;
    }
 
    // ------------------------------------------------------------------ inspector
@@ -167,11 +167,11 @@ public final class NocShapePanel {
    /** End of aLg.b_(dWe): add the section to the note Inspector. */
    public static void inspector(Object panel, Object box) {
       try {
-         if (disabled || !(panel instanceof aMo g) || !(box instanceof dXL b)) {
+         if (disabled || !(panel instanceof aLn g) || !(box instanceof dWb b)) {
             return;
          }
          try {
-            if (g.UIe().BBg()) {
+            if (g.Vr().IwV()) {
                return;   // audio events
             }
          } catch (Throwable ignored) {
@@ -193,18 +193,18 @@ public final class NocShapePanel {
     */
    public static void points(Object panel, Object box) {
       try {
-         if (disabled || !(box instanceof dXL b)) {
+         if (disabled || !(box instanceof dWb b)) {
             return;
          }
-         if (!(panel instanceof aLw m)) {
-            if (panel instanceof aHH h) {
+         if (!(panel instanceof aKv m)) {
+            if (panel instanceof aGI h) {
                automationPoints(h, b);   // automation points: the paste section
             }
             return;
          }
          List<Object> pts = new java.util.ArrayList<>();
          try {
-            pts.addAll(NocShapes.unwrap(new java.util.ArrayList<Object>(m.frp().bK_())));
+            pts.addAll(NocShapes.unwrap(new java.util.ArrayList<Object>(m.LEd().bJ_())));
          } catch (Throwable t) {
             Expr.log("Shape panel: could not read the selected points", t);
          }
@@ -237,9 +237,9 @@ public final class NocShapePanel {
    static List<Object> selectedPoints(Object panel) {
       java.util.Set<Object> out = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
       int live = -1;
-      if (panel instanceof aLw m) {
+      if (panel instanceof aKv m) {
          try {
-            List<Object> now = new java.util.ArrayList<Object>(m.frp().bK_());
+            List<Object> now = new java.util.ArrayList<Object>(m.LEd().bJ_());
             live = now.size();
             out.addAll(NocShapes.unwrap(now));
          } catch (Throwable t) {
@@ -251,9 +251,9 @@ public final class NocShapePanel {
          out.addAll(NocShapes.unwrap(new java.util.ArrayList<>(pts)));
       }
       try {
-         aOp a = editor.get();
+         aNj a = editor.get();
          if (a != null) {
-            out.addAll(NocShapes.unwrap(NocShapes.selectionItems(a.sM3().GwM().mS_()))); // the editor's selection
+            out.addAll(NocShapes.unwrap(NocShapes.selectionItems(a.nfq().iCS().mR_()))); // the editor's selection
          }
       } catch (Throwable t) {
          Expr.log("Copy: could not read the editor's selection", t);
@@ -266,46 +266,46 @@ public final class NocShapePanel {
    static volatile int pasteDepth = 0;
 
    /** The Points Inspector for automation points: "Paste Expression Shape", with its depths. */
-   private static void automationPoints(aHH panel, dXL box) {
+   private static void automationPoints(aGI panel, dWb box) {
       try {
          List<Object> items = new java.util.ArrayList<>();
          try {
-            items.addAll(new java.util.ArrayList<Object>(panel.Gak().bK_())); // the selected points
+            items.addAll(new java.util.ArrayList<Object>(panel.PD3().bJ_())); // the selected points
          } catch (Throwable t) {
             Expr.log("Paste: could not read the selected automation points", t);
          }
-         List<oq1> pts = NocPaste.automationPoints(items);
+         List<hMP> pts = NocPaste.automationPoints(items);
          if (pts.isEmpty()) {
             return;
          }
-         aMZ g = (aMZ) (Object) panel;
-         Consumer<dXL> body = d -> {
-            d.IvP(dvR.beI((JW) new NocText(NocPaste::describe, false)));
+         aLZ g = (aLZ) (Object) panel;
+         Consumer<dWb> body = d -> {
+            d.HL(dut.cfM((LJt) new NocText(NocPaste::describe, false)));
             if (NocPaste.has()) {
                NocNumber depth = new NocNumber(pasteDepth, 0, 100, true, v -> pasteDepth = (int) v);
-               d.IvP(aMZ.beI("Depth", "How far the pasted shape moves: As Copied, or so its swing fills this much of the range",
+               d.HL(aLZ.cfM("Depth", "How far the pasted shape moves: As Copied, or so its swing fills this much of the range",
                   field(g, depth, 0, 100, 5, v -> v < 0.5 ? "As Copied" : Math.round(v) + " %")));
-               d.IvP(aMZ.beI("Paste", "Paste the copied shape from the selected point, at this depth",
+               d.HL(aLZ.cfM("Paste", "Paste the copied shape from the selected point, at this depth",
                   NocChoice.create(new Object[]{"Paste Shape"}, o -> (String) o, null, o -> NocPaste.paste(pts, pasteDepth))));
             } else {
-               d.IvP(dvR.beI((JW) new NocText(() -> "Right-click selected expression points › Copy Expression Shape", false)));
+               d.HL(dut.cfM((LJt) new NocText(() -> "Right-click selected expression points › Copy Expression Shape", false)));
             }
             NocText line = new NocText(() -> status, true);
             LIVE_TEXT.add(line);
-            d.IvP(dvR.beI((JW) line));
+            d.HL(dut.cfM((LJt) line));
          };
-         box.IvP(g.beI((JW) new ATz("Paste Expression Shape"), body, null));
+         box.HL(g.cfM((LJt) new vjp("Paste Expression Shape"), body, null));
       } catch (Throwable t) {
          Expr.log("Paste: the Inspector section could not be added", t);
       }
    }
 
-   private static void add(aMZ g, dXL b) {
-      Consumer<dXL> body = d -> build(g, d);
-      b.IvP(g.beI((JW)new ATz("Expression Shape"), body, null));
+   private static void add(aLZ g, dWb b) {
+      Consumer<dWb> body = d -> build(g, d);
+      b.HL(g.cfM((LJt)new vjp("Expression Shape"), body, null));
    }
 
-   private static void build(aMZ g, dXL body) {
+   private static void build(aLZ g, dWb body) {
       try {
          // The panel got rebuilt for a new selection: start fresh, with every value back at its default and
          // nothing carried over from the points edited before. (A rebuild right after our own write is just
@@ -318,59 +318,59 @@ public final class NocShapePanel {
          rows[0] = NocChoice.create(FIRST, o -> ((NocShapes.Shape)o).label, o -> icon((NocShapes.Shape)o),
             has(FIRST, shape) ? shape : null, o -> {
                shape = (NocShapes.Shape)o;
-               rows[1].af((Object)null);
+               rows[1].vpw((Object)null);
                apply();
             }, null);
          rows[1] = NocChoice.create(SECOND, o -> ((NocShapes.Shape)o).label, o -> icon((NocShapes.Shape)o),
             has(SECOND, shape) ? shape : null, o -> {
                shape = (NocShapes.Shape)o;
-               rows[0].af((Object)null);
+               rows[0].vpw((Object)null);
                apply();
             }, null);
-         body.IvP(rows[0]);
-         body.IvP(rows[1]);
+         body.HL(rows[0]);
+         body.HL(rows[1]);
 
          NocNumber cyc = new NocNumber(cycles, 1, 32, true, v -> {
             cycles = (int)v;
             apply();
          });
-         body.IvP(aMZ.beI("Cycles", "How many times the shape repeats over the note",
+         body.HL(aLZ.cfM("Cycles", "How many times the shape repeats over the note",
             field(g, cyc, 1, 32, v -> String.valueOf((int)Math.rint(v)))));
 
-         lFl e = expression();
+         hJh e = expression();
          double max = amountMax(e);
          NocNumber amt = new NocNumber(e == null ? 25 : NocShapes.amount(e), 0, max, false, v -> {
-            lFl now = expression();
+            hJh now = expression();
             if (now != null) {
                NocShapes.AMOUNT.put(now, v);
             }
             apply();
          });
-         dPc amountBox = field(g, amt, 0, max, max <= 24 ? 0.1 : 1, NocShapePanel::amountText);
+         dND amountBox = field(g, amt, 0, max, max <= 24 ? 0.1 : 1, NocShapePanel::amountText);
          amountValue = new WeakReference<>(amt);
          amountField = new WeakReference<>(amountBox);
-         body.IvP(aMZ.beI("Amount", "Semitones for Pitch; for Gain how far it dips (100 % = down to -inf dB); percent otherwise",
+         body.HL(aLZ.cfM("Amount", "Semitones for Pitch; for Gain how far it dips (100 % = down to -inf dB); percent otherwise",
             amountBox));
 
          NocNumber skew = new NocNumber(NocShapes.skew * 100, -100, 100, false, v -> {
             NocShapes.skew = v / 100.0;
             apply();
          });
-         body.IvP(aMZ.beI("Skew", "Squeeze the cycles toward the start (negative) or the end (positive) of the note",
+         body.HL(aLZ.cfM("Skew", "Squeeze the cycles toward the start (negative) or the end (positive) of the note",
             field(g, skew, -100, 100, v -> Math.abs(v) < 0.5 ? "Even" : (v < 0 ? "Start " : "End ") + Math.round(Math.abs(v)) + " %")));
 
          NocNumber grow = new NocNumber(NocShapes.growth * 100, -100, 100, false, v -> {
             NocShapes.growth = v / 100.0;
             apply();
          });
-         body.IvP(aMZ.beI("Grow", "Grow into the shape over the note (positive) or fade it out (negative)",
+         body.HL(aLZ.cfM("Grow", "Grow into the shape over the note (positive) or fade it out (negative)",
             field(g, grow, -100, 100, v -> Math.abs(v) < 0.5 ? "Steady" : (v < 0 ? "Fade " : "Grow ") + Math.round(Math.abs(v)) + " %")));
 
          NocNumber edges = new NocNumber(NocShapes.edges * 100, 0, 50, false, v -> {
             NocShapes.edges = v / 100.0;
             apply();
          });
-         body.IvP(aMZ.beI("Fade", "Fade the shape in at the start and out at the end (how much of it each fade takes)",
+         body.HL(aLZ.cfM("Fade", "Fade the shape in at the start and out at the end (how much of it each fade takes)",
             field(g, edges, 0, 50, v -> v < 0.5 ? "Off" : "In/Out " + Math.round(v) + " %")));
 
          // Melt is live: drag it and the lines between the selected points soften as you go (0 = straight).
@@ -378,7 +378,7 @@ public final class NocShapePanel {
             NocShapes.meltAmount = v / 100.0;
             throttled(NocShapePanel::meltNow);
          });
-         body.IvP(aMZ.beI("Melt", "Soft S-curves between the selected points (like auto-fades); 0 = straight lines",
+         body.HL(aLZ.cfM("Melt", "Soft S-curves between the selected points (like auto-fades); 0 = straight lines",
             field(g, melt, 0, 95, v -> v < 0.5 ? "Off" : Math.round(v) + " %")));
 
          // Simplify is live too: redraws the selected stretch with as few points as still follow it.
@@ -386,20 +386,20 @@ public final class NocShapePanel {
             NocShapes.simplifyAmount = v / 100.0;
             throttled(NocShapePanel::meltNow);
          });
-         body.IvP(aMZ.beI("Simplify", "Redraw the selected stretch with as few points as still follow it (higher = fewer points, looser fit); 0 = off",
+         body.HL(aLZ.cfM("Simplify", "Redraw the selected stretch with as few points as still follow it (higher = fewer points, looser fit); 0 = off",
             field(g, simplify, 0, 100, v -> v < 0.5 ? "Off" : Math.round(v) + " %")));
 
-         body.IvP(aMZ.beI("Copy", "Copy this stretch of the expression, to paste onto automation (select an automation point, then Paste Expression Shape)",
+         body.HL(aLZ.cfM("Copy", "Copy this stretch of the expression, to paste onto automation (select an automation point, then Paste Expression Shape)",
             NocChoice.create(new Object[]{"Copy Shape"}, o -> (String) o, null, o -> {
-               lFl ex = expression();
+               hJh ex = expression();
                if (ex != null) {
-                  NocPaste.copy(selectedPoints(g), ex, cX.beI(ex));
+                  NocPaste.copy(selectedPoints(g), ex, cM.cfM(ex));
                }
             })));
 
          NocText line = new NocText(() -> status, true);
          LIVE_TEXT.add(line);
-         body.IvP(dvR.beI((JW)line));
+         body.HL(dut.cfM((LJt)line));
       } catch (Throwable t) {
          disabled = true;
          Expr.log("Shape panel could not be built", t);
@@ -424,12 +424,12 @@ public final class NocShapePanel {
     * One of Bitwig's own Inspector number fields, showing a NocNumber as one plain value ("4", "35 %",
     * "Grow 40 %"): drag it up or down, or double-click to type a number.
     */
-   private static dPc field(aMZ g, NocNumber value, double min, double max, java.util.function.DoubleFunction<String> text) {
+   private static dND field(aLZ g, NocNumber value, double min, double max, java.util.function.DoubleFunction<String> text) {
       return field(g, value, min, max, 1, text);
    }
 
-   private static dPc field(aMZ g, NocNumber value, double min, double max, double step, java.util.function.DoubleFunction<String> text) {
-      dPc f = g.beI((Clo)value, (NVD)null, (NVD)null);
+   private static dND field(aLZ g, NocNumber value, double min, double max, double step, java.util.function.DoubleFunction<String> text) {
+      dND f = g.cfM((mcu)value, (foz)null, (foz)null);
       String widest = "";
       for (double v : new double[]{min, max, (min + max) / 2}) {
          String t = text.apply(v);
@@ -437,10 +437,10 @@ public final class NocShapePanel {
             widest = t;
          }
       }
-      f.beI((dPg)new NocLayout(text, step, widest)); // one value, not Bitwig's minutes:seconds parts
-      f.beI((dPX)new NocFormat(text));
-      f.nhI(min);
-      f.IvP(max);
+      f.cfM((dNH)new NocLayout(text, step, widest)); // one value, not Bitwig's minutes:seconds parts
+      f.cfM((dOu)new NocFormat(text));
+      f.Z1C(min);
+      f.HL(max);
       return f;
    }
 
@@ -473,7 +473,7 @@ public final class NocShapePanel {
       TIMER.schedule(new java.util.TimerTask() {
          @Override
          public void run() {
-            Fx.beI(() -> {
+            Fq.cfM(() -> {
                pending = false;
                lastApply = System.currentTimeMillis();
                Runnable w = pendingWrite;
@@ -489,7 +489,7 @@ public final class NocShapePanel {
    /** Writes the current settings over the selected points' stretches. */
    static void applyNow() {
       try {
-         aOp a = editor.get();
+         aNj a = editor.get();
          if (a == null) {
             status("Right-click in the note editor once, then try again");
             return;
@@ -498,14 +498,14 @@ public final class NocShapePanel {
             status("Pick a shape to draw it with these values");
             return;
          }
-         lFl e = expression();
+         hJh e = expression();
          if (e == null) {
             status("Pick a note expression in the editor");
             return;
          }
-         sre parameter;
+         ucd parameter;
          try {
-            parameter = cX.beI(e);
+            parameter = cM.cfM(e);
          } catch (Throwable t) {
             parameter = null;
          }
@@ -513,7 +513,7 @@ public final class NocShapePanel {
             status("This expression has no curve");
             return;
          }
-         bpn notes = a.sM3().GwM();
+         bob notes = a.nfq().iCS();
          lastWrite = System.currentTimeMillis();
          List<Object> pts = panelPoints;
          if (pts != null) {
@@ -522,10 +522,10 @@ public final class NocShapePanel {
             NocShapes.applyNow(notes, e, parameter, shape, shape.repeats ? cycles : 1);
          }
          // Show the expression being written, as picking it from the hold button does.
-         dDG n = button.get();
-         if (n != null && !n.mm2()) {
+         dCm n = button.get();
+         if (n != null && !n.wuu()) {
             try {
-               n.y3f(true);
+               n.uWE(true);
             } catch (Throwable ignored) {
             }
          }
@@ -537,15 +537,15 @@ public final class NocShapePanel {
    /** Melt: soft S-curves between the selected points (see NocShapes.melt). */
    static void meltNow() {
       try {
-         aOp a = editor.get();
-         lFl e = expression();
+         aNj a = editor.get();
+         hJh e = expression();
          if (a == null || e == null) {
             status("Pick a note expression in the editor");
             return;
          }
-         sre parameter = cX.beI(e);
-         bpn notes = a.sM3().GwM();
-         List<Object> items = new java.util.ArrayList<>(NocShapes.selectionItems(notes.mS_()));
+         ucd parameter = cM.cfM(e);
+         bob notes = a.nfq().iCS();
+         List<Object> items = new java.util.ArrayList<>(NocShapes.selectionItems(notes.mR_()));
          List<Object> pts = panelPoints;
          if (pts != null) {
             items.addAll(pts);
@@ -583,12 +583,12 @@ public final class NocShapePanel {
       return Icons.name("shape/" + name + ".svg");
    }
 
-   private static double amountMax(lFl e) {
+   private static double amountMax(hJh e) {
       return e != null && NocShapes.isTranspose(e) ? 24 : 100;
    }
 
    private static String amountText(double v) {
-      lFl e = expression();
+      hJh e = expression();
       if (e != null && NocShapes.isTranspose(e)) {
          return (v < 10 ? String.format(java.util.Locale.ROOT, "%.2f", v) : String.format(java.util.Locale.ROOT, "%.1f", v)) + " st";
       }
