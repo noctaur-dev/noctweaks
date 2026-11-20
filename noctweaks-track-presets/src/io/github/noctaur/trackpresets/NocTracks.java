@@ -244,41 +244,48 @@ public final class NocTracks {
    }
 
    /** Collections that hold track presets (as submenus), then all presets, then the folder. */
+   /**
+    * The presets, as two submenus: Collections (each collection that holds a preset, with those presets) and
+    * All (every preset), then Open Track Presets Folder.
+    */
    private static void addPresetsMenu(dKW insert, java.util.function.Consumer<File> pick) {
       File[] presets = presets();
       if (presets.length == 0) {
          insert.cfM("(none saved yet: right-click a track > Save Track as Track Preset)", () -> {
          });
-      }
-      try {
-         for (Object o : EE.UNj().Cuu()) {
-            if (!(o instanceof GK fw)) {
-               continue;
-            }
-            List<File> in = new ArrayList<>();
-            for (File f : presets) {
-               try {
-                  if (fw.cfM(new z2y(f))) {
-                     in.add(f);
+      } else {
+         dKW collections = null;
+         try {
+            for (Object o : EE.UNj().Cuu()) {   // the user's collections
+               if (!(o instanceof GK fw)) {
+                  continue;
+               }
+               List<File> in = new ArrayList<>();
+               for (File f : presets) {
+                  try {
+                     if (fw.cfM(new z2y(f))) {   // the collection holds this file
+                        in.add(f);
+                     }
+                  } catch (Throwable ignored) {
                   }
-               } catch (Throwable ignored) {
+               }
+               if (!in.isEmpty()) {
+                  if (collections == null) {
+                     collections = insert.Hnt("Collections");
+                  }
+                  dKW sub = collections.Hnt(String.valueOf(fw.IwV()).replace("/", "  ›  "));
+                  for (File f : in) {
+                     sub.cfM(title(f), () -> pick.accept(f));
+                  }
                }
             }
-            if (!in.isEmpty()) {
-               dKW sub = insert.Hnt(String.valueOf(fw.IwV()).replace("/", "  ›  "));
-               for (File f : in) {
-                  sub.cfM(title(f), () -> pick.accept(f));
-               }
-            }
+         } catch (Throwable t) {
+            TrackPresets.log("Track presets: could not list collections", t);
          }
-      } catch (Throwable t) {
-         TrackPresets.log("Track presets: could not list collections", t);
-      }
-      if (presets.length > 0) {
-         insert.ELS();
-      }
-      for (File f : presets) {
-         insert.cfM(title(f), () -> pick.accept(f));
+         dKW all = insert.Hnt("All");
+         for (File f : presets) {
+            all.cfM(title(f), () -> pick.accept(f));
+         }
       }
       insert.ELS();
       insert.cfM("Open Track Presets Folder", NocTracks::openFolder);

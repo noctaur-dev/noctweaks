@@ -16,7 +16,8 @@ Part of **NocTweaks** by noctaur. Save whole tracks as presets and add them back
   ![Saving a track as a track preset](images/tp-save.gif)
 
 - **Add Track Preset Below…** in the track header menu, and **Add Track Preset** in the arranger's and panels'
-  background menus.
+  background menus. Each has an **All** submenu with every preset, and a **Collections** submenu with each
+  collection you've added presets to.
 
   ![Add Track Preset Below…](images/tp-add-below.gif)
 
