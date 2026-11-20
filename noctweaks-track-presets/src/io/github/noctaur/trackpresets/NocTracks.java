@@ -808,8 +808,8 @@ public final class NocTracks {
             if (TrackPresets.buttonShown() && at < 0) {
                p.cfM(YS.cfM(SOURCE), p.tp2());   // pin it at the end
             }
-         } else if (at >= 0) {
-            p.MRY((Wl)SOURCE);   // pinned there by an earlier version: track presets are main-browser only
+         } else if (at >= 0 && !newTrackPopupOn()) {
+            p.MRY((Wl)SOURCE);   // popups only get it while a new track's browser is open (popupOpening)
          }
       } catch (Throwable t) {
          TrackPresets.log("Could not pin the Tracks button", t);
@@ -818,6 +818,8 @@ public final class NocTracks {
 
    /** Show or hide the Tracks button (the browser's right-click menu). */
    static void browserMenu(dKW menu) {
+      boolean popup = TrackPresets.newTrackPopup();
+      menu.cfM((popup ? "✓ " : "    ") + "Track Presets in New Track Browser", () -> TrackPresets.setNewTrackPopup(!popup));
       boolean shown = TrackPresets.buttonShown();
       menu.cfM((shown ? "Hide" : "Show") + " Tracks Button", () -> {
          TrackPresets.setButtonShown(!shown);
@@ -935,6 +937,65 @@ public final class NocTracks {
       @Override
       public boolean MRY() {
          return inner.IwV() && isPreset(cursor);
+      }
+   }
+
+   // ------------------------------------------------------------------ the new-track popup browser
+
+   /** The insertion point of the popup browser that's open now, when it's an empty track's (else null). */
+   private static volatile aXs newTrack;
+   /** The kind set (and sidebar) that popup uses. */
+   private static volatile Object newTrackKinds;
+
+   static boolean newTrackPopupOn() {
+      return TrackPresets.newTrackPopup();
+   }
+
+   static boolean isNewTrackKinds(Object kinds) {
+      return kinds != null && kinds == newTrackKinds && newTrack != null;
+   }
+
+   /** True for the browser that opens on a new, empty instrument or audio track. */
+   private static boolean emptyTrack(aXs target) {
+      try {
+         if (!(target instanceof aXU u)) {
+            return false;
+         }
+         aXt mode = u.LaE();   // what is being added: an empty track's first device has its own modes
+         return mode == aXt.cfM || mode == aXt.MRY;
+      } catch (Throwable t) {
+         return false;
+      }
+   }
+
+   static void popupOpening(aXK where) {
+      try {
+         aXs target = where == null ? null : where.FzB();   // the insertion point the popup is for
+         boolean mine = target != null && newTrackPopupOn() && emptyTrack(target);
+         cEv kinds = target == null ? null : target.IwV();   // the popup's kind set (it has its own sidebar)
+         TrackPresets.log("Popup browser for " + (target == null ? "nothing" : target.getClass().getName())
+            + (mine ? " (an empty track: Tracks button shown)" : ""), null);
+         newTrack = mine ? target : null;
+         newTrackKinds = mine ? kinds : null;
+         if (kinds == null) {
+            return;
+         }
+         YO palette = kinds.lYc();   // that popup's sidebar buttons
+         int at = palette.cfM((Wl)SOURCE);
+         if (mine && at < 0) {
+            palette.cfM(YS.cfM(SOURCE), palette.tp2());
+         } else if (!mine && at >= 0) {
+            palette.MRY((Wl)SOURCE);
+         }
+      } catch (Throwable t) {
+         TrackPresets.log("Track presets: popup browser", t);
+      }
+   }
+
+   static void popupClosing(aXs target, boolean ok) {
+      if (target != null && target == newTrack) {
+         TrackPresets.log("New track browser " + (ok ? "OK" : "closed"), null);
+         newTrack = null;
       }
    }
 }

@@ -101,6 +101,26 @@ public final class TrackPresetsHooks {
       }
    }
 
+   // ================================================================== the new-track popup browser
+
+   /** A popup browser opens for an insertion point (a device chain, a track, a clip slot ...). */
+   @Hook(target = aXu.class, method = "cfM(LaCp;LaXK;ZZ)V", at = At.ENTRY, id = "popup-opening")
+   public static void popupOpening(@Arg(1) aXK target) {
+      NocTracks.popupOpening(target);
+   }
+
+   /** The popup's OK: its choice is kept (logged, to see what a track preset did there). */
+   @Hook(target = aXC.class, method = "cfM(LaXu;)V", at = At.ENTRY, id = "popup-commit")
+   public static void popupCommit(@This aXC target) {
+      NocTracks.popupClosing(target, true);
+   }
+
+   /** The popup closes without OK. */
+   @Hook(target = aXC.class, method = "UNj()V", at = At.ENTRY, id = "popup-closing")
+   public static void popupClosing(@This aXC target) {
+      NocTracks.popupClosing(target, false);
+   }
+
    /** The browser's final query: the projects the main browser now lists are kept to track presets. */
    @Hook(target = Jp.class, method = "tSS()LM22;", at = At.WRAP_RETURN, id = "presets-only")
    public static Object presetsOnly(@Return M22 query) {
@@ -136,7 +156,7 @@ public final class TrackPresetsHooks {
    @SuppressWarnings({"unchecked", "rawtypes"})
    public static Object browserKinds(@Return java.util.Set kinds) {
       Object b = take();
-      if (!(b instanceof cBj) || kinds == null) {
+      if (!(b instanceof cBj || NocTracks.isNewTrackKinds(b)) || kinds == null) {
          return kinds;
       }
       try {
