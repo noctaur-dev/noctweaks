@@ -110,10 +110,16 @@ public final class TrackPresetsHooks {
       NocTracks.popupOpening(target);
    }
 
-   /** The popup's OK: its choice is kept (logged, to see what a track preset did there). */
-   @Hook(target = aXC.class, method = "cfM(LaXu;)V", at = At.ENTRY, id = "popup-commit")
-   public static void popupCommit(@This aXC target) {
-      NocTracks.popupCommit(target);
+   /** The popup's OK (also a double-click on an item). */
+   @Hook(target = aXu.class, method = "E3()V", at = At.ENTRY, id = "popup-ok")
+   public static void popupOk(@This aXu popup) {
+      NocTracks.popupDone(popup.wGc, true);    // wGc: the insertion point the popup is for
+   }
+
+   /** The popup's Cancel (or closed). */
+   @Hook(target = aXu.class, method = "wGc()V", at = At.ENTRY, id = "popup-cancel")
+   public static void popupCancel(@This aXu popup) {
+      NocTracks.popupDone(popup.wGc, false);
    }
 
    /**
@@ -143,11 +149,6 @@ public final class TrackPresetsHooks {
       load.cfM(message);
    }
 
-   /** The popup closes without OK. */
-   @Hook(target = aXC.class, method = "UNj()V", at = At.ENTRY, id = "popup-closing")
-   public static void popupClosing(@This aXC target) {
-      NocTracks.popupClosing(target, false);
-   }
 
    /** The browser's final query: the projects the main browser now lists are kept to track presets. */
    @Hook(target = Jp.class, method = "tSS()LM22;", at = At.WRAP_RETURN, id = "presets-only")

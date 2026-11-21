@@ -3,7 +3,7 @@
   "mod": {
     "id": "noctweaks-track-presets",
     "name": "Tracks: Track Presets",
-    "version": "0.2.0-dev.5",
+    "version": "0.2.0-dev.6",
     "author": "noctaur",
     "description": "Save whole tracks as presets and add them back into any project: Save Track as Track Preset and Add Track Preset Below… in the track header menu, Add Track Preset in the arranger and panel menus, and a Tracks button in the browser sidebar to browse and drag them in. Experimental.",
     "area": "Tracks",

@@ -992,12 +992,6 @@ public final class NocTracks {
       }
    }
 
-   static void popupClosing(aXs target, boolean ok) {
-      if (target != null && target == newTrack) {
-         TrackPresets.log("New track browser " + (ok ? "OK" : "closed"), null);
-         newTrack = null;
-      }
-   }
 
    /** The track preset picked in the new track's browser (added on OK), and the project it goes into. */
    private static volatile File pendingPreset;
@@ -1033,15 +1027,20 @@ public final class NocTracks {
       return newTrack != null && presetFile(files) != null;
    }
 
-   /** OK in the new track's browser: a picked track preset replaces the new, empty track. */
-   static void popupCommit(aXs target) {
+   /** OK in the new track's browser: a picked track preset replaces the new, empty track. Cancel: nothing. */
+   static void popupDone(aXs target, boolean ok) {
       File file = pendingPreset;
       g2L project = pendingProject;
-      boolean mine = target != null && target == newTrack;
-      popupClosing(target, true);
+      boolean active = newTrack != null;
+      newTrack = null;
+      newTrackKinds = null;
       pendingPreset = null;
       pendingProject = null;
-      if (!mine || file == null || !(target instanceof aXC c)) {
+      if (!active) {
+         return;
+      }
+      TrackPresets.log("New track browser " + (ok ? "OK" : "closed") + (file == null ? "" : " with " + file.getName()), null);
+      if (!ok || file == null || !(target instanceof aXC c) || !emptyTrack(target)) {
          return;
       }
       try {
