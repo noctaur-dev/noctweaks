@@ -1,0 +1,30 @@
+{
+  "manifest_version": 2,
+  "mod": {
+    "id": "noctweaks-ara-bridge",
+    "name": "Audio: ARA Bridge (prototype)",
+    "version": "0.1.0-dev.1",
+    "author": "noctaur",
+    "description": "Prototype. Works with the NocTweaks ARA Bridge plug-in, which hosts Melodyne (or another ARA plug-in) on a track without transferring audio. Adds ARA Bridge items to the track header's right-click menu: set where the clip starts from the playhead, and open the bridge's folder.",
+    "area": "Tracks",
+    "documentation": "readme",
+    "tags": [
+      "noctweaks",
+      "ara",
+      "melodyne",
+      "prototype"
+    ]
+  },
+  "built_against": {
+    "bitwig_version": "6.1.4",
+    "platform": "windows",
+    "architecture": "x64"
+  },
+  "resources": {
+    "readme": {
+      "kind": "file",
+      "path": "README.md",
+      "media_type": "text/markdown"
+    }
+  }
+}

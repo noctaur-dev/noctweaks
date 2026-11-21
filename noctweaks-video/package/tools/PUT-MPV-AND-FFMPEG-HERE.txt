@@ -1,0 +1,12 @@
+The Video mod uses two free programs:
+
+  mpv     shows the video in a window kept in step with Bitwig
+  ffmpeg  turns the video's sound into a WAV that Bitwig adds as an audio clip
+
+If they're already installed (on PATH, Homebrew on a Mac, winget or scoop on Windows), nothing is needed here.
+Otherwise put them in this folder:
+
+  Windows: mpv.exe and ffmpeg.exe (or their folders, mpv\mpv.exe and ffmpeg\ffmpeg.exe)
+  macOS:   mpv.app (or the mpv program) and ffmpeg
+
+Without ffmpeg, mpv makes the WAV instead (slower).
