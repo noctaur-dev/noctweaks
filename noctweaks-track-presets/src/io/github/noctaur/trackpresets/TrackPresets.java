@@ -44,22 +44,4 @@ final class TrackPresets {
          log("Could not save the Tracks button setting", t);
       }
    }
-
-   /** Whether the new-track popup browser gets the Tracks button (on unless switched off in the browser's menu). */
-   static boolean newTrackPopup() {
-      try {
-         return MOD.settings().getBoolean("new-track-popup", true);
-      } catch (Throwable t) {
-         return true;
-      }
-   }
-
-   static void setNewTrackPopup(boolean on) {
-      try {
-         MOD.settings().putBoolean("new-track-popup", on);
-         MOD.settings().flush();
-      } catch (Throwable t) {
-         log("Could not save the new track browser setting", t);
-      }
-   }
 }

@@ -808,8 +808,8 @@ public final class NocTracks {
             if (TrackPresets.buttonShown() && at < 0) {
                p.cfM(YS.cfM(SOURCE), p.tp2());   // pin it at the end
             }
-         } else if (at >= 0 && !newTrackPopupOn()) {
-            p.MRY((Wl)SOURCE);   // popups only get it while a new track's browser is open (popupOpening)
+         } else if (at >= 0) {
+            p.MRY((Wl)SOURCE);   // pinned there by an earlier version: track presets are main-browser only
          }
       } catch (Throwable t) {
          TrackPresets.log("Could not pin the Tracks button", t);
@@ -818,8 +818,6 @@ public final class NocTracks {
 
    /** Show or hide the Tracks button (the browser's right-click menu). */
    static void browserMenu(dKW menu) {
-      boolean popup = TrackPresets.newTrackPopup();
-      menu.cfM((popup ? "✓ " : "    ") + "Track Presets in New Track Browser", () -> TrackPresets.setNewTrackPopup(!popup));
       boolean shown = TrackPresets.buttonShown();
       menu.cfM((shown ? "Hide" : "Show") + " Tracks Button", () -> {
          TrackPresets.setButtonShown(!shown);
@@ -937,128 +935,6 @@ public final class NocTracks {
       @Override
       public boolean MRY() {
          return inner.IwV() && isPreset(cursor);
-      }
-   }
-
-   // ------------------------------------------------------------------ the new-track popup browser
-
-   /** The insertion point of the popup browser that's open now, when it's an empty track's (else null). */
-   private static volatile aXs newTrack;
-   /** The kind set (and sidebar) that popup uses. */
-   private static volatile Object newTrackKinds;
-
-   static boolean newTrackPopupOn() {
-      return TrackPresets.newTrackPopup();
-   }
-
-   static boolean isNewTrackKinds(Object kinds) {
-      return kinds != null && kinds == newTrackKinds && newTrack != null;
-   }
-
-   /** True for the browser that opens on a new, empty instrument or audio track. */
-   private static boolean emptyTrack(aXs target) {
-      try {
-         if (!(target instanceof aXU u)) {
-            return false;
-         }
-         aXt mode = u.LaE();   // what is being added: an empty track's first device has its own modes
-         return mode == aXt.cfM || mode == aXt.MRY;
-      } catch (Throwable t) {
-         return false;
-      }
-   }
-
-   static void popupOpening(aXK where) {
-      try {
-         aXs target = where == null ? null : where.FzB();   // the insertion point the popup is for
-         boolean mine = target != null && newTrackPopupOn() && emptyTrack(target);
-         cEv kinds = target == null ? null : target.IwV();   // the popup's kind set (it has its own sidebar)
-         TrackPresets.log("Popup browser for " + (target == null ? "nothing" : target.getClass().getName())
-            + (mine ? " (an empty track: Tracks button shown)" : ""), null);
-         newTrack = mine ? target : null;
-         newTrackKinds = mine ? kinds : null;
-         if (kinds == null) {
-            return;
-         }
-         YO palette = kinds.lYc();   // that popup's sidebar buttons
-         int at = palette.cfM((Wl)SOURCE);
-         if (mine && at < 0) {
-            palette.cfM(YS.cfM(SOURCE), palette.tp2());
-         } else if (!mine && at >= 0) {
-            palette.MRY((Wl)SOURCE);
-         }
-      } catch (Throwable t) {
-         TrackPresets.log("Track presets: popup browser", t);
-      }
-   }
-
-
-   /** The track preset picked in the new track's browser (added on OK), and the project it goes into. */
-   private static volatile File pendingPreset;
-   private static volatile g2L pendingProject;
-
-   private static File presetFile(z2y[] files) {
-      try {
-         if (files == null || files.length != 1 || files[0] == null) {
-            return null;
-         }
-         File f = files[0].cfM();
-         String p = f == null ? "" : f.getPath().replace('\\', '/').toLowerCase(Locale.ROOT);
-         return p.endsWith(EXT) && p.contains("track presets/") && !p.contains("/.previous/") ? f : null;
-      } catch (Throwable t) {
-         return null;
-      }
-   }
-
-   /** Bitwig loads the picked item into the new track for a preview: remember a track preset for OK. */
-   static void previewing(z2y[] files, g2L project) {
-      if (newTrack == null) {
-         return;
-      }
-      File f = presetFile(files);
-      pendingPreset = f;
-      pendingProject = f == null ? null : project;
-      if (f != null) {
-         TrackPresets.log("New track browser: picked " + f.getName(), null);
-      }
-   }
-
-   static boolean previewIsPreset(z2y[] files) {
-      return newTrack != null && presetFile(files) != null;
-   }
-
-   /** OK in the new track's browser: a picked track preset replaces the new, empty track. Cancel: nothing. */
-   static void popupDone(aXs target, boolean ok) {
-      File file = pendingPreset;
-      g2L project = pendingProject;
-      boolean active = newTrack != null;
-      newTrack = null;
-      newTrackKinds = null;
-      pendingPreset = null;
-      pendingProject = null;
-      if (!active) {
-         return;
-      }
-      TrackPresets.log("New track browser " + (ok ? "OK" : "closed") + (file == null ? "" : " with " + file.getName()), null);
-      if (!ok || file == null || !(target instanceof aXC c) || !emptyTrack(target)) {
-         return;
-      }
-      try {
-         Object track = c.qoU().K_();   // the empty track (its device chain's owner)
-         g2L into = document(track) != null ? document(track) : project;
-         Fq.cfM(() -> {
-            try {
-               load(file, track, into);
-               if (into != null && track != null) {
-                  into.cfM(java.util.List.of(track));   // remove the empty track
-               }
-               TrackPresets.log("New track browser: " + file.getName() + " added in place of the new track", null);
-            } catch (Throwable t) {
-               TrackPresets.log("New track browser: could not add " + file.getName(), t);
-            }
-         });
-      } catch (Throwable t) {
-         TrackPresets.log("New track browser: OK", t);
       }
    }
 }

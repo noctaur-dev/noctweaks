@@ -8,8 +8,7 @@ import bml.api.Return;
 import bml.api.This;
 import com.bitwig.flt.document.core.master.IbI;                          // what a dropped browser item is added to
 import com.bitwig.flt.document.core.master.zwV;                         // what a dropped browser item becomes
-import com.bitwig.flt.document.core.master.g2L;
-import com.bitwig.flt.document.core.master.cen;                          // Bitwig loading files into a place                          // a loaded project (a dropped preset)
+import com.bitwig.flt.document.core.master.g2L;                          // a loaded project (a dropped preset)
 import com.bitwig.base.io.z2y;                                          // a library file (path + sub-item)
 
 import java.util.List;
@@ -102,54 +101,6 @@ public final class TrackPresetsHooks {
       }
    }
 
-   // ================================================================== the new-track popup browser
-
-   /** A popup browser opens for an insertion point (a device chain, a track, a clip slot ...). */
-   @Hook(target = aXu.class, method = "cfM(LaCp;LaXK;ZZ)V", at = At.ENTRY, id = "popup-opening")
-   public static void popupOpening(@Arg(1) aXK target) {
-      NocTracks.popupOpening(target);
-   }
-
-   /** The popup's OK (also a double-click on an item). */
-   @Hook(target = aXu.class, method = "E3()V", at = At.ENTRY, id = "popup-ok")
-   public static void popupOk(@This aXu popup) {
-      NocTracks.popupDone(popup.wGc, true);    // wGc: the insertion point the popup is for
-   }
-
-   /** The popup's Cancel (or closed). */
-   @Hook(target = aXu.class, method = "wGc()V", at = At.ENTRY, id = "popup-cancel")
-   public static void popupCancel(@This aXu popup) {
-      NocTracks.popupDone(popup.wGc, false);
-   }
-
-   /**
-    * cen: Bitwig loading files into a place (here: the item picked in the new track's browser, previewed on the
-    * track). A track preset can't go into a device chain; in the new track's browser it's kept for OK instead.
-    */
-   @Hook(target = cen.class, method = "cfM()V", at = At.ENTRY, id = "popup-preview")
-   public static void popupPreview(@This cen load) {
-      NocTracks.previewing(load.FzB, load.MRY); // FzB: the files; MRY: the project
-   }
-
-   /**
-    * ... and its "File type not supported" message is left out for a track preset there. The load still ends
-    * as failed (cfM(String) does both: it ends the load, then shows the message), or the browser waits for it.
-    */
-   @Hook(target = cen.class, method = "cfM()V", at = At.REPLACE_CALL,
-         callOwner = cen.class, call = "cfM(Ljava/lang/String;)V", id = "popup-preview-error")
-   public static void popupPreviewError(cen load, String message) {
-      if (NocTracks.previewIsPreset(load.FzB)) {
-         try {
-            load.IwV.cfM(message);   // IwV: the load's result; ends it as failed, without the message
-            return;
-         } catch (Throwable t) {
-            TrackPresets.log("New track browser: could not end the preview quietly", t);
-         }
-      }
-      load.cfM(message);
-   }
-
-
    /** The browser's final query: the projects the main browser now lists are kept to track presets. */
    @Hook(target = Jp.class, method = "tSS()LM22;", at = At.WRAP_RETURN, id = "presets-only")
    public static Object presetsOnly(@Return M22 query) {
@@ -185,7 +136,7 @@ public final class TrackPresetsHooks {
    @SuppressWarnings({"unchecked", "rawtypes"})
    public static Object browserKinds(@Return java.util.Set kinds) {
       Object b = take();
-      if (!(b instanceof cBj || NocTracks.isNewTrackKinds(b)) || kinds == null) {
+      if (!(b instanceof cBj) || kinds == null) {
          return kinds;
       }
       try {
