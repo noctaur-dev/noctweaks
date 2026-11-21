@@ -34,6 +34,13 @@ Part of **NocTweaks** by noctaur.
   > tree, and right-click a collection or folder there. For now it isn't in the right-click menu of a collection
   > pinned to the quick sources, or of Bitwig's own Collections list. That may come later.
 
+  <details>
+  <summary>Show where (screenshot)</summary>
+
+  <img src="images/br-set-icon-where.png" alt="Location selected at the top of the browser, Collections open in the tree, and the collections to right-click" width="262">
+
+  </details>
+
   ![The Set Icon picker with the colour wheel](images/br-set-icon.gif)
 
 - **Each plugin once** in the browser, instead of once per format (VST3, VST2, CLAP); the preferred format is
