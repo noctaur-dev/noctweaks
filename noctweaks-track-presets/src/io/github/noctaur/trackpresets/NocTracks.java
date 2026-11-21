@@ -493,6 +493,11 @@ public final class NocTracks {
    // ------------------------------------------------------------------ load
 
    static void load(File file, Object after, g2L project) {
+      load(file, after, project, false);
+   }
+
+   /** Adds a preset's tracks after the given track (or just before it), or at the end of the project. */
+   static void load(File file, Object after, g2L project, boolean before) {
       try {
          g2L dst = after != null ? document(after) : project;
          if (dst == null) {
@@ -520,7 +525,7 @@ public final class NocTracks {
          try {
             int i = after == null ? -1 : into.FzB((WSA)after);
             if (i >= 0) {
-               at = i + 1;
+               at = before ? i : i + 1;
             }
          } catch (Throwable ignored) {
             // nested track (inside a group): add at the end of the project
@@ -808,8 +813,8 @@ public final class NocTracks {
             if (TrackPresets.buttonShown() && at < 0) {
                p.cfM(YS.cfM(SOURCE), p.tp2());   // pin it at the end
             }
-         } else if (at >= 0) {
-            p.MRY((Wl)SOURCE);   // pinned there by an earlier version: track presets are main-browser only
+         } else if (at >= 0 && !newTrackPopupOn()) {
+            p.MRY((Wl)SOURCE);   // popups only get it while a new track's browser is open (popupOpening)
          }
       } catch (Throwable t) {
          TrackPresets.log("Could not pin the Tracks button", t);
@@ -818,6 +823,8 @@ public final class NocTracks {
 
    /** Show or hide the Tracks button (the browser's right-click menu). */
    static void browserMenu(dKW menu) {
+      boolean popup = TrackPresets.newTrackPopup();
+      menu.cfM((popup ? "✓ " : "    ") + "Track Presets in New Track Browser", () -> TrackPresets.setNewTrackPopup(!popup));
       boolean shown = TrackPresets.buttonShown();
       menu.cfM((shown ? "Hide" : "Show") + " Tracks Button", () -> {
          TrackPresets.setButtonShown(!shown);
@@ -936,5 +943,144 @@ public final class NocTracks {
       public boolean MRY() {
          return inner.IwV() && isPreset(cursor);
       }
+   }
+
+   // ------------------------------------------------------------------ the new-track popup browser
+
+   /** The insertion point of the popup browser that's open now, when it's an empty track's (else null). */
+   private static volatile aXs newTrack;
+   /** The kind set (and sidebar) that popup uses. */
+   private static volatile Object newTrackKinds;
+
+   static boolean newTrackPopupOn() {
+      return TrackPresets.newTrackPopup();
+   }
+
+   static boolean isNewTrackKinds(Object kinds) {
+      return kinds != null && kinds == newTrackKinds && newTrack != null;
+   }
+
+   /** True for the browser that opens on a new, empty instrument or audio track. */
+   private static boolean emptyTrack(aXs target) {
+      try {
+         if (!(target instanceof aXU u)) {
+            return false;
+         }
+         aXt mode = u.LaE();   // what is being added: an empty track's first device has its own modes
+         return mode == aXt.cfM || mode == aXt.MRY;
+      } catch (Throwable t) {
+         return false;
+      }
+   }
+
+   /** True when the popup browser is for a brand-new track ("+" under the tracks; aXX makes that track). */
+   private static boolean newTrackPopup(aXK where, aXs target) {
+      return where instanceof aXX && target instanceof aXC && emptyTrack(target);
+   }
+
+   static void popupOpening(aXK where, aXs target) {
+      try {
+         boolean mine = newTrackPopupOn() && newTrackPopup(where, target);
+         cEv kinds = target == null ? null : target.IwV();   // the popup's kind set (it has its own sidebar)
+         TrackPresets.log("Popup browser for " + (where == null ? "nothing" : where.getClass().getName())
+            + " -> " + (target == null ? "nothing" : target.getClass().getName())
+            + (mine ? " (a new track: Tracks button shown)" : ""), null);
+         newTrack = mine ? target : null;
+         newTrackKinds = mine ? kinds : null;
+         pendingPreset = null;
+         pendingProject = null;
+         if (kinds == null) {
+            return;
+         }
+         YO palette = kinds.lYc();   // that popup's sidebar buttons
+         int at = palette.cfM((Wl)SOURCE);
+         if (mine && at < 0) {
+            palette.cfM(YS.cfM(SOURCE), palette.tp2());
+         } else if (!mine && at >= 0) {
+            palette.MRY((Wl)SOURCE);
+         }
+      } catch (Throwable t) {
+         TrackPresets.log("Track presets: popup browser", t);
+      }
+   }
+
+   /** The track preset picked in the new track's browser (added on OK), and the project it goes into. */
+   private static volatile File pendingPreset;
+   private static volatile g2L pendingProject;
+
+   private static File presetFile(z2y[] files) {
+      try {
+         if (files == null || files.length != 1 || files[0] == null) {
+            return null;
+         }
+         File f = files[0].cfM();
+         String p = f == null ? "" : f.getPath().replace('\\', '/').toLowerCase(Locale.ROOT);
+         return p.endsWith(EXT) && p.contains("track presets/") && !p.contains("/.previous/") ? f : null;
+      } catch (Throwable t) {
+         return null;
+      }
+   }
+
+   /** Bitwig loads the picked item into the new track for a preview: remember a track preset for OK. */
+   static void previewing(z2y[] files, g2L project) {
+      if (newTrack == null) {
+         return;
+      }
+      File f = presetFile(files);
+      pendingPreset = f;
+      pendingProject = f == null ? null : project;
+      if (f != null) {
+         TrackPresets.log("New track browser: picked " + f.getName(), null);
+      }
+   }
+
+   static boolean previewIsPreset(z2y[] files) {
+      return newTrack != null && presetFile(files) != null;
+   }
+
+   /**
+    * OK in the new track's browser with a track preset picked: the browser is cancelled instead (so Bitwig
+    * takes its new, empty track away again, as it does on Cancel) and the preset's tracks go where it was.
+    */
+   static void popupOk(aXu popup) {
+      File file = pendingPreset;
+      aXs target = newTrack;
+      newTrack = null;
+      newTrackKinds = null;
+      pendingPreset = null;
+      pendingProject = null;
+      if (target == null) {
+         return;
+      }
+      TrackPresets.log("New track browser OK" + (file == null ? "" : " with " + file.getName()), null);
+      if (file == null) {
+         return;   // a device or anything else: Bitwig adds it as usual
+      }
+      try {
+         if (popup.lYc() != target || !(target instanceof aXC c)) {
+            TrackPresets.log("New track browser: not the popup it was opened for, left alone", null);
+            return;
+         }
+         Object track = c.qoU().K_();   // the new, empty track (its device chain's owner)
+         g2L into = document(track);
+         if (into == null) {
+            TrackPresets.log("New track browser: can't find the project of the new track", null);
+            return;
+         }
+         popup.wGc();                   // cancel: Bitwig removes the empty track when the popup closes
+         load(file, track, into, true); // the preset's tracks go in just above it, so they end up in its place
+      } catch (Throwable t) {
+         TrackPresets.log("New track browser: could not add " + file.getName(), t);
+      }
+   }
+
+   static void popupClosed(String how) {
+      if (newTrack != null) {
+         TrackPresets.log("New track browser " + how, null);
+      }
+      newTrack = null;
+      newTrackKinds = null;
+      pendingPreset = null;
+      pendingProject = null;
    }
 }
