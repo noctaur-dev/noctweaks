@@ -9,7 +9,11 @@ note expressions in the piano roll, and Stretch, Gain, Pan, Transpose, Formant a
 editor. This mod adds a strip of buttons for them beside that button, so each mode is one click away. The
 original button still works, and the strip always shows the mode that's selected.
 
-![The edit modes strip](images/edit-modes.gif)
+![The edit modes strip in the piano roll](images/edit-modes.gif)
+
+It works the same in the audio editor, with Stretch, Gain, Pan, Transpose, Formant and Onsets:
+
+![The edit modes strip in the audio editor](images/edit-modes-audio.png)
 
 ## Notes
 
