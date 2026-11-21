@@ -2,6 +2,8 @@
 
 Part of **NocTweaks** by noctaur.
 
+**[Download the latest release](https://github.com/noctaur-dev/noctweaks/releases/tag/noctweaks-edit-modes-0.2.0-dev.1)** (0.2.0-dev.1), then add the zip in Patchbay with *Add Mod…*.
+
 Bitwig 6 hides the editor's edit modes behind a hold-to-open button in the editor's bottom-left corner: the
 note expressions in the piano roll, and Stretch, Gain, Pan, Transpose, Formant and Onsets in the audio
 editor. This mod adds a strip of buttons for them beside that button, so each mode is one click away. The

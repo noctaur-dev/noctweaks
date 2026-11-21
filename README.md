@@ -3,13 +3,13 @@
 Mods for [Bitwig Studio](https://www.bitwig.com), for the
 [Patchbay](https://github.com/shaboogen-dev/Patchbay) mod loader.
 
-| Mod | What it does |
-| --- | --- |
-| [**Global Track View**](noctweaks-global-track-view) | Edit any track in the piano roll without going back to the arranger: the Track List panel in the Edit screen, an *Edit Tracks* menu, and layered editing when several tracks are open. |
-| [**Expression Controls**](noctweaks-expression-controls) | Draw shapes over note expression points, simplify and melt them, copy an expression shape onto automation, and Ctrl+drag to copy points. |
-| [**Edit Modes Strip**](noctweaks-edit-modes) | The editor's edit modes (note expressions, or Stretch, Gain, Pan and so on for audio) as a strip of buttons, each one click away. |
-| [**Browser: Collections and Icons**](noctweaks-browser-improvements) | Folders and nested collections, your own icons (Lucide), collections pinned as quick sources, and each plugin listed once. |
-| [**Track Presets**](noctweaks-track-presets) | Save whole tracks as presets and add them back into any project: from track menus, a Tracks button in the browser, or the new track browser (+). Experimental. |
+| Mod | What it does | Download |
+| --- | --- | --- |
+| [**Global Track View**](noctweaks-global-track-view) | Edit any track in the piano roll without going back to the arranger: the Track List panel in the Edit screen, an *Edit Tracks* menu, and layered editing when several tracks are open. | [0.2.0-dev.1](https://github.com/noctaur-dev/noctweaks/releases/tag/noctweaks-global-track-view-0.2.0-dev.1) |
+| [**Expression Controls**](noctweaks-expression-controls) | Draw shapes over note expression points, simplify and melt them, copy an expression shape onto automation, and Ctrl+drag to copy points. | [0.2.0-dev.1](https://github.com/noctaur-dev/noctweaks/releases/tag/noctweaks-expression-controls-0.2.0-dev.1) |
+| [**Edit Modes Strip**](noctweaks-edit-modes) | The editor's edit modes (note expressions, or Stretch, Gain, Pan and so on for audio) as a strip of buttons, each one click away. | [0.2.0-dev.1](https://github.com/noctaur-dev/noctweaks/releases/tag/noctweaks-edit-modes-0.2.0-dev.1) |
+| [**Browser: Collections and Icons**](noctweaks-browser-improvements) | Folders and nested collections, your own icons (Lucide), collections pinned as quick sources, and each plugin listed once. | [0.2.0-dev.1](https://github.com/noctaur-dev/noctweaks/releases/tag/noctweaks-browser-improvements-0.2.0-dev.1) |
+| [**Track Presets**](noctweaks-track-presets) | Save whole tracks as presets and add them back into any project: from track menus, a Tracks button in the browser, or the new track browser (+). Experimental. | [0.2.0-dev.8](https://github.com/noctaur-dev/noctweaks/releases/tag/noctweaks-track-presets-0.2.0-dev.8) |
 
 Each mod is separate: install only the ones you want. Each one changes as little of Bitwig as it can, so it's
 less likely to clash with other mods.

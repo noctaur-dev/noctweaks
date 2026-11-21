@@ -2,6 +2,8 @@
 
 Part of **NocTweaks** by noctaur.
 
+**[Download the latest release](https://github.com/noctaur-dev/noctweaks/releases/tag/noctweaks-browser-improvements-0.2.0-dev.1)** (0.2.0-dev.1), then add the zip in Patchbay with *Add Mod…*.
+
 ![Browser Improvements](images/top.png)
 
 ## What it adds

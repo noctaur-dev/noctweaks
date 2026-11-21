@@ -2,6 +2,8 @@
 
 Part of **NocTweaks** by noctaur. Note expression tools for the piano roll.
 
+**[Download the latest release](https://github.com/noctaur-dev/noctweaks/releases/tag/noctweaks-expression-controls-0.2.0-dev.1)** (0.2.0-dev.1), then add the zip in Patchbay with *Add Mod…*.
+
 ![Expression Controls](images/top.png)
 
 ## How to use it: it all works on nodes

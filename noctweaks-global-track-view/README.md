@@ -2,6 +2,8 @@
 
 Part of **NocTweaks** by noctaur. Edit any track in the piano roll without going back to the arranger.
 
+**[Download the latest release](https://github.com/noctaur-dev/noctweaks/releases/tag/noctweaks-global-track-view-0.2.0-dev.1)** (0.2.0-dev.1), then add the zip in Patchbay with *Add Mod…*.
+
 ![Global Track View](images/top.png)
 
 ## What it adds

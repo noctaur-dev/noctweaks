@@ -3,6 +3,8 @@
 Part of **NocTweaks** by noctaur. Save whole tracks as presets and add them back into any project.
 **Experimental.**
 
+**[Download the latest release](https://github.com/noctaur-dev/noctweaks/releases/tag/noctweaks-track-presets-0.2.0-dev.8)** (0.2.0-dev.8), then add the zip in Patchbay with *Add Mod…*.
+
 ▶ [Watch the full showcase](https://github.com/noctaur-dev/noctweaks/blob/main/noctweaks-track-presets/images/tp-showcase.mp4) (1 minute video)
 
 ## What it adds
