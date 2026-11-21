@@ -30,6 +30,10 @@ Part of **NocTweaks** by noctaur.
   [Lucide](https://lucide.dev/icons) icon (search by name or tag), in one of Bitwig's colours or any colour from the colour wheel. The sidebar buttons
   get theirs from *Sidebar Buttons* (including the Tracks button, if [Track Presets](../noctweaks-track-presets) is installed).
 
+  > **Where to find Set Icon…:** pick **Location** at the top of the browser, open **Collections** in the
+  > tree, and right-click a collection or folder there. For now it isn't in the right-click menu of a collection
+  > pinned to the quick sources, or of Bitwig's own Collections list. That may come later.
+
   ![The Set Icon picker with the colour wheel](images/br-set-icon.gif)
 
 - **Each plugin once** in the browser, instead of once per format (VST3, VST2, CLAP); the preferred format is
