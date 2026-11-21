@@ -9,7 +9,7 @@ Mods for [Bitwig Studio](https://www.bitwig.com), for the
 | [**Expression Controls**](noctweaks-expression-controls) | Draw shapes over note expression points, simplify and melt them, copy an expression shape onto automation, and Ctrl+drag to copy points. |
 | [**Edit Modes Strip**](noctweaks-edit-modes) | The editor's edit modes (note expressions, or Stretch, Gain, Pan and so on for audio) as a strip of buttons, each one click away. |
 | [**Browser: Collections and Icons**](noctweaks-browser-improvements) | Folders and nested collections, your own icons (Lucide), collections pinned as quick sources, and each plugin listed once. |
-| [**Track Presets**](noctweaks-track-presets) | Save whole tracks as presets and add them back into any project, with a Tracks button in the browser to drag them in. Experimental. |
+| [**Track Presets**](noctweaks-track-presets) | Save whole tracks as presets and add them back into any project: from track menus, a Tracks button in the browser, or the new track browser (+). Experimental. |
 
 Each mod is separate: install only the ones you want. Each one changes as little of Bitwig as it can, so it's
 less likely to clash with other mods.
