@@ -133,4 +133,24 @@ final class Follow {
       // the same file, or a copy of it (Bitwig can copy dropped audio into the project's folder)
       return file != null && (file.getAbsoluteFile().equals(sound.getAbsoluteFile()) || file.getName().equals(sound.getName()));
    }
+
+   /** Whether one of this track's arranger clips plays the linked video's sound. UI thread. */
+   static boolean trackHasVideo(xJo track) {
+      Video.Link link = Video.link();
+      if (link == null || link.sound() == null || track == null) {
+         return false;
+      }
+      try {
+         if (track.HVx().iAj() instanceof PSn clips) {
+            for (Object c : clips.cfM()) {
+               if (c instanceof Nbl clip && soundStart(clip, link.sound()) != null) {
+                  return true;
+               }
+            }
+         }
+      } catch (Throwable t) {
+         Video.log("Video: reading a track's clips", t);
+      }
+      return false;
+   }
 }

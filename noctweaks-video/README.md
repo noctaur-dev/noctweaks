@@ -34,7 +34,8 @@ the zips, `sh fetch-mpv.sh windows` (or `macos-arm`, `macos-intel`) puts mpv in 
 3. Click the **Video** button in the bottom bar to show the panel, and press play.
 
 Clips of the video's sound carry a **film strip** across their top (pictures of the video at those points),
-so they read as video in the arranger. Short clips get a film edge along their bottom instead.
+so they read as video in the arranger. Short clips get a film edge along their bottom instead. A track with a
+video clip also shows a small film icon under its track icon in the header: it's an AV track.
 
 ### Where the sound copies go
 

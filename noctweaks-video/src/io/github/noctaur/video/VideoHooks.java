@@ -7,6 +7,7 @@ import bml.api.Hook;
 import bml.api.Return;
 import bml.api.This;
 import com.bitwig.base.geom.DoubleRectangle;
+import com.bitwig.base.geom.IBe;   // an orientation (MRY: vertical)
 import com.bitwig.graphics.SYo;
 import com.bitwig.base.io.z2y;                                  // a file Bitwig loads (path + sub-item)
 import com.bitwig.flt.document.core.master.g2L;                 // a loaded project
@@ -224,6 +225,32 @@ public final class VideoHooks {
          p.clip = clip;
          p.rect = r;
       }
+   }
+
+   /**
+    * btF (an arranger track header) makes the icon at its top-left with FzB(track): bEo, the track kind's icon,
+    * for a track. For an audio-capable track, the icon is put in a column with an AVIcon under it, which shows a
+    * film icon while the track has a video clip.
+    */
+   private static final ThreadLocal<Object> HEADER_TRACK = new ThreadLocal<>();
+
+   @Hook(target = btF.class, method = "FzB(Lcom/bitwig/flt/document/core/iface/WSA;)Ldve;", at = At.ENTRY, id = "av-track-icon-track")
+   public static void headerIconTrack(@Arg(0) Object track) {
+      HEADER_TRACK.set(track);
+   }
+
+   @Hook(target = btF.class, method = "FzB(Lcom/bitwig/flt/document/core/iface/WSA;)Ldve;", at = At.WRAP_RETURN, id = "av-track-icon")
+   public static dve headerIcon(@Return dve icon) {
+      Object track = HEADER_TRACK.get();
+      HEADER_TRACK.remove();
+      try {
+         if (icon instanceof bEo && track instanceof xJo t) {
+            return dWb.cfM(IBe.MRY, 2, icon, AVIcon.create(t));   // a column: icon, film icon
+         }
+      } catch (Throwable e) {
+         Video.log("Video: track icon", e);
+      }
+      return icon;
    }
 
    private static int paintFailures;
