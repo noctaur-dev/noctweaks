@@ -5,7 +5,10 @@ import bml.panels.PanelProvider;
 import com.bitwig.flt.document.core.master.g2L;
 import bml.panels.Panels;
 
-/** The Video panel: a button in the bottom bar (next to Bitwig's own panel buttons) and the picture above it. */
+/**
+ * The Video panel: a button in the bottom bar (next to Bitwig's own panel buttons) and the picture above it,
+ * with a Detach button that shows it in a window of its own too.
+ */
 public final class VideoPanels implements PanelProvider {
    @Override
    public void declare(Panels panels) {
@@ -19,7 +22,7 @@ public final class VideoPanels implements PanelProvider {
                } catch (Throwable t) {
                   Video.log("Video: panel's project", t);
                }
-               return VideoPanel.create();
+               return Detach.panelContent();   // the Detach bar, then the picture
             });
    }
 }

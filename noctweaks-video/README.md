@@ -34,6 +34,14 @@ the zips, `sh fetch-mpv.sh windows` (or `macos-arm`, `macos-intel`) puts mpv in 
    A video with no sound gets a clip of silence as long as the video, so it works the same way.
 3. Click the **Video** button in the bottom bar to show the panel, and press play.
 
+### Detaching the picture
+
+The panel's **Detach** button opens the picture in a window of its own, in Bitwig's style, as well as in the
+panel. Drag it anywhere (a second screen, next to the piano roll) and resize it. It's **pinned** by default: it
+stays in front of Bitwig's window while you work in the editor, mixer or anywhere else. **Unpin** in the window
+makes it an ordinary window; **Pin on Top** pins it again. **Attach** (the panel's button, while the window is
+open) or the window's own close button puts it away; Detach brings it back where it was.
+
 ### Several videos
 
 Drop as many videos as you like, on any tracks. Every one becomes an AV track, and all their sound plays (mute
@@ -69,8 +77,8 @@ Right-click a video clip:
 
 Right-click empty arranger space:
 
-- **Pop Out to a Window**: the latest video in a separate window too (mpv's own), for a second screen. It
-  still uses the older fixed start, not the clips.
+- **Pop Out to a Window**: the latest video in mpv's own window (the older pop-out, with a fixed start; the
+  panel's Detach button is the better way).
 - **Forget All Videos**
 
 ## Limits of this prototype

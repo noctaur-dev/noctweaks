@@ -24,7 +24,10 @@ final class VideoPanel extends dve {
    private static final iok BLACK = iok.cfM(0, 0, 0);
 
    private Frames frames;   // the decoder of the video showing now
-   private final java.util.LinkedHashMap<File, Frames> decoders = new java.util.LinkedHashMap<>(4, 0.75f, true);
+
+   // shared by the panel and the detached window (UI thread): a decoder for each of the last few videos shown
+   private static final java.util.LinkedHashMap<File, Frames> decoders = new java.util.LinkedHashMap<>(4, 0.75f, true);
+   private static final java.util.Set<VideoPanel> alive = java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
    private qc1 bitmap;
    private int bw, bh;
    private NativeMemoryBlock block;   // the frame's pixels as Bitwig's graphics take them
@@ -38,9 +41,17 @@ final class VideoPanel extends dve {
    private VideoPanel() {
    }
 
+   private Runnable onTick;
+
+   /** Something to run on Bitwig's UI thread with each repaint while shown (the Detach button's label). */
+   void onTick(Runnable r) {
+      onTick = r;
+   }
+
    static VideoPanel create() {
       VideoPanel p = new VideoPanel();
       p.H_();   // Bitwig's initialisation
+      alive.add(p);
       return p;
    }
 
@@ -105,11 +116,14 @@ final class VideoPanel extends dve {
       dpN.TVZ().asyncExec(() -> {
          repaintQueued = false;
          try {
-            if (!ZTl()) {        // taken off screen
+            if (!ZTl()) {        // taken off screen (the decoders stay for the other view, waiting)
                stopTicking();
-               closeFrames();
             } else {
                jbi();           // repaint
+               Runnable r = onTick;
+               if (r != null) {
+                  r.run();
+               }
             }
          } catch (Throwable t) {
             Video.log("Video: panel", t);
@@ -120,7 +134,10 @@ final class VideoPanel extends dve {
    @Override
    public void iy_() {   // disposed
       stopTicking();
-      closeFrames();
+      alive.remove(this);
+      if (alive.isEmpty()) {
+         closeFrames();   // no view left: stop the decoders
+      }
       freeAllLater();
       super.iy_();
    }
@@ -201,6 +218,16 @@ final class VideoPanel extends dve {
       frames = null;
    }
 
+   /** Another view is showing this video now: a decoder this view doesn't use is left to it. */
+   private static boolean usedElsewhere(Frames d, VideoPanel self) {
+      for (VideoPanel p : alive) {
+         if (p != self && p.frames == d && p.ZTl()) {
+            return true;
+         }
+      }
+      return false;
+   }
+
 
    // ---------- painting ----------
 
@@ -231,17 +258,18 @@ final class VideoPanel extends dve {
          for (Frames d : decoders.values()) {
             d.want(-1);   // nothing to show: black
          }
+         frames = null;
          status(-1);
          return;
       }
       File video = now.link().video();
 
-      // decode at the size the picture shows in the panel (fitted, at most 960 x 540)
+      // decoded at most 960 x 540 (the same for every view: they share the decoder), then scaled to the view
       int[] vs = Frames.sizeIfKnown(video);
       if (vs == null) {
          return;
       }
-      double fit = Math.min(Math.min(w / vs[0], h / vs[1]), Math.min(960.0 / vs[0], 540.0 / vs[1]));
+      double fit = Math.min(1, Math.min(960.0 / vs[0], 540.0 / vs[1]));
       int fw = Math.max(2, (int) (vs[0] * fit) & ~1), fh = Math.max(2, (int) (vs[1] * fit) & ~1);
       Frames fr = decoders.get(video);
       if (fr == null || Math.abs(fr.width() - fw) > 4 || Math.abs(fr.height() - fh) > 4) {
@@ -258,7 +286,7 @@ final class VideoPanel extends dve {
          }
       }
       for (Frames d : decoders.values()) {
-         if (d != fr) {
+         if (d != fr && !usedElsewhere(d, this)) {
             d.want(Double.NaN);   // waits where it is
          }
       }
