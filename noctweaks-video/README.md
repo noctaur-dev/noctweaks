@@ -36,8 +36,9 @@ it goes on the timeline.
 
   ![Switching the film strip to separate, with the waveform below it](images/vid-strip-separate.gif)
 
-- **The Video panel.** Its button is in the bottom bar, next to Bitwig's own panel buttons. The picture follows
-  Bitwig's transport: play, stop, scrub, jump and loop.
+- **The Video panel.** Its button is in the bottom bar, next to Bitwig's own panel buttons (with a panel layout
+  mod on, it's with that mod's view buttons instead; see [Can't find the Video panel?](#cant-find-the-video-panel)).
+  The picture follows Bitwig's transport: play, stop, scrub, jump and loop.
 
   ![Opening the Video panel and playing](images/vid-panel.gif)
 
@@ -125,6 +126,19 @@ puts the program in `package/tools` first.
 
 Patchbay's **Panels** framework (for the panel and its button) and **Settings** framework (for the sound copies
 option), both part of Patchbay.
+
+## Can't find the Video panel?
+
+If video clips get their film strip but you don't see the Video panel's button:
+
+- **Try the window first:** right-click a video clip > **Video** > **Detach Video to a Window**. It shows the same
+  picture without the panel. If the picture plays there, decoding works and only the panel's button is missing.
+- **A panel layout mod on** (such as Panel: Streamlined Views) puts the mods' panels in its own row of view
+  buttons, not in the bottom bar. Look for **Video** there.
+- **Still nothing?** Patchbay's Panels framework writes why it left a panel out to Bitwig's log:
+  `BitwigStudio.log` in `%LOCALAPPDATA%\Bitwig Studio` on Windows, `~/Library/Logs/Bitwig` on macOS,
+  `~/.BitwigStudio/log` on Linux. Look for lines with "Video" or "panel", and please
+  [open an issue](https://github.com/noctaur-dev/noctweaks/issues) with them.
 
 ## Limits
 
