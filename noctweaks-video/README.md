@@ -1,4 +1,4 @@
-# Video: Video Track
+Video Track
 
 Part of **NocTweaks** by noctaur.
 
