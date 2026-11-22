@@ -44,7 +44,6 @@ final class Clock {
       try {
          QSF t = transport(doc);
          double s = t.IwV(beats);
-         Video.log("Video: beat " + beats + " = " + s + " s", null);
          return s;
       } catch (Throwable e) {
          Video.log("Video: could not convert the drop time to seconds", e);

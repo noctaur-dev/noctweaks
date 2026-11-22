@@ -6,6 +6,7 @@ import bitwig.obf.dve;   // a widget
 import bitwig.obf.iok;   // a colour
 import com.bitwig.base.geom.tfK;            // a widget size
 import com.bitwig.flt.document.core.master.g2L;
+import com.bitwig.graphics.CHR;             // how a bitmap is filtered when drawn (IwV: bilinear)
 import com.bitwig.graphics.Jkg;             // a pixel format (MRY: RGB24 in 32 bits)
 import com.bitwig.graphics.SYo;             // Bitwig's drawing surface
 import com.bitwig.base.platform.NativeMemoryBlock;   // native memory Bitwig hands to its graphics
@@ -200,7 +201,14 @@ final class VideoPanel extends dve {
          drawn = f;
       }
       if (bitmap != null) {
-         bitmap.cfM(g, Math.floor((w - bw) / 2), Math.floor((h - bh) / 2));
+         // drawn as Bitwig's own image widget draws (with a filter: the plain call draws it as a surface, which
+         // shows nothing on Windows), scaled up to fill the panel
+         double s = Math.min(w / bw, h / bh);
+         g.qoU();
+         g.FzB(Math.floor((w - bw * s) / 2), Math.floor((h - bh * s) / 2));
+         g.Hnt(s, s);
+         bitmap.cfM(g, 0, 0, CHR.IwV);
+         g.ucQ();
       }
    }
 
@@ -245,6 +253,25 @@ final class VideoPanel extends dve {
       }
       if (!loggedUpload) {
          loggedUpload = true;
+         try {   // the first picture, saved by Bitwig to tools/first-frame.png (for testing)
+            File dir = Tools.toolsFolder();
+            if (dir != null && bitmap != null) {
+               File png = new File(dir, "first-frame.png");
+               bitmap.cfM(png, new com.bitwig.base.async.lBQ() {
+                  @Override
+                  public void taskCompleted() {
+                     Video.log("Video: first frame saved to " + png, null);
+                  }
+
+                  @Override
+                  public void cfM(Exception e) {
+                     Video.log("Video: could not save the first frame", e);
+                  }
+               });
+            }
+         } catch (Throwable t) {
+            Video.log("Video: could not save the first frame", t);
+         }
          Video.log("Video: first frame uploaded (" + w + " x " + h + ", stride " + blockStride + ", channels "
             + java.util.Arrays.toString(ch) + ", bitmap " + (bitmap == null ? "none" : bitmap.getClass().getSimpleName()) + ")", null);
       }
