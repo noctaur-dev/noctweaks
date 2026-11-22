@@ -8,7 +8,7 @@ Pick the zip for your computer: `-windows`, `-macos-arm` (Apple silicon) or `-ma
 ▶ [Watch the full showcase](https://github.com/noctaur-dev/noctweaks/blob/main/noctweaks-video/images/vid-showcase.mp4) (2½ minute video)
 
 Video in Bitwig, the way video editors and other DAWs do it. Drop a video file on a track: its sound becomes
-an audio clip that **is** the video, and the picture plays in a **Video** panel that follows the clip wherever
+an audio clip that **is** the video, an AV track as I like to call it - and the picture plays in a **Video** panel that follows the clip wherever
 it goes on the timeline.
 
 ![A video track in Bitwig, with the picture in the Video panel and in a detached window](images/top.png)
