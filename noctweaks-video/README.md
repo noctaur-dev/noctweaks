@@ -39,6 +39,8 @@ the zips, `sh fetch-mpv.sh windows` (or `macos-arm`, `macos-intel`) puts mpv in 
 Drop as many videos as you like, on any tracks. Every one becomes an AV track, and all their sound plays (mute
 a track to silence it). The **Video panel shows the highest AV track** that has a clip under the playhead, as a
 video editor does: the top track covers the ones below, and where it has a gap the next one down shows through.
+**Muting an AV track hides its picture too**, so the next one down shows. Tracks inside groups count, in the
+order the arranger lists them, and muting a group mutes the videos in it.
 
 Clips of the video's sound carry a **film strip** across their top (pictures of the video at those points),
 so they read as video in the arranger. Short clips get a film edge along their bottom instead. A track with a
@@ -74,7 +76,6 @@ Right-click empty arranger space:
 ## Limits of this prototype
 
 - The videos are remembered after a restart, but aren't tied to a project yet.
-- Clips on tracks inside groups aren't followed yet.
 
 ## Bitwig versions
 

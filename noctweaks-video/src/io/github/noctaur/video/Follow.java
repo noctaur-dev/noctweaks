@@ -1,6 +1,7 @@
 package io.github.noctaur.video;
 
 import bitwig.obf.*;
+import com.bitwig.flt.document.core.iface.WSA;   // a track or group
 import com.bitwig.flt.document.core.master.g2L;
 import com.bitwig.flt.document.core.master.qjn;   // an audio file in the project
 import com.bitwig.flt.document.core.master.ruS;   // a project's tracks
@@ -13,7 +14,8 @@ import java.util.List;
  * The picture follows the sound: the video's time is read from the arranger clip under the playhead that
  * plays a video's sound (the WAV made when it was dropped). Move the clip and the picture moves with it;
  * cut it, and each piece shows its own part; between clips the panel is black. With several videos, the clip
- * on the highest track wins, as in a video editor.
+ * on the highest track wins, as in a video editor; a muted track is skipped. Tracks inside groups count, in
+ * the order the arranger lists them.
  *
  * Bitwig 6.1.4 names: track xJo.HVx().iAj() is its arranger clip timeline (PSn, cfM() the clips). An audio
  * clip Nbl: its position SMz.x3t(), its length asx.nfq() (Jsq.QWG() is its end), in beats, as Bitwig's
@@ -31,7 +33,8 @@ final class Follow {
     * starts playing, and its sound's event: where that is in the content (beats) and where in the file (= the
     * video) it starts (seconds).
     */
-   record Span(Video.Link link, int track, double start, double end, double playStart, double eventPos, double fileStart) {
+   record Span(Video.Link link, int track, boolean muted, double start, double end, double playStart, double eventPos,
+               double fileStart) {
    }
 
    /** What the panel shows now: which video, at what time (seconds). */
@@ -73,6 +76,9 @@ final class Follow {
       }
       double beats = Clock.secondsToBeats(doc, secs);
       for (Span s : found) {   // in track order, top first
+         if (s.muted()) {
+            continue;   // a muted AV track hides its picture too, so the next one down shows
+         }
          double t = timeAt(doc, s, beats);
          if (t >= 0) {
             return new Now(s.link(), t);
@@ -104,23 +110,8 @@ final class Follow {
       try {
          List<Span> out = new ArrayList<>();
          ruS tracks = doc.spd();
-         int n = tracks == null ? 0 : tracks.ugU();
-         for (int i = 0; i < n; i++) {
-            if (!(tracks.FzB(i) instanceof xJo track)) {
-               continue;
-            }
-            Object timeline = track.HVx().iAj();
-            if (!(timeline instanceof PSn clips)) {
-               continue;
-            }
-            for (Object c : clips.cfM()) {
-               if (c instanceof Nbl clip) {
-                  Span sp = span(clip, i);
-                  if (sp != null) {
-                     out.add(sp);
-                  }
-               }
-            }
+         if (tracks != null) {
+            walk(tracks, false, out, new int[1], 0);
          }
          return out;
       } catch (Throwable t) {
@@ -129,12 +120,64 @@ final class Follow {
       }
    }
 
-   /** The clip as a span of its video, or null if it doesn't play a video's sound. */
-   static Span span(Nbl clip) {
-      return span(clip, -1);
+   /**
+    * The tracks of a group (ruS: the project's top level, or a group track) in the order the arranger lists
+    * them, groups opened: SC.FzB(i) is its i-th track or group. A group's mute covers its tracks.
+    */
+   private static void walk(ruS group, boolean groupMuted, List<Span> out, int[] order, int depth) {
+      int n = group.ugU();
+      for (int i = 0; i < n; i++) {
+         Object item = group.FzB(i);
+         boolean muted = groupMuted || muted(item);
+         if (item instanceof ruS sub) {
+            if (depth < 16 && sub != group) {
+               walk(sub, muted, out, order, depth + 1);
+            }
+            continue;
+         }
+         if (!(item instanceof xJo track)) {
+            continue;
+         }
+         int index = order[0]++;
+         Object timeline = track.HVx().iAj();
+         if (!(timeline instanceof PSn clips)) {
+            continue;
+         }
+         for (Object c : clips.cfM()) {
+            if (c instanceof Nbl clip) {
+               Span sp = span(clip, index, muted);
+               if (sp != null) {
+                  out.add(sp);
+               }
+            }
+         }
+      }
    }
 
-   private static Span span(Nbl clip, int track) {
+   /** Whether a track or group is muted: WSA.tp2() is its channel, uva().lYc().iCS() its mute (as its header shows it). */
+   static boolean muted(Object trackOrGroup) {
+      try {
+         if (trackOrGroup instanceof WSA w) {
+            iKU channel = w.tp2();
+            return channel != null && channel.uva().lYc().iCS().getBoolValue();
+         }
+      } catch (Throwable t) {
+         if (!mutedFailed) {
+            mutedFailed = true;
+            Video.log("Video: reading a track's mute", t);
+         }
+      }
+      return false;
+   }
+
+   private static boolean mutedFailed;
+
+   /** The clip as a span of its video, or null if it doesn't play a video's sound. */
+   static Span span(Nbl clip) {
+      return span(clip, -1, false);
+   }
+
+   private static Span span(Nbl clip, int track, boolean muted) {
       gIs content = clip.z();
       if (content == null) {
          return null;
@@ -148,7 +191,7 @@ final class Follow {
             Video.Link link = Video.linkForSound(fileOf(ev));
             if (link != null) {
                double start = clip.x3t();
-               return new Span(link, track, start, start + clip.nfq(), clip.dC_(), ev.x3t(), ev.ODA());
+               return new Span(link, track, muted, start, start + clip.nfq(), clip.dC_(), ev.x3t(), ev.ODA());
             }
          }
       }
