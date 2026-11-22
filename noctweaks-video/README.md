@@ -23,13 +23,18 @@ it goes on the timeline.
 
   ![Dropping a video file onto the arranger](images/vid-drop.gif)
 
-- **The film strip, your way.** By default it's **separate**: the strip takes the top of the clip and the
-  waveform moves down below it, so neither covers the other. Or put it **over the waveform**: the pictures
-  fill the whole clip, see-through, with the waveform showing underneath, at an opacity from 10 % to 100 %.
-  Right-click a clip (or empty arranger space) > **Video** > **Film Strip**, or **Settings > User Interface >
-  Video Clips**.
+- **The film strip, your way.** Right-click a clip (or empty arranger space) > **Video** > **Film Strip**, or
+  **Settings > User Interface > Video Clips**:
 
-  ![Switching the film strip between over the waveform, at different opacities, and separate](images/vid-film-strip.gif)
+  **Over the waveform**: the pictures fill the whole clip, see-through, with the waveform showing
+  underneath, at an opacity from 10 % to 100 %.
+
+  ![Putting the film strip over the waveform and changing its opacity](images/vid-strip-over.gif)
+
+  **Separate** (the default): the strip takes the top of the clip and the waveform moves down below it, so
+  neither covers the other.
+
+  ![Switching the film strip to separate, with the waveform below it](images/vid-strip-separate.gif)
 
 - **The Video panel.** Its button is in the bottom bar, next to Bitwig's own panel buttons. The picture follows
   Bitwig's transport: play, stop, scrub, jump and loop.
