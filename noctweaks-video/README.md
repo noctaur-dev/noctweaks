@@ -29,7 +29,7 @@ the zips, `sh fetch-mpv.sh windows` (or `macos-arm`, `macos-intel`) puts mpv in 
 1. Drag a video file (`.mp4`, `.mov`, `.m4v`, `.mkv`, `.webm`, `.avi`) from Explorer or Finder onto an audio
    track in the arranger.
 2. The mod makes a WAV of the video's sound and Bitwig adds that as the clip. The clip *is* the video: the
-   picture follows it wherever it goes. Move it, cut it, slip it, and the panel shows the matching part of
+   picture follows it wherever it goes. Move it, cut it, trim it, slip it, and the panel shows the matching part of
    the video; between clips the panel is black.
    A video with no sound gets a clip of silence as long as the video, so it works the same way.
 3. Click the **Video** button in the bottom bar to show the panel, and press play.
@@ -61,7 +61,6 @@ A copy can be deleted once no project uses it; dropping the video again makes it
 ## Limits of this prototype
 
 - One video at a time. The link is remembered after a restart, but isn't tied to a project yet.
-- Trimming a clip's left edge isn't followed yet (moving, cutting and gaps are).
 - Clips on tracks inside groups aren't followed yet.
 
 ## Bitwig versions

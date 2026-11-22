@@ -14,17 +14,35 @@ import java.util.List;
  * plays the video's sound (the WAV made when it was dropped). Move the clip and the picture moves with it;
  * cut it, and each piece shows its own part; between clips the panel is black.
  *
- * Bitwig 6.1.4 names: track xJo.HVx().iAj() is its arranger clip timeline (PSn, cfM() the clips); an audio
- * clip Nbl has its position SMz.x3t() and length Jsq.QWG() (beats; as Bitwig's TestTemporalEvent and
- * TestEnduringEvent read them); Nbl.z().sut() is its audio events (zmK, cfM() the list), each an ocL with its
- * position in the clip SMz.x3t() and its file Scv().uWE().IwV(). (AGr.ODA() is the clip's tempo, not its position.)
+ * Bitwig 6.1.4 names: track xJo.HVx().iAj() is its arranger clip timeline (PSn, cfM() the clips). An audio
+ * clip Nbl: its position SMz.x3t(), its length asx.nfq() (Jsq.QWG() is its end), in beats, as Bitwig's
+ * TestTemporalEvent and TestEnduringEvent read them; and zZi.dC_(), where in its content it starts playing
+ * (trimming the clip's left edge moves it). Nbl.z().sut() is its audio events (zmK, cfM() the list), each an
+ * ocL: its position in the clip's content SMz.x3t() (beats), where in the file it starts mgr.ODA() (seconds),
+ * and its file Scv().uWE().IwV(). (AGr.ODA() on a clip is its tempo.) Read from a clip before and after a trim.
  */
 final class Follow {
    private Follow() {
    }
 
-   /** A clip playing the video's sound: where it is (beats), and where in it the sound starts. */
-   record Span(double start, double end, double soundStart) {
+   /**
+    * A clip playing the video's sound: where it is and how far it goes (timeline beats), where in its content it
+    * starts playing, and its sound's event: where that is in the content (beats) and where in the file (= the
+    * video) it starts (seconds).
+    */
+   record Span(double start, double end, double playStart, double eventPos, double fileStart) {
+   }
+
+   /** The video time (seconds) a span shows at this timeline beat, or -1 where it shows nothing. */
+   static double timeAt(g2L doc, Span s, double beat) {
+      if (beat < s.start() - 1e-9 || beat >= s.end()) {
+         return -1;
+      }
+      double into = beat - s.start() + s.playStart() - s.eventPos();   // beats into the sound's event
+      if (into < -1e-9) {
+         return -1;
+      }
+      return s.fileStart() + Clock.beatsToSeconds(doc, beat) - Clock.beatsToSeconds(doc, beat - into);
    }
 
    private static List<Span> spans = List.of();
@@ -51,8 +69,7 @@ final class Follow {
       double beats = Clock.secondsToBeats(doc, secs);
       for (Span s : found) {
          if (beats >= s.start() - 1e-9 && beats < s.end()) {
-            double from = s.start() + s.soundStart();
-            return beats < from ? -1 : secs - Clock.beatsToSeconds(doc, from);
+            return timeAt(doc, s, beats);
          }
       }
       return -1;   // between clips
@@ -91,10 +108,9 @@ final class Follow {
             }
             for (Object c : clips.cfM()) {
                if (c instanceof Nbl clip) {
-                  Double soundStart = soundStart(clip, sound);
-                  if (soundStart != null) {
-                     double start = clip.x3t();
-                     out.add(new Span(start, start + clip.QWG(), soundStart));
+                  Span sp = span(clip, sound);
+                  if (sp != null) {
+                     out.add(sp);
                   }
                }
             }
@@ -106,8 +122,8 @@ final class Follow {
       }
    }
 
-   /** Where in the clip its event playing the sound starts (beats), or null if it doesn't play it. */
-   static Double soundStart(Nbl clip, File sound) {
+   /** The clip as a span of the video, or null if it doesn't play the video's sound. */
+   static Span span(Nbl clip, File sound) {
       gIs content = clip.z();
       if (content == null) {
          return null;
@@ -118,7 +134,8 @@ final class Follow {
       }
       for (Object e : events.cfM()) {
          if (e instanceof ocL ev && plays(ev, sound)) {
-            return ev.x3t();
+            double start = clip.x3t();
+            return new Span(start, start + clip.nfq(), clip.dC_(), ev.x3t(), ev.ODA());
          }
       }
       return null;
@@ -143,7 +160,7 @@ final class Follow {
       try {
          if (track.HVx().iAj() instanceof PSn clips) {
             for (Object c : clips.cfM()) {
-               if (c instanceof Nbl clip && soundStart(clip, link.sound()) != null) {
+               if (c instanceof Nbl clip && span(clip, link.sound()) != null) {
                   return true;
                }
             }

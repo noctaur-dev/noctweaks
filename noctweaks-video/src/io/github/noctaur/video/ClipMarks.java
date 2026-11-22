@@ -42,12 +42,12 @@ final class ClipMarks {
       if (link == null || link.sound() == null || g == null || r == null) {
          return;
       }
-      Double soundStart = Follow.soundStart(clip, link.sound());
-      if (soundStart == null) {
+      Follow.Span span = Follow.span(clip, link.sound());
+      if (span == null) {
          return;   // not a video clip
       }
       double y0 = r.FzB(), h = r.UNj();
-      double x0 = timeline.MRY(clip.x3t()), x1 = timeline.MRY(clip.x3t() + clip.QWG()), w = x1 - x0;
+      double x0 = timeline.MRY(span.start()), x1 = timeline.MRY(span.end()), w = x1 - x0;
       if (!logged) {   // once, for testing
          logged = true;
          Video.log(String.format(java.util.Locale.ROOT, "Video: marking a video clip at %.0f, %.0f (%.0f x %.0f)", x0, y0, w, h), null);
@@ -73,7 +73,7 @@ final class ClipMarks {
 
       double hole = pictures ? 2 : 1.5, pad = pictures ? 4 : 0;
       if (pictures) {
-         pictures(g, widget, link, clip, soundStart, x0, w, left, right, bandY + pad, bandH - 2 * pad);
+         pictures(g, widget, link, clip, span, x0, w, left, right, bandY + pad, bandH - 2 * pad);
       }
 
       // sprocket holes along the strip's edges
@@ -91,7 +91,7 @@ final class ClipMarks {
       g.ucQ();
    }
 
-   private static void pictures(SYo g, dve widget, Video.Link link, Nbl clip, double soundStart,
+   private static void pictures(SYo g, dve widget, Video.Link link, Nbl clip, Follow.Span span,
                                 double x0, double w, double left, double right, double y, double th) {
       if (th < 10) {
          return;
@@ -111,8 +111,7 @@ final class ClipMarks {
          BUDGET[0] = 6;
       }
       sal gs = widget == null ? null : widget.afn();
-      double clipStart = clip.x3t(), clipLen = clip.QWG();
-      double zero = Clock.beatsToSeconds(doc, clipStart + soundStart);   // where the video's 0 s is
+      double clipStart = span.start(), clipLen = span.end() - span.start();
       double scale = th / thumbs.height;
       double tw = Math.floor(thumbs.width * scale), slot = tw + 2;
       // every picture that reaches into the part being painted (Bitwig clips the drawing to it), and fits in the clip
@@ -122,7 +121,7 @@ final class ClipMarks {
       for (int k = first, n = 0; k <= last && n < 400; k++, n++) {
          double sx = x0 + 1 + k * slot;
          double beat = clipStart + (sx + tw / 2 - x0) / w * clipLen;
-         double t = Clock.beatsToSeconds(doc, beat) - zero;
+         double t = Follow.timeAt(doc, span, beat);
          if (t < 0) {
             continue;   // before the video starts
          }
