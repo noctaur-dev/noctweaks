@@ -11,7 +11,7 @@ import java.lang.ref.WeakReference;
 
 /**
  * A small film icon under an audio track's icon in its header, shown while one of the track's clips plays a
- * video's sound: the track is an AV track. Empty otherwise. Checked about twice a second while painted.
+ * video's sound: the track is an AV track. Empty otherwise. Checked twice a second, repainted when it changes.
  */
 final class AVIcon extends dve {
    static final int W = 14, H = 11;
@@ -20,8 +20,7 @@ final class AVIcon extends dve {
    private static final iok HOLE = iok.cfM(36, 36, 36);
 
    private final WeakReference<xJo> track;
-   private boolean video;
-   private long checkedAt;
+   private boolean video;   // set by checkAll
 
    private AVIcon(xJo track) {
       this.track = new WeakReference<>(track);
@@ -30,7 +29,60 @@ final class AVIcon extends dve {
    static AVIcon create(xJo track) {
       AVIcon i = new AVIcon(track);
       i.H_();   // Bitwig's initialisation
+      synchronized (ALL) {
+         ALL.put(i, Boolean.TRUE);
+      }
+      startWatching();
+      if (!logged) {
+         logged = true;
+         Video.log("Video: AV icons added to audio track headers", null);
+      }
       return i;
+   }
+
+   private static boolean logged;
+
+   // every AV icon made (weakly: they go when Bitwig drops their header); checked twice a second on Bitwig's UI
+   // thread, and repainted when their track gains or loses a video clip, so the header needn't be redrawn by hand
+   private static final java.util.Map<AVIcon, Boolean> ALL = new java.util.WeakHashMap<>();
+   private static Thread watcher;
+
+   private static synchronized void startWatching() {
+      if (watcher != null) {
+         return;
+      }
+      watcher = new Thread(() -> {
+         try {
+            while (true) {
+               Thread.sleep(500);
+               bitwig.obf.dpN.TVZ().asyncExec(AVIcon::checkAll);
+            }
+         } catch (Throwable t) {   // never let an exception leave the thread
+            Video.log("Video: AV icons", t);
+         }
+      }, "noctweaks-video-av-icons");
+      watcher.setDaemon(true);
+      watcher.start();
+   }
+
+   private static void checkAll() {
+      java.util.List<AVIcon> icons;
+      synchronized (ALL) {
+         icons = new java.util.ArrayList<>(ALL.keySet());
+      }
+      for (AVIcon i : icons) {
+         try {
+            boolean v = Follow.trackHasVideo(i.track.get());
+            if (v != i.video) {
+               i.video = v;
+               if (i.ZTl()) {
+                  i.jbi();   // repaint
+               }
+            }
+         } catch (Throwable t) {
+            Video.log("Video: AV icon", t);
+         }
+      }
    }
 
    @Override
@@ -61,11 +113,6 @@ final class AVIcon extends dve {
    @Override
    public void cfM(SYo g) {
       try {
-         long now = System.currentTimeMillis();
-         if (now - checkedAt > 500) {
-            checkedAt = now;
-            video = Follow.trackHasVideo(track.get());
-         }
          if (video && Sxo() >= W && yiX() >= H) {
             paintIcon(g);
          }

@@ -1,6 +1,7 @@
 package io.github.noctaur.video;
 
 import bitwig.obf.Nbl;   // an audio clip
+import bitwig.obf.bpa;   // a timeline painter
 import bitwig.obf.dve;   // a widget
 import bitwig.obf.iok;   // a colour
 import com.bitwig.base.geom.DoubleRectangle;
@@ -31,7 +32,12 @@ final class ClipMarks {
    private static long budgetAt;
    private static final int[] BUDGET = { 0 };
 
-   static void paint(SYo g, dve widget, DoubleRectangle r, Nbl clip) {
+   /**
+    * The clip's rectangle as Bitwig hands it to the painter is cut to the part being painted (when the
+    * playhead moves, only a thin column is), so the strip's pictures are placed from the clip's start and
+    * end on the timeline instead (timeline.MRY: a time to x), and only drawn where the rectangle is.
+    */
+   static void paint(SYo g, bpa timeline, dve widget, DoubleRectangle r, Nbl clip) {
       Video.Link link = Video.link();
       if (link == null || link.sound() == null || g == null || r == null) {
          return;
@@ -40,7 +46,8 @@ final class ClipMarks {
       if (soundStart == null) {
          return;   // not a video clip
       }
-      double x0 = r.Hnt(), y0 = r.FzB(), w = r.IwV(), h = r.UNj();
+      double y0 = r.FzB(), h = r.UNj();
+      double x0 = timeline.MRY(clip.x3t()), x1 = timeline.MRY(clip.x3t() + clip.QWG()), w = x1 - x0;
       if (!logged) {   // once, for testing
          logged = true;
          Video.log(String.format(java.util.Locale.ROOT, "Video: marking a video clip at %.0f, %.0f (%.0f x %.0f)", x0, y0, w, h), null);
@@ -48,8 +55,7 @@ final class ClipMarks {
       if (w < 6 || h < 6) {
          return;
       }
-      double right = widget == null ? x0 + w : Math.min(x0 + w, widget.Sxo());
-      double left = Math.max(x0, 0);
+      double left = Math.max(x0, r.Hnt()), right = Math.min(x1, r.Hnt() + r.IwV());   // the part being painted
       if (right <= left) {
          return;
       }
@@ -109,8 +115,9 @@ final class ClipMarks {
       double zero = Clock.beatsToSeconds(doc, clipStart + soundStart);   // where the video's 0 s is
       double scale = th / thumbs.height;
       double tw = Math.floor(thumbs.width * scale), slot = tw + 2;
-      int first = (int) Math.max(0, Math.floor((left - x0 - 1) / slot));
-      int last = (int) Math.floor((Math.min(right, x0 + w) - x0 - 1 - tw) / slot);
+      // every picture that reaches into the part being painted (Bitwig clips the drawing to it), and fits in the clip
+      int first = (int) Math.max(0, Math.floor((left - x0 - 1 - tw) / slot) + 1);
+      int last = (int) Math.min(Math.floor((w - 1 - tw) / slot), Math.floor((right - x0 - 1) / slot));
       boolean waiting = false;
       for (int k = first, n = 0; k <= last && n < 400; k++, n++) {
          double sx = x0 + 1 + k * slot;

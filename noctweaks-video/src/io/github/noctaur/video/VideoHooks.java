@@ -211,7 +211,7 @@ public final class VideoHooks {
       p.rect = null;
       try {
          if (g != null && r != null && clip instanceof Nbl audio) {
-            ClipMarks.paint(g, painter.LaE(), r, audio);
+            ClipMarks.paint(g, painter, painter.LaE(), r, audio);
          }
       } catch (Throwable t) {
          clipPaintFailed(t);
@@ -228,29 +228,30 @@ public final class VideoHooks {
    }
 
    /**
-    * btF (an arranger track header) makes the icon at its top-left with FzB(track): bEo, the track kind's icon,
-    * for a track. For an audio-capable track, the icon is put in a column with an AVIcon under it, which shows a
-    * film icon while the track has a video clip.
+    * bEo: a track's icon (top-left in its header). E3(track) builds it: Bitwig's icon (dqT) padded by
+    * dnF.cfM(icon, ...). For an audio track that padding is put around a column instead: the icon, then an
+    * AVIcon under it, which shows a film icon while the track has a video clip.
     */
-   private static final ThreadLocal<Object> HEADER_TRACK = new ThreadLocal<>();
+   private static final ThreadLocal<Object> ICON_TRACK = new ThreadLocal<>();
 
-   @Hook(target = btF.class, method = "FzB(Lcom/bitwig/flt/document/core/iface/WSA;)Ldve;", at = At.ENTRY, id = "av-track-icon-track")
-   public static void headerIconTrack(@Arg(0) Object track) {
-      HEADER_TRACK.set(track);
+   @Hook(target = bEo.class, method = "E3(Lcom/bitwig/flt/document/core/iface/RYd;)V", at = At.ENTRY, id = "av-track-icon-track")
+   public static void iconTrack(@Arg(0) Object track) {
+      ICON_TRACK.set(track);
    }
 
-   @Hook(target = btF.class, method = "FzB(Lcom/bitwig/flt/document/core/iface/WSA;)Ldve;", at = At.WRAP_RETURN, id = "av-track-icon")
-   public static dve headerIcon(@Return dve icon) {
-      Object track = HEADER_TRACK.get();
-      HEADER_TRACK.remove();
+   @Hook(target = bEo.class, method = "E3(Lcom/bitwig/flt/document/core/iface/RYd;)V", at = At.REPLACE_CALL,
+         callOwner = dnF.class, call = "cfM(Ldve;IIII)LdnF;", id = "av-track-icon")
+   public static dnF iconPadding(dve icon, int a, int b, int c, int d) {
+      Object track = ICON_TRACK.get();
+      ICON_TRACK.remove();
       try {
-         if (icon instanceof bEo && track instanceof xJo t) {
-            return dWb.cfM(IBe.MRY, 2, icon, AVIcon.create(t));   // a column: icon, film icon
+         if (track instanceof xJo t && "audio_track.svg".equals(bEo.cfM(t, IBe.cfM))) {
+            return dnF.cfM(dWb.cfM(IBe.MRY, 2, icon, AVIcon.create(t)), a, b, c, d);   // a column: icon, film icon
          }
       } catch (Throwable e) {
          Video.log("Video: track icon", e);
       }
-      return icon;
+      return dnF.cfM(icon, a, b, c, d);
    }
 
    private static int paintFailures;

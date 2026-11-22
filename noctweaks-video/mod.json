@@ -3,7 +3,7 @@
   "mod": {
     "id": "noctweaks-video",
     "name": "Video: Video Track (prototype)",
-    "version": "0.1.0-dev.11",
+    "version": "0.1.0-dev.12",
     "author": "noctaur",
     "description": "Prototype. Drop a video file on an arranger track: its sound goes in as an audio clip, and the picture plays in a Video panel (its button is in the bottom bar) that follows Bitwig's transport. mpv comes with it.",
     "area": "Arranger",
