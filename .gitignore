@@ -2,3 +2,7 @@ releases/
 *.class
 .DS_Store
 Thumbs.db
+build/
+# mpv binaries: fetched by noctweaks-video/fetch-mpv.sh at build time, not kept in git
+noctweaks-video/package/tools/mpv/
+noctweaks-video/package/tools/mpv.tar.gz

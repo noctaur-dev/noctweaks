@@ -1,0 +1,58 @@
+{
+  "manifest_version": 2,
+  "mod": {
+    "id": "noctweaks-video",
+    "name": "Video: Video Track",
+    "version": "0.1.0",
+    "author": "noctaur",
+    "description": "Drop a video file on an arranger track: its sound goes in as an audio clip that is the video, with a film strip, and the picture plays in a Video panel (its button is in the bottom bar) that follows the clips through moves, cuts and trims. Several videos (the highest AV track shows), a detachable window, mpv included.",
+    "area": "Arranger",
+    "documentation": "readme",
+    "tags": [
+      "noctweaks",
+      "video",
+      "arranger"
+    ]
+  },
+  "built_against": {
+    "bitwig_version": "6.1.4",
+    "platform": "windows",
+    "architecture": "x64"
+  },
+  "resources": {
+    "readme": {
+      "kind": "file",
+      "path": "README.md",
+      "media_type": "text/markdown"
+    },
+    "tools": {
+      "kind": "directory",
+      "path": "tools",
+      "persistence": "preserve"
+    },
+    "video_icon": {
+      "kind": "file",
+      "path": "resources/noctweaks-video/video.svg",
+      "media_type": "image/svg+xml"
+    },
+    "sounds": {
+      "kind": "directory",
+      "path": "sounds",
+      "persistence": "preserve"
+    }
+  },
+  "registrations": [
+    {
+      "id": "panels",
+      "consumer": "panel-management-framework",
+      "descriptor": "panels.properties",
+      "jar": "helper.jar"
+    },
+    {
+      "id": "preferences",
+      "consumer": "preferences-composition-framework",
+      "descriptor": "preferences.properties",
+      "jar": "helper.jar"
+    }
+  ]
+}
