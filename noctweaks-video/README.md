@@ -103,5 +103,11 @@ option), both part of Patchbay.
 
 ## Bitwig versions
 
-Built against Bitwig 6.1.4, so Patchbay runs it on 6.0 to 6.1.7 on Windows, macOS and Linux. Tested on Bitwig
+Built against Bitwig 6.1.4, so Patchbay runs it on 6.0 to 6.1.7 on Windows, macOS. Tested on Bitwig
 6.1.7 on Windows.
+
+Not currently tested on Linux. In theory should work but you need to obtain mpv manually
+mpv doesn't publish an official Linux build the way it does for Windows and Mac, so I didn't include one. A Linux user would need to:
+
+Install mpv from their package manager (sudo apt install mpv, sudo dnf install mpv or sudo pacman -S mpv). The mod finds it in /usr/bin or anywhere on the PATH.
+Install any of the three zips. The mpv inside them is for Windows or Mac, so the mod skips it and uses the system mpv. The Windows zip is the smallest.
