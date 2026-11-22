@@ -16,5 +16,8 @@ public final class VideoSettings implements PreferenceProvider {
       preferences.dropdown("sound_copies", "Sound copies of videos", Sounds.PLACES)
          .in(video)
          .value(Sounds::place, Sounds::setPlace);
+      preferences.dropdown("decoder", "Decode pictures with", Decode.CHOICES)
+         .in(video)
+         .value(Decode::choice, Decode::choose);
    }
 }

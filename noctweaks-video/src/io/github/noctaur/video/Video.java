@@ -234,7 +234,7 @@ final class Video {
          Link latest = link();
          if (Player.running()) {
             m.cfM("Close Pop-Out Window", Player::close);
-         } else {
+         } else if (Decode.mpv() != null) {   // mpv's own window: only with mpv
             m.cfM("Pop Out to a Window: " + latest.video().getName(), () -> {
                seen(doc);
                Player.show(latest.video());

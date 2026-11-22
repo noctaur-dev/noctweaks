@@ -3,7 +3,7 @@
 #   sh fetch-mpv.sh windows | macos-arm | macos-intel | none
 set -e
 cd "$(dirname "$0")/package/tools"
-rm -rf mpv mpv.tar.gz
+rm -rf mpv mpv.tar.gz mpv-licence
 V=v0.41.0
 URL=https://github.com/mpv-player/mpv/releases/download/$V
 T=$(mktemp -d)
@@ -21,7 +21,8 @@ case "$1" in
     unzip -q "$T/mpv.zip" -d "$T/outer"
     cp "$T/outer/mpv.tar.gz" mpv.tar.gz   # kept as Apple's tar, so mpv.app keeps its signature
     ;;
-  none) ;;
+  none) rm -rf "$T"; exit 0 ;;
   *) echo "usage: fetch-mpv.sh windows|macos-arm|macos-intel|none"; exit 1 ;;
 esac
 rm -rf "$T"
+cp -R ../../licences/mpv mpv-licence

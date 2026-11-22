@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Video frames for the panel, decoded by mpv in the background and read raw (BGR0, 4 bytes a pixel) from its
+ * Video frames for the panel, decoded by mpv or ffmpeg (see Decode) in the background and read raw (BGR0, 4 bytes a pixel) from its
  * output, at a fixed rate (FPS), scaled to fit the panel. The panel asks for a time; this keeps
- * reading forward to it while Bitwig plays, and starts mpv again at the new time when the playhead jumps
- * back or far ahead. mpv waits while nothing reads, so it never runs ahead of Bitwig.
+ * reading forward to it while Bitwig plays, and starts the decoder again at the new time when the playhead
+ * jumps back or far ahead. The decoder waits while nothing reads, so it never runs ahead of Bitwig.
  */
 final class Frames {
    static final double FPS = 30;
@@ -144,19 +144,10 @@ final class Frames {
 
    private synchronized void start(double t) throws IOException {
       stop();
-      File mpv = mpvForPipes();
-      if (mpv == null) {
-         throw new IOException("mpv not found");
+      List<String> cmd = Decode.frames(video, t, FPS, width, height);
+      if (cmd == null) {
+         throw new IOException("neither mpv nor ffmpeg was found");
       }
-      String exe = mpv.getAbsolutePath();
-      List<String> cmd = new ArrayList<>(List.of(
-         exe, "--no-config", "--really-quiet", "--terminal=no",
-         String.format(Locale.ROOT, "--start=%.4f", t),
-         "--audio=no", "--sub=no",
-         "--o=-", "--of=rawvideo", "--ovc=rawvideo",
-         String.format(Locale.ROOT,
-            "--vf=fps=%d,scale=%d:%d,format=bgr0", (int) FPS, width, height),
-         video.getAbsolutePath()));
       ProcessBuilder pb = new ProcessBuilder(cmd);
       pb.redirectError(ProcessBuilder.Redirect.DISCARD);
       process = pb.start();
@@ -182,7 +173,7 @@ final class Frames {
 
    private static final java.util.Set<File> ASKING = java.util.concurrent.ConcurrentHashMap.newKeySet();
 
-   /** The video's size if it's known; if not, asks mpv on a background thread and returns null for now. */
+   /** The video's size if it's known; if not, asks the decoder on a background thread and returns null for now. */
    static int[] sizeIfKnown(File video) {
       int[] known = SIZES.get(video);
       if (known == null && ASKING.add(video)) {
@@ -198,51 +189,29 @@ final class Frames {
       return known;
    }
 
-   /** The video's length in seconds (known once size() has asked mpv), or NaN. */
+   /** The video's length in seconds (known once size() has asked), or NaN. */
    static double duration(File video) {
       Double d = DURATIONS.get(video);
       return d == null ? Double.NaN : d;
    }
 
-   static File mpvForPipes() {
-      File mpv = Tools.find("mpv");
-      if (mpv == null) {
-         return null;
-      }
-      // On Windows, mpv.com is the console front end of mpv.exe: it passes stdout through as a plain pipe.
-      File com = new File(mpv.getParentFile(), "mpv.com");
-      return WINDOWS && com.isFile() ? com : mpv;
-   }
 
-   /** The video's picture size (width, height), asked of mpv once per file; null if mpv can't tell. */
+
+   /** The video's picture size (width, height), asked once per file; null if it can't be told. */
    static int[] size(File video) {
       int[] known = SIZES.get(video);
       if (known != null) {
          return known;
       }
-      try {
-         File mpv = mpvForPipes();
-         if (mpv == null) {
-            return null;
+      double[] probe = Decode.probe(video);
+      if (probe != null) {
+         int[] wh = { (int) probe[0], (int) probe[1] };
+         if (!Double.isNaN(probe[2])) {
+            DURATIONS.put(video, probe[2]);
          }
-         Process p = new ProcessBuilder(mpv.getAbsolutePath(), "--no-config", "--vo=null", "--ao=null", "--frames=1",
-            "--term-playing-msg=SIZE ${width} ${height} ${duration}", video.getAbsolutePath()).redirectErrorStream(true).start();
-         String text = new String(p.getInputStream().readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
-         p.waitFor(10, java.util.concurrent.TimeUnit.SECONDS);
-         java.util.regex.Matcher m = java.util.regex.Pattern.compile("SIZE (\\d+) (\\d+) ?([0-9.]*)").matcher(text);
-         if (m.find()) {
-            int[] wh = { Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)) };
-            try {
-               DURATIONS.put(video, Double.parseDouble(m.group(3)));
-            } catch (NumberFormatException ignored) {
-            }
-            SIZES.put(video, wh);
-            Video.log("Video: " + video.getName() + " is " + wh[0] + " x " + wh[1], null);
-            return wh;
-         }
-         Video.log("Video: mpv didn't give the size of " + video.getName() + ": " + text.strip(), null);
-      } catch (Throwable t) {
-         Video.log("Video: could not ask mpv for the video's size", t);
+         SIZES.put(video, wh);
+         Video.log("Video: " + video.getName() + " is " + wh[0] + " x " + wh[1] + " (decoded by " + Decode.which() + ")", null);
+         return wh;
       }
       return null;
    }

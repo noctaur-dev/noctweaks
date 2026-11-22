@@ -10,7 +10,7 @@ Mods for [Bitwig Studio](https://www.bitwig.com), for the
 | [**Edit Modes Strip**](noctweaks-edit-modes) | The editor's edit modes (note expressions, or Stretch, Gain, Pan and so on for audio) as a strip of buttons, each one click away. | [0.2.0-dev.1](https://github.com/noctaur-dev/noctweaks/releases/tag/noctweaks-edit-modes-0.2.0-dev.1) |
 | [**Browser: Collections and Icons**](noctweaks-browser-improvements) | Folders and nested collections, your own icons (Lucide), collections pinned as quick sources, and each plugin listed once. | [0.2.0-dev.1](https://github.com/noctaur-dev/noctweaks/releases/tag/noctweaks-browser-improvements-0.2.0-dev.1) |
 | [**Track Presets**](noctweaks-track-presets) | Save whole tracks as presets and add them back into any project: from track menus, a Tracks button in the browser, or the new track browser (+). Experimental. | [0.2.0-dev.8](https://github.com/noctaur-dev/noctweaks/releases/tag/noctweaks-track-presets-0.2.0-dev.8) |
-| [**Video Track**](noctweaks-video) | Drop a video on a track: its sound becomes a clip that is the video, with a film strip, and the picture plays in a Video panel (or a detached window) that follows the clips through moves, cuts and trims. Several videos: the highest AV track shows. mpv included. | [0.1.0](https://github.com/noctaur-dev/noctweaks/releases/tag/noctweaks-video-0.1.0) |
+| [**Video Track**](noctweaks-video) | Drop a video on a track: its sound becomes a clip that is the video, with a film strip, and the picture plays in a Video panel (or a detached window) that follows the clips through moves, cuts and trims. Several videos: the highest AV track shows. Windows, macOS and Linux, with ffmpeg or mpv included. | [0.1.1](https://github.com/noctaur-dev/noctweaks/releases/tag/noctweaks-video-0.1.1) |
 
 Each mod is separate: install only the ones you want. Each one changes as little of Bitwig as it can, so it's
 less likely to clash with other mods.
@@ -65,8 +65,8 @@ workspace's `Mods/` folder and run `python3 BML/tools/build_mod.py <mod id>`; se
 ## Licence
 
 [MIT](LICENSE). The Browser mod includes [Lucide](https://lucide.dev) icons (ISC). The Video mod's release zips
-include [mpv](https://mpv.io) (GPL 2 or later), unchanged; its licence is in the zip and its source code is
-attached to the Video release.
+include [mpv](https://mpv.io) (GPL 2 or later) or [ffmpeg](https://ffmpeg.org) (GPL), unchanged; their licences are
+in the zips and their source code is attached to the Video release.
 
 The MIT licence covers NocTweaks' own code and files only. Bitwig Studio's source code is proprietary and
 belongs to Bitwig GmbH: none of it is included here, and nothing here grants any rights to it. These mods and

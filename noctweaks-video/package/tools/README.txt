@@ -1,13 +1,18 @@
 Tools for the NocTweaks Video mod.
 
-mpv (https://mpv.io) shows the video and makes the WAV of its sound. It comes with the mod:
-  Windows: mpv\mpv.exe (with the DLLs beside it)
-  macOS:   mpv.tar.gz, unpacked to mpv.app the first time the mod needs it
+The mod needs mpv (https://mpv.io) or ffmpeg (https://ffmpeg.org): either one decodes the pictures for the
+Video panel and the clips' film strips, and makes the WAV of a video's sound. Each zip of the mod comes with
+one of them:
 
-mpv 0.41.0, the official build from https://github.com/mpv-player/mpv/releases/tag/v0.41.0,
-unchanged. mpv is free software under the GNU GPL version 2 or later (see mpv-licence/). Its source code
-for this version is in the mod's GitHub release (mpv-0.41.0-source.tar.gz) and at
-https://github.com/mpv-player/mpv/tree/v0.41.0.
+  mpv zips     Windows: mpv\mpv.exe (with the DLLs beside it)
+               macOS:   mpv.tar.gz, unpacked to mpv.app the first time the mod needs it
+               mpv 0.41.0, the official build, unchanged (licence: mpv-licence/; source: the mod's GitHub
+               release, mpv-0.41.0-source.tar.gz, and https://github.com/mpv-player/mpv/tree/v0.41.0).
 
-ffmpeg is optional: if it's installed (or ffmpeg.exe / ffmpeg is put here), the WAV is made with it instead.
-To use another mpv, put it here in place of this one, or install it (PATH, Homebrew).
+  ffmpeg zips  ffmpeg.gz, a static build of ffmpeg 6.0 (one file), unpacked to ffmpeg/ the first time the
+               mod needs it (licence and build notes: ffmpeg-licence/; source: the mod's GitHub release,
+               ffmpeg-6.0-source.tar.gz, and https://github.com/FFmpeg/FFmpeg/tree/n6.0).
+
+The mod also uses an mpv or ffmpeg installed on the computer (on the PATH, Homebrew, /usr/bin), so you can
+put another one here or install your own. With both, mpv decodes the pictures unless Settings > Locations >
+Video > Decode pictures with says ffmpeg; ffmpeg makes the WAVs.

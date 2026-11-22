@@ -51,6 +51,39 @@ final class Tools {
     * macOS: the mod ships mpv as Apple's own mpv.tar.gz (mpv.app inside), and unpacks it here on first use.
     * Unpacking with the Mac's own tar keeps mpv.app's code signature; quarantine is cleared so it can start.
     */
+   /**
+    * The ffmpeg zips ship ffmpeg as tools/ffmpeg.gz (a static build: one file, nothing to install); it's unpacked to
+    * tools/ffmpeg/ffmpeg(.exe) on first use and made runnable. On a Mac it's also cleared of quarantine and signed
+    * ad hoc (Apple silicon runs only signed programs); both best effort.
+    */
+   private static synchronized void unpackFfmpeg(File tools) {
+      File gz = new File(tools, "ffmpeg.gz");
+      File exe = new File(new File(tools, "ffmpeg"), WINDOWS ? "ffmpeg.exe" : "ffmpeg");
+      if (!gz.isFile() || (exe.isFile() && exe.length() > 0 && exe.lastModified() >= gz.lastModified())) {
+         return;
+      }
+      try {
+         Video.log("Video: unpacking ffmpeg", null);
+         exe.getParentFile().mkdirs();
+         File part = new File(exe.getParentFile(), exe.getName() + ".part");
+         try (java.io.InputStream in = new java.util.zip.GZIPInputStream(new java.io.FileInputStream(gz), 1 << 16);
+              java.io.OutputStream out = new java.io.FileOutputStream(part)) {
+            in.transferTo(out);
+         }
+         java.nio.file.Files.move(part.toPath(), exe.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+         exe.setExecutable(true, false);
+         if (MAC) {
+            new ProcessBuilder("/usr/bin/xattr", "-d", "com.apple.quarantine", exe.getAbsolutePath())
+               .redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.DISCARD).start().waitFor(1, TimeUnit.MINUTES);
+            new ProcessBuilder("/usr/bin/codesign", "--force", "--sign", "-", exe.getAbsolutePath())
+               .redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.DISCARD).start().waitFor(1, TimeUnit.MINUTES);
+         }
+         Video.log("Video: ffmpeg ready (" + exe.length() / 1048576 + " MB)", null);
+      } catch (Throwable t) {
+         Video.log("Video: could not unpack ffmpeg", t);
+      }
+   }
+
    private static void unpackMacMpv(File tools) {
       File app = new File(tools, "mpv.app");
       File archive = new File(tools, "mpv.tar.gz");
@@ -78,6 +111,9 @@ final class Tools {
       if (tools != null) {
          if (name.equals("mpv")) {
             unpackMacMpv(tools);
+         }
+         if (name.equals("ffmpeg")) {
+            unpackFfmpeg(tools);
          }
          places.add(new File(tools, exe));
          places.add(new File(new File(tools, name), exe));

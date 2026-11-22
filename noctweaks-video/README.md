@@ -2,8 +2,9 @@ Video Track
 
 Part of **NocTweaks** by noctaur.
 
-**[Download the latest release](https://github.com/noctaur-dev/noctweaks/releases/tag/noctweaks-video-0.1.0)** (0.1.0), then add the zip in Patchbay with *Add Mod…*.
-Pick the zip for your computer: `-windows`, `-macos-arm` (Apple silicon) or `-macos-intel`.
+**[Download the latest release](https://github.com/noctaur-dev/noctweaks/releases/tag/noctweaks-video-0.1.1)** (0.1.1), then add the zip in Patchbay with *Add Mod…*.
+Pick the zip for your computer: `-windows`, `-macos-arm` (Apple silicon), `-macos-intel` or `-linux`. Each
+comes in an **ffmpeg** and an **mpv** version (see [Which zip](#which-zip-ffmpeg-or-mpv)); Linux is ffmpeg only.
 
 ▶ [Watch the full showcase](https://github.com/noctaur-dev/noctweaks/blob/main/noctweaks-video/images/vid-showcase.mp4) (2½ minute video)
 
@@ -55,7 +56,7 @@ it goes on the timeline.
 
 ## Where the sound copies go
 
-Bitwig can't read sound straight out of a video file, so the mod makes a WAV of it (with mpv) and that's what
+Bitwig can't read sound straight out of a video file, so the mod makes a WAV of it (with ffmpeg or mpv) and that's what
 the clip plays. By default the WAVs are kept out of the way in the mod's own data folder (`sounds/`, one
 folder per video), not next to your videos. To change that, **Settings > Locations > Video > Sound copies of
 videos**:
@@ -75,19 +76,34 @@ Right-click a video clip, then **Video**:
 - **Open Sound Copies Folder**, **Choose Folder for Sound Copies...**
 - **Describe This Clip**: a diagnostic (what Bitwig holds for the clip), written to the log.
 
-Right-click empty arranger space for **Forget All Videos** and **Pop Out to a Window** (the latest video in
-mpv's own window, with a fixed start: the older way, before Detach).
+Right-click empty arranger space for **Forget All Videos** and, with mpv, **Pop Out to a Window** (the latest
+video in mpv's own window, with a fixed start: the older way, before Detach).
 
-## mpv
+## Which zip: ffmpeg or mpv
 
-The mod comes with **mpv**, the free player that decodes the pictures and makes the WAVs, so there's nothing
-else to install. On a Mac, mpv is unpacked the first time you use the mod. If **ffmpeg** is installed, the mod
-uses it for the sound instead (a little faster); it isn't needed.
+The mod needs one free program to decode the pictures and make the WAVs: **ffmpeg** or **mpv**. Either one does
+everything, and each zip comes with one of them, so there's nothing else to install.
 
-mpv 0.41.0 is the official build from [mpv's releases](https://github.com/mpv-player/mpv/releases/tag/v0.41.0),
-unchanged. mpv is free software under the GNU GPL version 2 or later: its licence is in the mod's
-`tools/mpv-licence` folder, and its source code is attached to the release (`mpv-0.41.0-source.tar.gz`). To
-build the zips, `sh fetch-mpv.sh windows` (or `macos-arm`, `macos-intel`) puts mpv in `package/tools` first.
+- **ffmpeg zips** (`…-ffmpeg.zip`): Windows, macOS and **Linux**. ffmpeg is a single file, unpacked the first
+  time the mod needs it. The smaller download.
+- **mpv zips** (`…-mpv.zip`): Windows and macOS. mpv also powers the older *Pop Out to a Window* (mpv's own
+  window); the panel's **Detach** works with either.
+
+If you have both (one in the zip, the other installed), mpv decodes the pictures unless **Settings > Locations
+> Video > Decode pictures with** says ffmpeg, and ffmpeg makes the WAVs. An mpv or ffmpeg already on your
+computer (on the PATH, Homebrew, `/usr/bin`) is used too.
+
+**Linux:** use the `-linux-ffmpeg` zip. mpv doesn't publish a Linux build, so there's no mpv zip for Linux; to
+use your distribution's mpv instead, [`install-mpv.sh`](linux/install-mpv.sh) (also attached to the release)
+installs it with your package manager: `sh install-mpv.sh`. Bitwig installed as a Flatpak isn't supported by Patchbay; use Bitwig's .deb or
+.tar.gz.
+
+The programs are unchanged builds: mpv 0.41.0, the official build from
+[mpv's releases](https://github.com/mpv-player/mpv/releases/tag/v0.41.0) (GPL 2 or later), and ffmpeg 6.0, the
+static builds packaged by [ffmpeg-static](https://github.com/eugeneware/ffmpeg-static) (GPL). Their licences are
+in the zip's `tools` folder, and their source code is attached to the release (`mpv-0.41.0-source.tar.gz`,
+`ffmpeg-6.0-source.tar.gz`). To build the zips, `sh fetch-ffmpeg.sh <platform>` or `sh fetch-mpv.sh <platform>`
+puts the program in `package/tools` first.
 
 ## Needs
 
@@ -103,11 +119,10 @@ option), both part of Patchbay.
 
 ## Bitwig versions
 
-Built against Bitwig 6.1.4, so Patchbay runs it on 6.0 to 6.1.7 on Windows, macOS. Tested on Bitwig
+Built against Bitwig 6.1.4, so Patchbay runs it on 6.0 to 6.1.7 on Windows, macOS and Linux. Tested on Bitwig
 6.1.7 on Windows.
 
-Not currently tested on Linux. In theory should work but you need to obtain mpv manually
-mpv doesn't publish an official Linux build the way it does for Windows and Mac, so I didn't include one. A Linux user would need to:
-
-Install mpv from their package manager (sudo apt install mpv, sudo dnf install mpv or sudo pacman -S mpv). The mod finds it in /usr/bin or anywhere on the PATH.
-Install any of the three zips. The mpv inside them is for Windows or Mac, so the mod skips it and uses the system mpv. The Windows zip is the smallest.
+Not currently tested on macOS or Linux. In theory it should work: the Linux zip comes with ffmpeg, so nothing
+else is needed, or you can install mpv from your package manager with [`install-mpv.sh`](linux/install-mpv.sh)
+(see [Which zip](#which-zip-ffmpeg-or-mpv) above). The mod finds an installed mpv or ffmpeg in /usr/bin or
+anywhere on the PATH.

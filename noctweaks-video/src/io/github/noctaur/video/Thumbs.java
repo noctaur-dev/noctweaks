@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Small pictures of the linked video, for its clips in the arranger: decoded by mpv in the background, one
+ * Small pictures of the linked video, for its clips in the arranger: decoded by mpv or ffmpeg in the background, one
  * every second or so (at most MAX for the whole video), and turned into Bitwig bitmaps a few at a time while
  * the arranger paints. Kept until the linked video changes.
  */
@@ -150,14 +150,11 @@ final class Thumbs {
    private void decode() {
       Process p = null;
       try {
-         File mpv = Frames.mpvForPipes();
-         if (mpv == null) {
+         java.util.List<String> cmd = Decode.frames(video, 0, fps, width, height);
+         if (cmd == null) {
             return;
          }
-         p = new ProcessBuilder(mpv.getAbsolutePath(), "--no-config", "--really-quiet", "--terminal=no",
-            "--audio=no", "--sub=no", "--o=-", "--of=rawvideo", "--ovc=rawvideo",
-            String.format(Locale.ROOT, "--vf=fps=%.6f,scale=%d:%d,format=bgr0", fps, width, height),
-            video.getAbsolutePath()).redirectError(ProcessBuilder.Redirect.DISCARD).start();
+         p = new ProcessBuilder(cmd).redirectError(ProcessBuilder.Redirect.DISCARD).start();
          InputStream in = p.getInputStream();
          int size = width * height * 4;
          while (!closed) {
