@@ -31,6 +31,7 @@ the zips, `sh fetch-mpv.sh windows` (or `macos-arm`, `macos-intel`) puts mpv in 
 2. The mod makes a WAV of the video's sound and Bitwig adds that as the clip. The clip *is* the video: the
    picture follows it wherever it goes. Move it, cut it, slip it, and the panel shows the matching part of
    the video; between clips the panel is black.
+   A video with no sound gets a clip of silence as long as the video, so it works the same way.
 3. Click the **Video** button in the bottom bar to show the panel, and press play.
 
 Clips of the video's sound carry a **film strip** across their top (pictures of the video at those points),

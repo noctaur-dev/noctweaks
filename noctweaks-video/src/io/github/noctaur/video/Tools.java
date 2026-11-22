@@ -153,9 +153,46 @@ final class Tools {
             video.getAbsolutePath()), out)) {
          return out;
       }
-      Video.log("Video: could not make a sound file (ffmpeg " + (ffmpeg == null ? "not found" : "failed")
-         + ", mpv " + (mpv == null ? "not found" : "failed") + ")", null);
-      return null;
+      // No sound came out: most often the video has no sound at all. Its clip is then silence as long as the
+      // video, so it can still be placed, moved and cut like any other.
+      Video.log("Video: no sound from " + video.getName() + " (ffmpeg " + (ffmpeg == null ? "not found" : "failed")
+         + ", mpv " + (mpv == null ? "not found" : "failed") + "): using silence", null);
+      double seconds = Frames.size(video) == null ? Double.NaN : Frames.duration(video);
+      if (Double.isNaN(seconds) || seconds <= 0) {
+         Video.log("Video: mpv couldn't tell how long " + video.getName() + " is", null);
+         return null;
+      }
+      return writeSilence(out, seconds) ? out : null;
+   }
+
+   /** A WAV of silence (48 kHz, 16-bit, stereo) this many seconds long. */
+   static boolean writeSilence(File out, double seconds) {
+      int rate = 48000, channels = 2, bytesPerSample = 2;
+      long frames = (long) Math.ceil(seconds * rate);
+      long data = frames * channels * bytesPerSample;
+      if (data > Integer.MAX_VALUE - 44) {
+         Video.log("Video: the video is too long for a silent WAV", null);
+         return false;
+      }
+      try (java.io.OutputStream o = new java.io.BufferedOutputStream(new java.io.FileOutputStream(out), 1 << 16)) {
+         java.nio.ByteBuffer h = java.nio.ByteBuffer.allocate(44).order(java.nio.ByteOrder.LITTLE_ENDIAN);
+         h.put("RIFF".getBytes(java.nio.charset.StandardCharsets.US_ASCII)).putInt((int) (36 + data));
+         h.put("WAVEfmt ".getBytes(java.nio.charset.StandardCharsets.US_ASCII)).putInt(16);
+         h.putShort((short) 1).putShort((short) channels).putInt(rate).putInt(rate * channels * bytesPerSample);
+         h.putShort((short) (channels * bytesPerSample)).putShort((short) (8 * bytesPerSample));
+         h.put("data".getBytes(java.nio.charset.StandardCharsets.US_ASCII)).putInt((int) data);
+         o.write(h.array());
+         byte[] zeros = new byte[1 << 16];
+         for (long left = data; left > 0; left -= zeros.length) {
+            o.write(zeros, 0, (int) Math.min(zeros.length, left));
+         }
+      } catch (Throwable t) {
+         Video.log("Video: could not write a silent WAV", t);
+         out.delete();
+         return false;
+      }
+      Video.log(String.format(java.util.Locale.ROOT, "Video: made %s (%.1f s of silence)", out, seconds), null);
+      return true;
    }
 
    private static boolean run(List<String> cmd, File out) {
