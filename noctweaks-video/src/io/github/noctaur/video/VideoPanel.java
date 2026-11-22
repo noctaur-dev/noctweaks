@@ -120,23 +120,76 @@ final class VideoPanel extends dve {
    public void iy_() {   // disposed
       stopTicking();
       closeFrames();
-      freeBitmap();
+      freeAllLater();
       super.iy_();
    }
 
-   private void freeBitmap() {
-      try {
-         if (bitmap != null) {
-            bitmap.iy_();
+   /**
+    * Bitwig's renderer draws on its own thread, after the paint that asked for a bitmap: a bitmap freed at
+    * once can still be waiting to be drawn, and drawing a freed bitmap crashes Bitwig. So a replaced bitmap
+    * is kept for a second before it's freed, and when the panel closes they're freed a few seconds later.
+    */
+   private record Retired(qc1 bitmap, long at) {
+   }
+
+   private final java.util.ArrayDeque<Retired> retired = new java.util.ArrayDeque<>();
+
+   private void retire(qc1 b) {
+      if (b != null) {
+         retired.add(new Retired(b, System.currentTimeMillis()));
+      }
+   }
+
+   private void disposeRetired(boolean all) {
+      long now = System.currentTimeMillis();
+      while (!retired.isEmpty() && (all || now - retired.peek().at() > 1000)) {
+         try {
+            retired.poll().bitmap().iy_();
+         } catch (Throwable t) {
+            Video.log("Video: freeing a picture", t);
          }
+      }
+   }
+
+   private void freeBitmap() {
+      retire(bitmap);
+      bitmap = null;
+      try {
          if (block != null) {
-            block.iy_();
+            block.iy_();   // plain memory: Bitwig copied it when it made the bitmap
          }
       } catch (Throwable t) {
-         Video.log("Video: freeing the picture", t);
+         Video.log("Video: freeing the picture memory", t);
       }
-      bitmap = null;
       block = null;
+   }
+
+   /** The panel is closing: its bitmaps are freed a few seconds later, on Bitwig's UI thread. */
+   private void freeAllLater() {
+      freeBitmap();
+      java.util.List<Retired> left = new java.util.ArrayList<>(retired);
+      retired.clear();
+      if (left.isEmpty()) {
+         return;
+      }
+      Thread t = new Thread(() -> {
+         try {
+            Thread.sleep(3000);
+            dpN.TVZ().asyncExec(() -> {
+               for (Retired r : left) {
+                  try {
+                     r.bitmap().iy_();
+                  } catch (Throwable e) {
+                     Video.log("Video: freeing a picture", e);
+                  }
+               }
+            });
+         } catch (Throwable e) {
+            Video.log("Video: freeing the pictures", e);
+         }
+      }, "noctweaks-video-free");
+      t.setDaemon(true);
+      t.start();
    }
 
    private void closeFrames() {
@@ -246,32 +299,11 @@ final class VideoPanel extends dve {
          }
          mem.put(y * blockStride, row, 0, w * 4);
       }
-      qc1 old = bitmap;
+      retire(bitmap);
       bitmap = gs.cfM(block, w, h, Jkg.MRY);   // copies the memory
-      if (old != null) {
-         old.iy_();
-      }
+      disposeRetired(false);
       if (!loggedUpload) {
          loggedUpload = true;
-         try {   // the first picture, saved by Bitwig to tools/first-frame.png (for testing)
-            File dir = Tools.toolsFolder();
-            if (dir != null && bitmap != null) {
-               File png = new File(dir, "first-frame.png");
-               bitmap.cfM(png, new com.bitwig.base.async.lBQ() {
-                  @Override
-                  public void taskCompleted() {
-                     Video.log("Video: first frame saved to " + png, null);
-                  }
-
-                  @Override
-                  public void cfM(Exception e) {
-                     Video.log("Video: could not save the first frame", e);
-                  }
-               });
-            }
-         } catch (Throwable t) {
-            Video.log("Video: could not save the first frame", t);
-         }
          Video.log("Video: first frame uploaded (" + w + " x " + h + ", stride " + blockStride + ", channels "
             + java.util.Arrays.toString(ch) + ", bitmap " + (bitmap == null ? "none" : bitmap.getClass().getSimpleName()) + ")", null);
       }
