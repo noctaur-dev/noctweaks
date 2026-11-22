@@ -193,6 +193,8 @@ final class Video {
          });
       }
       m.ELS();
+      soundCopyItems(m);
+      m.ELS();
       m.cfM("Describe Clips at Playhead (for linking video to clip edits)", () -> Inspect.describe(doc));
       m.cfM("Open Video Tools Folder (mpv, ffmpeg)", Tools::openToolsFolder);
    }
@@ -220,6 +222,8 @@ final class Video {
       menu.ELS();
       dKW m = menu.Hnt("Video");
       m.cfM("Describe This Clip (for linking video to clip edits)", () -> Inspect.describeClips(project, clips));
+      m.ELS();
+      soundCopyItems(m);
       if (project != null && link != null) {
          m.cfM(String.format(Locale.ROOT, "Set Video Start to Playhead (%.2f s)", Clock.seconds(project)), () -> {
             Link cur = link;
@@ -229,6 +233,12 @@ final class Video {
             }
          });
       }
+   }
+
+   /** Where the sound copies of videos go (also in Settings > Locations > Video). */
+   private static void soundCopyItems(dKW m) {
+      m.cfM("Open Sound Copies Folder (" + Sounds.describe() + ")", Sounds::openFolder);
+      m.cfM("Choose Folder for Sound Copies...", Sounds::chooseFolder);
    }
 
    private static void nudge(double seconds) {

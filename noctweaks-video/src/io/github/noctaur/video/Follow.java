@@ -107,7 +107,7 @@ final class Follow {
    }
 
    /** Where in the clip its event playing the sound starts (beats), or null if it doesn't play it. */
-   private static Double soundStart(Nbl clip, File sound) {
+   static Double soundStart(Nbl clip, File sound) {
       gIs content = clip.z();
       if (content == null) {
          return null;

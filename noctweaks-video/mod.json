@@ -3,7 +3,7 @@
   "mod": {
     "id": "noctweaks-video",
     "name": "Video: Video Track (prototype)",
-    "version": "0.1.0-dev.8",
+    "version": "0.1.0-dev.9",
     "author": "noctaur",
     "description": "Prototype. Drop a video file on an arranger track: its sound goes in as an audio clip, and the picture plays in a Video panel (its button is in the bottom bar) that follows Bitwig's transport. mpv comes with it.",
     "area": "Arranger",
@@ -35,6 +35,11 @@
       "kind": "file",
       "path": "resources/noctweaks-video/video.svg",
       "media_type": "image/svg+xml"
+    },
+    "sounds": {
+      "kind": "directory",
+      "path": "sounds",
+      "persistence": "preserve"
     }
   },
   "registrations": [
@@ -42,6 +47,12 @@
       "id": "panels",
       "consumer": "panel-management-framework",
       "descriptor": "panels.properties",
+      "jar": "helper.jar"
+    },
+    {
+      "id": "preferences",
+      "consumer": "preferences-composition-framework",
+      "descriptor": "preferences.properties",
       "jar": "helper.jar"
     }
   ]

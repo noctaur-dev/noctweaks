@@ -30,8 +30,12 @@ final class Tools {
    }
 
    static void openToolsFolder() {
+      open(toolsFolder());
+   }
+
+   /** Shows a folder in Explorer / Finder. */
+   static void open(File dir) {
       try {
-         File dir = toolsFolder();
          if (dir == null) {
             return;
          }
@@ -39,7 +43,7 @@ final class Tools {
          String open = WINDOWS ? "explorer.exe" : MAC ? "open" : "xdg-open";
          new ProcessBuilder(open, dir.getAbsolutePath()).start();
       } catch (Throwable t) {
-         Video.log("Video: could not open the tools folder", t);
+         Video.log("Video: could not open " + dir, t);
       }
    }
 
@@ -133,11 +137,7 @@ final class Tools {
     * ffmpeg nor mpv is found or both fail.
     */
    static File extractSound(File video) {
-      String base = video.getName().replaceFirst("\\.[^.]+$", "");
-      File out = new File(video.getParentFile(), base + " (sound).wav");
-      if (!video.getParentFile().canWrite() && toolsFolder() != null) {
-         out = new File(toolsFolder(), base + " (sound).wav");
-      }
+      File out = Sounds.copyFor(video);   // where the user wants sound copies kept
       if (out.isFile() && out.length() > 44 && out.lastModified() >= video.lastModified()) {
          Video.log("Video: using the sound made before, " + out, null);
          return out;

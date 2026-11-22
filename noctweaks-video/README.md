@@ -27,28 +27,42 @@ the zips, `sh fetch-mpv.sh windows` (or `macos-arm`, `macos-intel`) puts mpv in 
 ## How to use it
 
 1. Drag a video file (`.mp4`, `.mov`, `.m4v`, `.mkv`, `.webm`, `.avi`) from Explorer or Finder onto an audio
-   track in the arranger, where it should start.
-2. The mod saves the sound beside the video as `<name> (sound).wav`, and Bitwig adds that as the clip.
+   track in the arranger.
+2. The mod makes a WAV of the video's sound and Bitwig adds that as the clip. The clip *is* the video: the
+   picture follows it wherever it goes. Move it, cut it, slip it, and the panel shows the matching part of
+   the video; between clips the panel is black.
 3. Click the **Video** button in the bottom bar to show the panel, and press play.
 
-The arranger's right-click menu (empty space) has a **Video** submenu:
+Clips of the video's sound carry a **film strip** across their top (pictures of the video at those points),
+so they read as video in the arranger. Short clips get a film edge along their bottom instead.
 
-- **Set Video Start to Playhead**: put the playhead where the clip starts, then pick this (after moving the
-  clip, or when the video wasn't dropped on a lane).
-- **Earlier / Later by 1 Frame**: fine-tune the picture against the sound.
-- **Pop Out to a Window**: the picture in a separate window too (mpv's own), for a second screen.
-- **Describe Clips at Playhead**: a diagnostic for the next step (the video following clip edits).
+### Where the sound copies go
+
+By default the WAVs are kept out of the way, in the mod's own data folder (`sounds/`, one folder per video),
+not next to your videos. To change that, **Settings > Locations > Video > Sound copies of videos**:
+
+- **In the Video mod's folder** (default)
+- **Next to each video** (as `<name> (sound).wav`)
+- **In a folder you choose**: pick the folder with **Choose Folder for Sound Copies...** in the Video menu
+
+The **Video** submenu (right-click a clip, or empty arranger space) also has **Open Sound Copies Folder**.
+
+A copy can be deleted once no project uses it; dropping the video again makes it again.
+
+### The Video menu
+
+- **Describe This Clip**: a diagnostic (what Bitwig holds for the clip), written to the log.
+- **Pop Out to a Window**: the picture in a separate window too (mpv's own), for a second screen. It still
+  uses the older fixed start, not the clip.
 - **Forget Video**
 
 ## Limits of this prototype
 
-- One video at a time. The link is remembered after a restart (Show Video Window opens it again), but
-  isn't tied to a project yet.
-- The video doesn't follow the clip if you move, cut or slip it yet: use **Set Video Start to Playhead**.
-  Next step: the picture follows whichever clip of the video's sound is playing, so edits carry over.
-- Tempo changes after the drop aren't followed (the start is kept in seconds).
+- One video at a time. The link is remembered after a restart, but isn't tied to a project yet.
+- Trimming a clip's left edge isn't followed yet (moving, cutting and gaps are).
+- Clips on tracks inside groups aren't followed yet.
 
 ## Bitwig versions
 
-Built against Bitwig 6.1.4, so Patchbay runs it on 6.0 to 6.1.7 on Windows, macOS and Linux. Not tested in
-Bitwig yet.
+Built against Bitwig 6.1.4, so Patchbay runs it on 6.0 to 6.1.7 on Windows, macOS and Linux. Tested on
+Bitwig 6.1.7 on Windows.

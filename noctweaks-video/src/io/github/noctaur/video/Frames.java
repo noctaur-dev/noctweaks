@@ -178,6 +178,31 @@ final class Frames {
    }
 
    private static final java.util.Map<File, int[]> SIZES = new java.util.concurrent.ConcurrentHashMap<>();
+   private static final java.util.Map<File, Double> DURATIONS = new java.util.concurrent.ConcurrentHashMap<>();
+
+   private static final java.util.Set<File> ASKING = java.util.concurrent.ConcurrentHashMap.newKeySet();
+
+   /** The video's size if it's known; if not, asks mpv on a background thread and returns null for now. */
+   static int[] sizeIfKnown(File video) {
+      int[] known = SIZES.get(video);
+      if (known == null && ASKING.add(video)) {
+         Thread t = new Thread(() -> {
+            try {
+               size(video);
+            } catch (Throwable ignored) {
+            }
+         }, "noctweaks-video-size");
+         t.setDaemon(true);
+         t.start();
+      }
+      return known;
+   }
+
+   /** The video's length in seconds (known once size() has asked mpv), or NaN. */
+   static double duration(File video) {
+      Double d = DURATIONS.get(video);
+      return d == null ? Double.NaN : d;
+   }
 
    static File mpvForPipes() {
       File mpv = Tools.find("mpv");
@@ -201,12 +226,16 @@ final class Frames {
             return null;
          }
          Process p = new ProcessBuilder(mpv.getAbsolutePath(), "--no-config", "--vo=null", "--ao=null", "--frames=1",
-            "--term-playing-msg=SIZE ${width} ${height}", video.getAbsolutePath()).redirectErrorStream(true).start();
+            "--term-playing-msg=SIZE ${width} ${height} ${duration}", video.getAbsolutePath()).redirectErrorStream(true).start();
          String text = new String(p.getInputStream().readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
          p.waitFor(10, java.util.concurrent.TimeUnit.SECONDS);
-         java.util.regex.Matcher m = java.util.regex.Pattern.compile("SIZE (\\d+) (\\d+)").matcher(text);
+         java.util.regex.Matcher m = java.util.regex.Pattern.compile("SIZE (\\d+) (\\d+) ?([0-9.]*)").matcher(text);
          if (m.find()) {
             int[] wh = { Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)) };
+            try {
+               DURATIONS.put(video, Double.parseDouble(m.group(3)));
+            } catch (NumberFormatException ignored) {
+            }
             SIZES.put(video, wh);
             Video.log("Video: " + video.getName() + " is " + wh[0] + " x " + wh[1], null);
             return wh;

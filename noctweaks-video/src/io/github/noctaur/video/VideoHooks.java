@@ -4,7 +4,10 @@ import bitwig.obf.*;
 import bml.api.Arg;
 import bml.api.At;
 import bml.api.Hook;
+import bml.api.Return;
 import bml.api.This;
+import com.bitwig.base.geom.DoubleRectangle;
+import com.bitwig.graphics.SYo;
 import com.bitwig.base.io.z2y;                                  // a file Bitwig loads (path + sub-item)
 import com.bitwig.flt.document.core.master.g2L;                 // a loaded project
 
@@ -90,6 +93,91 @@ public final class VideoHooks {
          Video.clipMenu(menu, header == null ? java.util.List.of() : new java.util.ArrayList<Object>(header.UNj().FzB()));
       } catch (Throwable t) {
          Video.log("Video: clip menu", t);
+      }
+   }
+
+   /**
+    * bpN / bst: Bitwig's painters for an audio clip on a timeline. After one paints a clip, a clip playing a
+    * video's sound gets its film strip (ClipMarks), in the rectangle the painter gives for that clip (Hnt with
+    * the same arguments); MIO() is the painter's drawing surface and LaE() its widget.
+    */
+   // While a painter paints an audio clip: the clip (from the paint's start) and the rectangle the painter
+   // works out for it (its Hnt, called first thing in the paint), for drawing on top at the paint's end.
+   // (At the end of the paint Bitwig's arguments are gone, so they are kept here.)
+   private static final class Painting {
+      Object clip;
+      DoubleRectangle rect;
+   }
+
+   private static final ThreadLocal<Painting> PAINTING = ThreadLocal.withInitial(Painting::new);
+
+   @Hook(target = bpN.class, method = "cfM(Lso1;LlbB;LLA1;LMQG;DIDD)V", at = At.ENTRY, id = "video-clip-paint-start")
+   public static void clipPaintStart(@Arg(3) MQG clip) {
+      startPaint(clip);
+   }
+
+   @Hook(target = bst.class, method = "cfM(Lso1;LlbB;LLA1;LMQG;DIDD)V", at = At.ENTRY, id = "video-clip-paint-start-2")
+   public static void clipPaintStart2(@Arg(3) MQG clip) {
+      startPaint(clip);
+   }
+
+   @Hook(target = bpN.class, method = "Hnt(Lso1;LlbB;LLA1;LMQG;DIDD)Lcom/bitwig/base/geom/DoubleRectangle;",
+         at = At.WRAP_RETURN, id = "video-clip-rect")
+   public static DoubleRectangle clipRect(@Return DoubleRectangle r) {
+      keepRect(r);
+      return r;
+   }
+
+   @Hook(target = bst.class, method = "Hnt(Lso1;LlbB;LLA1;LMQG;DIDD)Lcom/bitwig/base/geom/DoubleRectangle;",
+         at = At.WRAP_RETURN, id = "video-clip-rect-2")
+   public static DoubleRectangle clipRect2(@Return DoubleRectangle r) {
+      keepRect(r);
+      return r;
+   }
+
+   @Hook(target = bpN.class, method = "cfM(Lso1;LlbB;LLA1;LMQG;DIDD)V", at = At.BEFORE_RETURN, id = "video-clip-paint")
+   public static void clipPainted(@This bpN painter) {
+      painted(painter.MIO(), painter.LaE());
+   }
+
+   @Hook(target = bst.class, method = "cfM(Lso1;LlbB;LLA1;LMQG;DIDD)V", at = At.BEFORE_RETURN, id = "video-clip-paint-2")
+   public static void clipPainted2(@This bst painter) {
+      painted(painter.MIO(), painter.LaE());
+   }
+
+   private static void startPaint(MQG clip) {
+      Painting p = PAINTING.get();
+      p.clip = clip instanceof Nbl && Video.link() != null ? clip : null;
+      p.rect = null;
+   }
+
+   private static void keepRect(DoubleRectangle r) {
+      Painting p = PAINTING.get();
+      if (p.clip != null && p.rect == null) {
+         p.rect = r;
+      }
+   }
+
+   private static void painted(SYo g, dve widget) {
+      Painting p = PAINTING.get();
+      Object clip = p.clip;
+      DoubleRectangle r = p.rect;
+      p.clip = null;
+      p.rect = null;
+      try {
+         if (r != null && clip instanceof Nbl audio) {
+            ClipMarks.paint(g, widget, r, audio);
+         }
+      } catch (Throwable t) {
+         clipPaintFailed(t);
+      }
+   }
+
+   private static int paintFailures;
+
+   private static void clipPaintFailed(Throwable t) {
+      if (paintFailures++ < 5) {   // painting repeats: log only the first few
+         Video.log("Video: marking a video clip", t);
       }
    }
 }
