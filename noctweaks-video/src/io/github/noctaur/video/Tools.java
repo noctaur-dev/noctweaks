@@ -8,9 +8,9 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 /**
- * The outside programs the mod uses: mpv (the video window, and the video's sound as a WAV) and, if it's
- * installed, ffmpeg (makes the WAV a little faster). mpv ships with the mod, in its tools folder (Windows:
- * tools/mpv/mpv.exe; macOS: tools/mpv.tar.gz, unpacked on first use). Looked for there first, then in the settings
+ * The outside programs the mod uses: ffmpeg, else mpv (they decode the pictures and make the video's sound into a
+ * WAV; see Decode). Each zip ships one in the tools folder (ffmpeg: tools/ffmpeg.gz, unpacked on first use; mpv on
+ * Windows: tools/mpv/mpv.exe; on macOS: tools/mpv.tar.gz, unpacked on first use). Looked for there first, then in the settings
  * ("mpv" / "ffmpeg" = a full path), then on PATH and where installers usually put them.
  */
 final class Tools {

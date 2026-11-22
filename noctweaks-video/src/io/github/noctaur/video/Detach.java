@@ -62,6 +62,15 @@ final class Detach {
    }
 
    private static void open(dve from) {
+      if (owner == null && from != null) {   // opened from a menu: the window that menu belongs to
+         try {
+            if (from.ZTl() && from.jg_() instanceof dwh w) {
+               owner = w;
+            }
+         } catch (Throwable t) {
+            Video.log("Video: finding Bitwig's window", t);
+         }
+      }
       if (owner == null) {
          for (dAd b : detachButtons) {   // Bitwig's main window: the one the panel is in
             Object win = b.ZTl() ? b.jg_() : null;

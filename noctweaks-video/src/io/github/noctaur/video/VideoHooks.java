@@ -26,6 +26,7 @@ public final class VideoHooks {
    }
 
    private static final ThreadLocal<Object> MENU = new ThreadLocal<>();
+   private static final ThreadLocal<dve> MENU_WIDGET = new ThreadLocal<>();
 
    /** A file is being dragged over an arranger lane: note where, so a video starts where it was dropped. */
    @Hook(target = dzN.class, method = "cfM(Lcom/bitwig/flt/document/core/master/g2L;LhKf;Lwat;)LZuD;",
@@ -65,19 +66,22 @@ public final class VideoHooks {
 
    /** The arranger's right-click menu: the Video submenu. */
    @Hook(target = aZv.class, method = "cfM(Ldve;LdKW;)V", at = At.ENTRY, id = "arranger-menu-args")
-   public static void arrangerMenuArgs(@Arg(1) dKW menu) {
+   public static void arrangerMenuArgs(@Arg(0) dve widget, @Arg(1) dKW menu) {
       MENU.set(menu);
+      MENU_WIDGET.set(widget);
    }
 
    @Hook(target = aZv.class, method = "cfM(Ldve;LdKW;)V", at = At.BEFORE_RETURN, id = "arranger-menu")
    public static void arrangerMenu(@This aZv arranger) {
       Object m = MENU.get();
       MENU.remove();
+      dve widget = MENU_WIDGET.get();
+      MENU_WIDGET.remove();
       try {
          Video.log("Video: arranger menu (" + (m == null ? "no menu" : "menu") + ", project " + arranger.gfw() + ")", null);
          if (m instanceof dKW menu && arranger.gfw() instanceof g2L project) {
             Video.seen(project);
-            Video.menu(menu, project);
+            Video.menu(menu, project, widget);
          }
       } catch (Throwable t) {
          Video.log("Video: arranger menu", t);

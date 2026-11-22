@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Video frames for the panel, decoded by mpv or ffmpeg (see Decode) in the background and read raw (BGR0, 4 bytes a pixel) from its
+ * Video frames for the panel, decoded by ffmpeg or mpv (see Decode) in the background and read raw (BGR0, 4 bytes a pixel) from its
  * output, at a fixed rate (FPS), scaled to fit the panel. The panel asks for a time; this keeps
  * reading forward to it while Bitwig plays, and starts the decoder again at the new time when the playhead
  * jumps back or far ahead. The decoder waits while nothing reads, so it never runs ahead of Bitwig.

@@ -76,8 +76,8 @@ Right-click a video clip, then **Video**:
 - **Open Sound Copies Folder**, **Choose Folder for Sound Copies...**
 - **Describe This Clip**: a diagnostic (what Bitwig holds for the clip), written to the log.
 
-Right-click empty arranger space for **Forget All Videos** and, with mpv, **Pop Out to a Window** (the latest
-video in mpv's own window, with a fixed start: the older way, before Detach).
+Right-click empty arranger space for **Detach Video to a Window** (the same window as the panel's Detach button,
+so it opens without the panel) and **Forget All Videos**.
 
 ## Which zip: ffmpeg or mpv
 
@@ -86,11 +86,11 @@ everything, and each zip comes with one of them, so there's nothing else to inst
 
 - **ffmpeg zips** (`…-ffmpeg.zip`): Windows, macOS and **Linux**. ffmpeg is a single file, unpacked the first
   time the mod needs it. The smaller download.
-- **mpv zips** (`…-mpv.zip`): Windows and macOS. mpv also powers the older *Pop Out to a Window* (mpv's own
-  window); the panel's **Detach** works with either.
+- **mpv zips** (`…-mpv.zip`): Windows and macOS, for anyone who'd rather use mpv.
 
-If you have both (one in the zip, the other installed), mpv decodes the pictures unless **Settings > Locations
-> Video > Decode pictures with** says ffmpeg, and ffmpeg makes the WAVs. An mpv or ffmpeg already on your
+Both versions work the same: panel, film strips and the detached window. ffmpeg comes first and mpv is the
+fallback: if you have both (one in the zip, the other installed), ffmpeg decodes the pictures and makes the
+WAVs, unless **Settings > Locations > Video > Decode pictures with** says mpv. An mpv or ffmpeg already on your
 computer (on the PATH, Homebrew, `/usr/bin`) is used too.
 
 **Linux:** use the `-linux-ffmpeg` zip. mpv doesn't publish a Linux build, so there's no mpv zip for Linux; to

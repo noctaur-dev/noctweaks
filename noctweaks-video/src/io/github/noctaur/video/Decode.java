@@ -9,8 +9,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The program that decodes the pictures: mpv or ffmpeg, whichever the mod has (mpv first, unless Settings >
- * Locations > Video says otherwise). The mod's zips come with one or the other; either one alone does
+ * The program that decodes the pictures: ffmpeg or mpv, whichever the mod has (ffmpeg first, mpv the fallback,
+ * unless Settings > Locations > Video says otherwise). The mod's zips come with one or the other; either one alone does
  * everything the panel and the film strips need. Both are asked
  * for the same thing: raw BGR0 frames on their output, at a fixed rate, scaled to a size, from a time on.
  */
@@ -35,7 +35,7 @@ final class Decode {
    }
 
    static final int AUTOMATIC = 0, MPV = 1, FFMPEG = 2;
-   static final String[] CHOICES = { "Automatic (mpv if it's there)", "mpv", "ffmpeg" };
+   static final String[] CHOICES = { "Automatic (ffmpeg, else mpv)", "mpv", "ffmpeg" };
 
    /** Settings > Locations > Video > Decode pictures with. */
    static int choice() {
@@ -59,15 +59,10 @@ final class Decode {
 
    /** The program to decode with: the chosen one, or the other if it isn't there. */
    private static boolean useFfmpeg() {
-      int c = choice();
-      File mpv = c == FFMPEG ? null : mpv();
-      if (mpv != null) {
+      if (choice() == MPV && mpv() != null) {
          return false;
       }
-      if (ffmpeg() != null) {
-         return true;
-      }
-      return false;   // the chosen ffmpeg isn't there: mpv, if it is
+      return ffmpeg() != null;   // otherwise ffmpeg; mpv only if there's no ffmpeg
    }
 
    /** Which one decodes, for the log. */

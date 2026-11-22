@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Small pictures of the linked video, for its clips in the arranger: decoded by mpv or ffmpeg in the background, one
+ * Small pictures of the linked video, for its clips in the arranger: decoded by ffmpeg or mpv in the background, one
  * every second or so (at most MAX for the whole video), and turned into Bitwig bitmaps a few at a time while
  * the arranger paints. Kept until the linked video changes.
  */
@@ -54,7 +54,7 @@ final class Thumbs {
       if (t != null) {
          return t;
       }
-      int[] size = Frames.sizeIfKnown(video);   // never waits: asked of mpv in the background
+      int[] size = Frames.sizeIfKnown(video);   // never waits: asked of ffmpeg or mpv in the background
       double dur = Frames.duration(video);
       if (size == null || size[1] <= 0) {
          return null;

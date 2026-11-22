@@ -64,7 +64,7 @@ final class Video {
       return !links.isEmpty();
    }
 
-   /** The latest video dropped (for the pop-out window and diagnostics), or null. */
+   /** The latest video dropped (for diagnostics), or null. */
    static Link link() {
       List<Link> l = links;
       return l.isEmpty() ? null : l.get(l.size() - 1);
@@ -211,17 +211,13 @@ final class Video {
          double start = 0;
          project = new java.lang.ref.WeakReference<>(doc);
          addLink(new Link(f, sound, start));
-         if (Player.running()) {
-            Player.show(f);   // the pop-out window, if it's open, follows too
-            Sync.start();
-         }
          return;   // one video per drop
       }
    }
 
    // ------------------------------------------------------------------ the arranger's menu
 
-   static void menu(dKW menu, g2L doc) {
+   static void menu(dKW menu, g2L doc, dve widget) {
       menu.ELS();
       dKW m = menu.Hnt("Video");
       List<Link> l = links;
@@ -231,27 +227,19 @@ final class Video {
       } else {
          m.cfM(l.size() == 1 ? "1 video (the highest AV track shows in the panel)"
             : l.size() + " videos (the highest AV track shows in the panel)", () -> seen(doc));
-         Link latest = link();
-         if (Player.running()) {
-            m.cfM("Close Pop-Out Window", Player::close);
-         } else if (Decode.mpv() != null) {   // mpv's own window: only with mpv
-            m.cfM("Pop Out to a Window: " + latest.video().getName(), () -> {
-               seen(doc);
-               Player.show(latest.video());
-               Sync.start();
-            });
-         }
-         m.ELS();
-         m.cfM("Forget All Videos", () -> {
-            Player.close();
-            forgetAll();
+         // the same window as the panel's Detach button (ffmpeg or mpv, whichever decodes)
+         m.cfM(Detach.isOpen() ? "Attach Video (close its window)" : "Detach Video to a Window", () -> {
+            seen(doc);
+            Detach.toggle(widget);
          });
+         m.ELS();
+         m.cfM("Forget All Videos", Video::forgetAll);
       }
       m.ELS();
       soundCopyItems(m);
       m.ELS();
       m.cfM("Describe Clips at Playhead (for testing)", () -> Inspect.describe(doc));
-      m.cfM("Open Video Tools Folder (mpv, ffmpeg)", Tools::openToolsFolder);
+      m.cfM("Open Video Tools Folder (ffmpeg, mpv)", Tools::openToolsFolder);
    }
 
    /** The right-click menu of a selection: a Video submenu when it holds an audio clip. */
