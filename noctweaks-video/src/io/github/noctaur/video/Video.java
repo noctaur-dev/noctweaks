@@ -200,6 +200,40 @@ final class Video {
       m.cfM("Open Video Tools Folder (mpv, ffmpeg)", Tools::openToolsFolder);
    }
 
+   /** The right-click menu of a selection: a Video submenu when it holds an audio clip. */
+   static void clipMenu(dKW menu, java.util.List<Object> items) {
+      java.util.List<Object> clips = new java.util.ArrayList<>();
+      for (Object o : items) {
+         if (o instanceof Nbl) {   // an audio clip
+            clips.add(o);
+         }
+      }
+      if (clips.isEmpty()) {
+         return;
+      }
+      g2L doc = project();
+      try {
+         if (clips.get(0) instanceof zZi clip && clip.oQj() instanceof g2L d) {   // the clip's project
+            doc = d;
+            seen(d);
+         }
+      } catch (Throwable ignored) {
+      }
+      g2L project = doc;
+      menu.ELS();
+      dKW m = menu.Hnt("Video");
+      m.cfM("Describe This Clip (for linking video to clip edits)", () -> Inspect.describeClips(project, clips));
+      if (project != null && link != null) {
+         m.cfM(String.format(Locale.ROOT, "Set Video Start to Playhead (%.2f s)", Clock.seconds(project)), () -> {
+            Link cur = link;
+            if (cur != null) {
+               setLink(new Link(cur.video(), cur.sound(), Clock.seconds(project)));
+               Sync.kick();
+            }
+         });
+      }
+   }
+
    private static void nudge(double seconds) {
       Link cur = link;
       if (cur != null) {

@@ -81,6 +81,45 @@ final class Inspect {
       }
    }
 
+   /** The same, for the clips right-clicked (exactly the clip the user means). */
+   static void describeClips(g2L doc, java.util.List<Object> clips) {
+      StringBuilder out = new StringBuilder();
+      try {
+         if (doc != null) {
+            double secs = Clock.seconds(doc);
+            out.append(String.format(Locale.ROOT, "playhead %.6f s = %.6f beats%n", secs, Clock.secondsToBeats(doc, secs)));
+         }
+         Video.Link l = Video.link();
+         out.append("linked video: ").append(l == null ? "none" : l.video() + " / " + l.sound() + " start " + l.startSeconds()).append('\n');
+         for (Object c : clips) {
+            out.append("clip ").append(c.getClass().getName()).append(": ").append(numbers(c)).append('\n');
+            if (c instanceof Nbl audioClip) {
+               Object content = audioClip.z();
+               out.append("  content ").append(content == null ? "none" : content.getClass().getName())
+                  .append(": ").append(numbers(content)).append('\n');
+               events(content, out, "  ");
+            }
+         }
+      } catch (Throwable t) {
+         out.append("\nstopped: ").append(t);
+         Video.log("Video: describe", t);
+      }
+      write(out);
+   }
+
+   private static void write(StringBuilder out) {
+      Video.log("Video: clips described\n" + out, null);
+      try {
+         File dir = Tools.toolsFolder();
+         if (dir != null) {
+            dir.mkdirs();
+            Files.writeString(new File(dir, "describe.txt").toPath(), out.toString(), StandardCharsets.UTF_8);
+         }
+      } catch (Throwable t) {
+         Video.log("Video: could not write describe.txt", t);
+      }
+   }
+
    /** The audio events of a clip's content: gIs may be a timeline itself, or hold lanes (takes) of them. */
    private static void events(Object content, StringBuilder out, String indent) {
       List<?> evs = null;

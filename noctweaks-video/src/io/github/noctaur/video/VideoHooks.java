@@ -70,12 +70,26 @@ public final class VideoHooks {
       Object m = MENU.get();
       MENU.remove();
       try {
+         Video.log("Video: arranger menu (" + (m == null ? "no menu" : "menu") + ", project " + arranger.gfw() + ")", null);
          if (m instanceof dKW menu && arranger.gfw() instanceof g2L project) {
             Video.seen(project);
             Video.menu(menu, project);
          }
       } catch (Throwable t) {
          Video.log("Video: arranger menu", t);
+      }
+   }
+
+   /**
+    * bkS: the menu for a selection (right-click a clip): a Video submenu when an audio clip is selected.
+    * big.UNj().FzB() is the selected items (as Expression Controls reads them).
+    */
+   @Hook(target = bkS.class, method = "cfM(LdKW;Ldve;Lbig;LkbG;)V", at = At.BEFORE_RETURN, id = "video-clip-menu")
+   public static void clipMenu(@Arg(0) dKW menu, @Arg(2) big header) {
+      try {
+         Video.clipMenu(menu, header == null ? java.util.List.of() : new java.util.ArrayList<Object>(header.UNj().FzB()));
+      } catch (Throwable t) {
+         Video.log("Video: clip menu", t);
       }
    }
 }

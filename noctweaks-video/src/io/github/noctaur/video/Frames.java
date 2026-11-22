@@ -75,6 +75,18 @@ final class Frames {
    }
 
    private void run() {
+      try {
+         loop();
+      } catch (Throwable t) {   // an exception leaving a thread would take Bitwig down
+         Video.log("Video: frames stopped", t);
+      }
+      try {
+         stop();
+      } catch (Throwable ignored) {
+      }
+   }
+
+   private void loop() {
       byte[] buf = new byte[width * height * 4];
       double frame = 1.0 / FPS;
       while (running) {
@@ -112,15 +124,15 @@ final class Frames {
             break;
          } catch (Throwable e) {
             Video.log("Video: frames", e);
-            stop();
             try {
+               stop();
                Thread.sleep(500);
             } catch (InterruptedException ie) {
                break;
+            } catch (Throwable ignored) {
             }
          }
       }
-      stop();
    }
 
    private void fire() {
@@ -130,7 +142,7 @@ final class Frames {
       }
    }
 
-   private void start(double t) throws IOException {
+   private synchronized void start(double t) throws IOException {
       stop();
       File mpv = mpvForPipes();
       if (mpv == null) {
@@ -206,11 +218,15 @@ final class Frames {
       return null;
    }
 
-   private void stop() {
-      if (process != null) {
-         process.destroyForcibly();
-      }
+   private synchronized void stop() {
+      Process p = process;   // close() runs on another thread: never touch the field twice
       process = null;
       out = null;
+      if (p != null) {
+         try {
+            p.destroyForcibly();
+         } catch (Throwable ignored) {
+         }
+      }
    }
 }

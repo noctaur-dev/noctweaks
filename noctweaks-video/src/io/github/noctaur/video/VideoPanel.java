@@ -76,6 +76,8 @@ final class VideoPanel extends dve {
                repaintSoon();
             }
          } catch (InterruptedException ignored) {
+         } catch (Throwable t) {   // never let an exception leave the thread
+            Video.log("Video: panel ticker", t);
          }
       }, "noctweaks-video-panel");
       ticker.setDaemon(true);
@@ -165,7 +167,9 @@ final class VideoPanel extends dve {
          frames = new Frames(link.video(), fw, fh);
          drawn = null;
       }
-      frames.want(Video.videoTime(doc));
+      double vt = Video.videoTime(doc);
+      frames.want(vt);
+      status(vt);
 
       Frames.Frame f = frames.latest();
       if (f == null) {
@@ -190,6 +194,28 @@ final class VideoPanel extends dve {
          drawn = f;
       }
       bitmap.cfM(g, Math.floor((w - bw) / 2), Math.floor((h - bh) / 2));
+   }
+
+   // a line in the log every few seconds while the panel is shown (for testing)
+   private long lastStatus;
+   private int statusCount, paints;
+
+   private void status(double vt) {
+      paints++;
+      long now = System.currentTimeMillis();
+      if (now - lastStatus < 3000 || statusCount >= 40) {
+         return;
+      }
+      lastStatus = now;
+      statusCount++;
+      Frames.Frame f = frames == null ? null : frames.latest();
+      Video.log(String.format(java.util.Locale.ROOT,
+         "Video panel: %d paints, playhead video time %.2f s (start %.2f s), frame %s, bitmap %s, panel %d x %d",
+         paints, vt, Video.link() == null ? 0 : Video.link().startSeconds(),
+         f == null ? "none yet" : String.format(java.util.Locale.ROOT, "%.2f s %dx%d", f.time(), f.width(), f.height()),
+         bitmap == null ? "none" : bitmap.getClass().getSimpleName() + (bitmap instanceof oRV ? " with memory" : " WITHOUT memory"),
+         Sxo(), yiX()), null);
+      paints = 0;
    }
 
    // the video's size, asked of mpv on a background thread (the panel stays black until it's known)
