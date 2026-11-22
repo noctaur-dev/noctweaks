@@ -227,11 +227,7 @@ final class Video {
       } else {
          m.cfM(l.size() == 1 ? "1 video (the highest AV track shows in the panel)"
             : l.size() + " videos (the highest AV track shows in the panel)", () -> seen(doc));
-         // the same window as the panel's Detach button (ffmpeg or mpv, whichever decodes)
-         m.cfM(Detach.isOpen() ? "Attach Video (close its window)" : "Detach Video to a Window", () -> {
-            seen(doc);
-            Detach.toggle(widget);
-         });
+         detachItem(m, widget);
          m.ELS();
          m.cfM("Forget All Videos", Video::forgetAll);
       }
@@ -243,7 +239,7 @@ final class Video {
    }
 
    /** The right-click menu of a selection: a Video submenu when it holds an audio clip. */
-   static void clipMenu(dKW menu, java.util.List<Object> items) {
+   static void clipMenu(dKW menu, java.util.List<Object> items, dve widget) {
       java.util.List<Object> clips = new java.util.ArrayList<>();
       for (Object o : items) {
          if (o instanceof Nbl) {   // an audio clip
@@ -271,10 +267,17 @@ final class Video {
          });
          m.cfM("Forget This Video (its clips become plain audio)", () -> forget(l));
          m.ELS();
+         detachItem(m, widget);
+         m.ELS();
       }
       m.cfM("Describe This Clip (for testing)", () -> Inspect.describeClips(project, clips));
       m.ELS();
       soundCopyItems(m);
+   }
+
+   /** The same window as the panel's Detach button (ffmpeg or mpv, whichever decodes), opened from a menu. */
+   private static void detachItem(dKW m, dve widget) {
+      m.cfM(Detach.isOpen() ? "Attach Video (close its window)" : "Detach Video to a Window", () -> Detach.toggle(widget));
    }
 
    /** Where the sound copies of videos go (also in Settings > Locations > Video). */

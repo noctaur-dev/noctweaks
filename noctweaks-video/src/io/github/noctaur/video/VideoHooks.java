@@ -27,6 +27,7 @@ public final class VideoHooks {
 
    private static final ThreadLocal<Object> MENU = new ThreadLocal<>();
    private static final ThreadLocal<dve> MENU_WIDGET = new ThreadLocal<>();
+   private static final ThreadLocal<dve> CLIP_MENU_WIDGET = new ThreadLocal<>();
 
    /** A file is being dragged over an arranger lane: note where, so a video starts where it was dropped. */
    @Hook(target = dzN.class, method = "cfM(Lcom/bitwig/flt/document/core/master/g2L;LhKf;Lwat;)LZuD;",
@@ -92,10 +93,17 @@ public final class VideoHooks {
     * bkS: the menu for a selection (right-click a clip): a Video submenu when an audio clip is selected.
     * big.UNj().FzB() is the selected items (as Expression Controls reads them).
     */
+   @Hook(target = bkS.class, method = "cfM(LdKW;Ldve;Lbig;LkbG;)V", at = At.ENTRY, id = "video-clip-menu-widget")
+   public static void clipMenuWidget(@Arg(1) dve widget) {
+      CLIP_MENU_WIDGET.set(widget);
+   }
+
    @Hook(target = bkS.class, method = "cfM(LdKW;Ldve;Lbig;LkbG;)V", at = At.BEFORE_RETURN, id = "video-clip-menu")
    public static void clipMenu(@Arg(0) dKW menu, @Arg(2) big header) {
+      dve widget = CLIP_MENU_WIDGET.get();
+      CLIP_MENU_WIDGET.remove();
       try {
-         Video.clipMenu(menu, header == null ? java.util.List.of() : new java.util.ArrayList<Object>(header.UNj().FzB()));
+         Video.clipMenu(menu, header == null ? java.util.List.of() : new java.util.ArrayList<Object>(header.UNj().FzB()), widget);
       } catch (Throwable t) {
          Video.log("Video: clip menu", t);
       }

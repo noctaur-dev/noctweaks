@@ -114,24 +114,34 @@ final class ClipMarks {
       double clipStart = span.start(), clipLen = span.end() - span.start();
       double scale = th / thumbs.height;
       double tw = Math.floor(thumbs.width * scale), slot = tw + 2;
-      // every picture that reaches into the part being painted (Bitwig clips the drawing to it), and fits in the clip
+      // every picture that reaches into the part being painted (Bitwig clips the drawing to it) and starts
+      // inside the clip; the last one is cut off at the clip's end, so the strip runs to the end with no gap
       int first = (int) Math.max(0, Math.floor((left - x0 - 1 - tw) / slot) + 1);
-      int last = (int) Math.min(Math.floor((w - 1 - tw) / slot), Math.floor((right - x0 - 1) / slot));
+      int last = (int) Math.min(Math.floor((w - 2) / slot), Math.floor((right - x0 - 1) / slot));
+      double end = x0 + w - 1;   // where the pictures stop
       boolean waiting = false;
       for (int k = first, n = 0; k <= last && n < 400; k++, n++) {
          double sx = x0 + 1 + k * slot;
-         double beat = clipStart + (sx + tw / 2 - x0) / w * clipLen;
+         double vw = Math.min(tw, end - sx);   // the part of this picture that's shown
+         if (vw < 1) {
+            continue;
+         }
+         double beat = clipStart + (sx + vw / 2 - x0) / w * clipLen;   // the middle of what's shown
          double t = Follow.timeAt(doc, span, beat);
          if (t < 0) {
             continue;   // before the video starts
          }
-         qc1 b = thumbs.bitmap(thumbs.index(t), gs, BUDGET);
+         int index = thumbs.index(t);
+         if (thumbs.finished() && index >= thumbs.count() && thumbs.count() > 0) {
+            index = thumbs.count() - 1;   // the very end of the video: its last picture
+         }
+         qc1 b = thumbs.bitmap(index, gs, BUDGET);
          if (b == null) {
-            if (!thumbs.finished() || thumbs.index(t) < thumbs.count()) {
+            if (!thumbs.finished() || index < thumbs.count()) {
                waiting = true;
                g.qoU();
                g.nVd();
-               g.MRY(sx, y, tw, th);
+               g.MRY(sx, y, vw, th);
                g.Hnt(WAITING);
                g.wGc();
                g.ucQ();
@@ -139,6 +149,11 @@ final class ClipMarks {
             continue;
          }
          g.qoU();
+         if (vw < tw) {   // cut off at the clip's end
+            g.nVd();
+            g.MRY(sx, y, vw, th);
+            g.lYc();   // clip to that rectangle
+         }
          g.FzB(sx, y);
          g.Hnt(scale, scale);
          b.cfM(g, 0, 0, CHR.IwV);   // as Bitwig's image widget draws (see VideoPanel)

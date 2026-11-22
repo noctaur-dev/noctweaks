@@ -73,11 +73,11 @@ Right-click a video clip, then **Video**:
 
 - **Video: <name>** shows which video the clip is.
 - **Forget This Video**: its clips become plain audio clips again.
+- **Detach Video to a Window**: the same window as the panel's Detach button, without opening the panel.
 - **Open Sound Copies Folder**, **Choose Folder for Sound Copies...**
 - **Describe This Clip**: a diagnostic (what Bitwig holds for the clip), written to the log.
 
-Right-click empty arranger space for **Detach Video to a Window** (the same window as the panel's Detach button,
-so it opens without the panel) and **Forget All Videos**.
+Right-click empty arranger space for **Detach Video to a Window** too, and **Forget All Videos**.
 
 ## Which zip: ffmpeg or mpv
 
