@@ -5,7 +5,10 @@ import bml.preferences.PreferenceProvider;
 import bml.preferences.Preferences;
 import bml.preferences.Section;
 
-/** The Video mod's options in Bitwig's Settings (Locations page): where the sound copies of videos go. */
+/**
+ * The Video mod's options in Bitwig's Settings: where the sound copies go and what decodes (Locations), and how
+ * the film strip sits on video clips (User Interface; also in the Video menus).
+ */
 public final class VideoSettings implements PreferenceProvider {
    public VideoSettings() {
    }
@@ -19,5 +22,14 @@ public final class VideoSettings implements PreferenceProvider {
       preferences.dropdown("decoder", "Decode pictures with", Decode.CHOICES)
          .in(video)
          .value(Decode::choice, Decode::choose);
+
+      Section clips = preferences.section(Page.USER_INTERFACE, "noctweaks-video-clips", "Video Clips");
+      preferences.choice("film_strip", "Film strip", "Separate", "Over the waveform")
+         .in(clips)
+         .value(FilmStrip::mode, FilmStrip::setMode);
+      preferences.slider("film_strip_opacity", "Film strip opacity (over the waveform)", 0, 100)
+         .in(clips)
+         .wholeNumbers()
+         .value(FilmStrip::opacityPercent, FilmStrip::setOpacityPercent);
    }
 }

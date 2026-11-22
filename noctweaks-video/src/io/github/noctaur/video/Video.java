@@ -278,6 +278,7 @@ final class Video {
    /** The same window as the panel's Detach button (ffmpeg or mpv, whichever decodes), opened from a menu. */
    private static void detachItem(dKW m, dve widget) {
       m.cfM(Detach.isOpen() ? "Attach Video (close its window)" : "Detach Video to a Window", () -> Detach.toggle(widget));
+      FilmStrip.menu(m);
    }
 
    /** Where the sound copies of videos go (also in Settings > Locations > Video). */

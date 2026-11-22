@@ -2,7 +2,7 @@ Video Track
 
 Part of **NocTweaks** by noctaur.
 
-**[Download the latest release](https://github.com/noctaur-dev/noctweaks/releases/tag/noctweaks-video-0.1.1)** (0.1.1), then add the zip in Patchbay with *Add Mod…*.
+**[Download the latest release](https://github.com/noctaur-dev/noctweaks/releases/tag/noctweaks-video-0.1.2)** (0.1.2), then add the zip in Patchbay with *Add Mod…*.
 Pick the zip for your computer: `-windows`, `-macos-arm` (Apple silicon), `-macos-intel` or `-linux`. Each
 comes in an **ffmpeg** and an **mpv** version (see [Which zip](#which-zip-ffmpeg-or-mpv)); Linux is ffmpeg only.
 
@@ -22,6 +22,14 @@ it goes on the timeline.
   sound gets a clip of silence as long as the video.
 
   ![Dropping a video file onto the arranger](images/vid-drop.gif)
+
+- **The film strip, your way.** By default it's **separate**: the strip takes the top of the clip and the
+  waveform moves down below it, so neither covers the other. Or put it **over the waveform**: the pictures
+  fill the whole clip, see-through, with the waveform showing underneath, at an opacity from 10 % to 100 %.
+  Right-click a clip (or empty arranger space) > **Video** > **Film Strip**, or **Settings > User Interface >
+  Video Clips**.
+
+  ![Switching the film strip between over the waveform, at different opacities, and separate](images/vid-film-strip.gif)
 
 - **The Video panel.** Its button is in the bottom bar, next to Bitwig's own panel buttons. The picture follows
   Bitwig's transport: play, stop, scrub, jump and loop.
@@ -74,10 +82,13 @@ Right-click a video clip, then **Video**:
 - **Video: <name>** shows which video the clip is.
 - **Forget This Video**: its clips become plain audio clips again.
 - **Detach Video to a Window**: the same window as the panel's Detach button, without opening the panel.
+- **Film Strip**: *Separate from the waveform* (the default) or *Over the waveform*, and its **Opacity Over the
+  Waveform** (10 % to 100 %).
 - **Open Sound Copies Folder**, **Choose Folder for Sound Copies...**
 - **Describe This Clip**: a diagnostic (what Bitwig holds for the clip), written to the log.
 
-Right-click empty arranger space for **Detach Video to a Window** too, and **Forget All Videos**.
+Right-click empty arranger space for **Detach Video to a Window** and **Film Strip** too, and **Forget All
+Videos**.
 
 ## Which zip: ffmpeg or mpv
 

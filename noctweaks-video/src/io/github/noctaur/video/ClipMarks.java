@@ -22,37 +22,52 @@ final class ClipMarks {
    private ClipMarks() {
    }
 
-   private static final iok FILM = iok.cfM(16, 16, 16);
-   private static final iok HOLE = iok.cfM(92, 92, 92);
-   private static final iok WAITING = iok.cfM(44, 44, 44);
-   private static final double HEADER = 14;   // the clip's name bar
+   private static final int[] FILM = { 16, 16, 16 };
+   private static final int[] HOLE = { 92, 92, 92 };
+   private static final int[] WAITING = { 44, 44, 44 };
+   private static final double HEADER = 14;   // the clip's name bar (only for the fallback geometry)
 
    // bitmaps made per stretch of painting (making one waits for Bitwig's renderer, so only a few at a time)
    private static boolean logged;
    private static long budgetAt;
    private static final int[] BUDGET = { 0 };
 
+   private static iok colour(int[] rgb, double alpha) {
+      return iok.cfM(rgb[0] / 255f, rgb[1] / 255f, rgb[2] / 255f, (float) Math.max(0, Math.min(1, alpha)));
+   }
+
    /**
+    * Draws the strip in the band from bandY, bandH high (from VideoHooks: the top of the waveform's area,
+    * freed for it when separate, or over the waveform), at alpha. With bandY NaN the band is worked out from the
+    * clip's whole rectangle, as before there was a choice (a fallback for painters other than the waveform's).
+    *
     * The clip's rectangle as Bitwig hands it to the painter is cut to the part being painted (when the
     * playhead moves, only a thin column is), so the strip's pictures are placed from the clip's start and
     * end on the timeline instead (timeline.MRY: a time to x), and only drawn where the rectangle is.
     */
-   static void paint(SYo g, bpa timeline, dve widget, DoubleRectangle r, Nbl clip) {
-      if (g == null || r == null || !Video.hasLinks()) {
+   static void paint(SYo g, bpa timeline, dve widget, DoubleRectangle r, Nbl clip, double bandY, double bandH, double alpha) {
+      if (g == null || r == null || !Video.hasLinks() || alpha <= 0.001) {
          return;
       }
       Follow.Span span = Follow.span(clip);
       if (span == null) {
          return;   // not a video clip
       }
+      FilmStrip.paintedIn(widget);
       Video.Link link = span.link();
-      double y0 = r.FzB(), h = r.UNj();
       double x0 = timeline.MRY(span.start()), x1 = timeline.MRY(span.end()), w = x1 - x0;
+      if (Double.isNaN(bandY)) {
+         double y0 = r.FzB(), h = r.UNj();
+         boolean big = h >= 44;
+         bandH = big ? Math.min(58, Math.floor((h - HEADER) * 0.6)) : 6;
+         bandY = big ? y0 + HEADER : y0 + h - bandH;
+      }
       if (!logged) {   // once, for testing
          logged = true;
-         Video.log(String.format(java.util.Locale.ROOT, "Video: marking a video clip at %.0f, %.0f (%.0f x %.0f)", x0, y0, w, h), null);
+         Video.log(String.format(java.util.Locale.ROOT, "Video: film strip at x %.0f, y %.0f (%.0f x %.0f), %s, opacity %.2f",
+            x0, bandY, w, bandH, FilmStrip.separate() ? "separate" : "over the waveform", alpha), null);
       }
-      if (w < 6 || h < 6) {
+      if (w < 6 || bandH < 2) {
          return;
       }
       double left = Math.max(x0, r.Hnt()), right = Math.min(x1, r.Hnt() + r.IwV());   // the part being painted
@@ -60,20 +75,17 @@ final class ClipMarks {
          return;
       }
 
-      boolean pictures = h >= 44;
-      double bandH = pictures ? Math.min(58, Math.floor((h - HEADER) * 0.6)) : 6;
-      double bandY = pictures ? y0 + HEADER : y0 + h - bandH;
-
+      boolean pictures = bandH >= 16;
       g.qoU();
       g.nVd();
       g.MRY(left, bandY, right - left, bandH);
-      g.Hnt(FILM);
+      g.Hnt(colour(FILM, alpha));
       g.wGc();
       g.ucQ();
 
-      double hole = pictures ? 2 : 1.5, pad = pictures ? 4 : 0;
+      double hole = pictures ? 2 : 1.5, pad = pictures ? (bandH >= 30 ? 4 : 3) : 0;
       if (pictures) {
-         pictures(g, widget, link, clip, span, x0, w, left, right, bandY + pad, bandH - 2 * pad);
+         pictures(g, widget, link, clip, span, x0, w, left, right, bandY + pad, bandH - 2 * pad, alpha);
       }
 
       // sprocket holes along the strip's edges
@@ -86,14 +98,14 @@ final class ClipMarks {
             g.MRY(x, bandY + bandH - 1 - hole, 3, hole);
          }
       }
-      g.Hnt(HOLE);
+      g.Hnt(colour(HOLE, alpha));
       g.wGc();
       g.ucQ();
    }
 
    private static void pictures(SYo g, dve widget, Video.Link link, Nbl clip, Follow.Span span,
-                                double x0, double w, double left, double right, double y, double th) {
-      if (th < 10) {
+                                double x0, double w, double left, double right, double y, double th, double alpha) {
+      if (th < 8) {
          return;
       }
       Thumbs thumbs = Thumbs.of(link.video());
@@ -142,7 +154,7 @@ final class ClipMarks {
                g.qoU();
                g.nVd();
                g.MRY(sx, y, vw, th);
-               g.Hnt(WAITING);
+               g.Hnt(colour(WAITING, alpha));
                g.wGc();
                g.ucQ();
             }
@@ -156,7 +168,11 @@ final class ClipMarks {
          }
          g.FzB(sx, y);
          g.Hnt(scale, scale);
-         b.cfM(g, 0, 0, CHR.IwV);   // as Bitwig's image widget draws (see VideoPanel)
+         if (alpha >= 0.999) {
+            b.cfM(g, 0, 0, CHR.IwV);   // as Bitwig's image widget draws (see VideoPanel)
+         } else {
+            g.cfM(b, 0, 0, alpha);     // Bitwig's "paint offscreen image with alpha"
+         }
          g.ucQ();
       }
       if (waiting) {
