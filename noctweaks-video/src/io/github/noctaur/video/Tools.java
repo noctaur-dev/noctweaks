@@ -8,8 +8,9 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 /**
- * The outside programs the prototype uses: mpv (the video window) and ffmpeg (the video's sound as a WAV;
- * mpv can do it too, more slowly). Looked for in the mod's tools folder first, then in the settings
+ * The outside programs the mod uses: mpv (the video window, and the video's sound as a WAV) and, if it's
+ * installed, ffmpeg (makes the WAV a little faster). mpv ships with the mod, in its tools folder (Windows:
+ * tools/mpv/mpv.exe; macOS: tools/mpv.tar.gz, unpacked on first use). Looked for there first, then in the settings
  * ("mpv" / "ffmpeg" = a full path), then on PATH and where installers usually put them.
  */
 final class Tools {
@@ -42,12 +43,38 @@ final class Tools {
       }
    }
 
+   /**
+    * macOS: the mod ships mpv as Apple's own mpv.tar.gz (mpv.app inside), and unpacks it here on first use.
+    * Unpacking with the Mac's own tar keeps mpv.app's code signature; quarantine is cleared so it can start.
+    */
+   private static void unpackMacMpv(File tools) {
+      File app = new File(tools, "mpv.app");
+      File archive = new File(tools, "mpv.tar.gz");
+      if (!MAC || app.isDirectory() || !archive.isFile()) {
+         return;
+      }
+      try {
+         Video.log("Video: unpacking mpv.app", null);
+         Process p = new ProcessBuilder("/usr/bin/tar", "-xzf", archive.getAbsolutePath(), "-C", tools.getAbsolutePath())
+            .redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.DISCARD).start();
+         p.waitFor(2, TimeUnit.MINUTES);
+         new ProcessBuilder("/usr/bin/xattr", "-dr", "com.apple.quarantine", app.getAbsolutePath())
+            .redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.DISCARD).start().waitFor(1, TimeUnit.MINUTES);
+         Video.log("Video: mpv.app " + (app.isDirectory() ? "ready" : "could not be unpacked"), null);
+      } catch (Throwable t) {
+         Video.log("Video: could not unpack mpv.app", t);
+      }
+   }
+
    /** The program, or null. */
    static File find(String name) {
       String exe = WINDOWS ? name + ".exe" : name;
       List<File> places = new ArrayList<>();
       File tools = toolsFolder();
       if (tools != null) {
+         if (name.equals("mpv")) {
+            unpackMacMpv(tools);
+         }
          places.add(new File(tools, exe));
          places.add(new File(new File(tools, name), exe));
          if (MAC && name.equals("mpv")) {

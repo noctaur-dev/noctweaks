@@ -5,18 +5,22 @@ Part of **NocTweaks** by noctaur. **Prototype: expect rough edges.**
 Drop a video file on an arranger track. Its sound goes in as an ordinary audio clip, and the picture plays in
 a window that follows Bitwig's transport: play, stop, scrub, jump and loop.
 
-## What you need
+## Downloads
 
-Two free programs. The mod looks for them on your PATH and in the usual install places, then in the mod's
-own **tools** folder:
+The mod comes with **mpv**, the free player that shows the picture and makes the WAV of the sound, so
+there's nothing else to install. Pick the zip for your computer:
 
-- **mpv** shows the picture. Windows: download it from [mpv.io](https://mpv.io/installation/); macOS:
-  `brew install mpv`.
-- **ffmpeg** makes the WAV of the video's sound. Windows: [ffmpeg.org](https://ffmpeg.org/download.html);
-  macOS: `brew install ffmpeg`. Without ffmpeg, mpv makes the WAV instead.
+- `noctweaks-video-<version>-windows.zip`
+- `noctweaks-video-<version>-macos-arm.zip` (Apple silicon: M1 and later)
+- `noctweaks-video-<version>-macos-intel.zip`
 
-Not installed anywhere? Put `mpv.exe` and `ffmpeg.exe` (macOS: `mpv.app` and `ffmpeg`) in the tools folder:
-arranger right-click menu > **Video** > **Open Video Tools Folder (mpv, ffmpeg)**.
+On a Mac, mpv is unpacked the first time you use the mod. If **ffmpeg** is installed, the mod uses it for the
+sound instead (a little faster); it isn't needed.
+
+mpv 0.41.0 is the official build from [mpv's releases](https://github.com/mpv-player/mpv/releases/tag/v0.41.0),
+unchanged. mpv is free software under the GNU GPL version 2 or later: its licence is in the mod's
+`tools/mpv-licence` folder, and its source code is in each release (`mpv-0.41.0-source.tar.gz`). To build
+the zips, `sh fetch-mpv.sh windows` (or `macos-arm`, `macos-intel`) puts mpv in `package/tools` first.
 
 ## How to use it
 
