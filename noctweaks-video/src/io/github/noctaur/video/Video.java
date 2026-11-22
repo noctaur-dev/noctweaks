@@ -68,10 +68,12 @@ final class Video {
       }
    }
 
-   /** The video time (seconds) for the playhead, or a negative number before the video starts. */
+   /**
+    * The video time (seconds) for the playhead, or a negative number when there's nothing to show: read
+    * from the clip playing the video's sound (see Follow). UI thread only.
+    */
    static double videoTime(g2L doc) {
-      Link l = link;
-      return l == null ? -1 : Clock.seconds(doc) - l.startSeconds();
+      return Follow.videoTime(doc, link);
    }
 
    private static Link loadLink() {

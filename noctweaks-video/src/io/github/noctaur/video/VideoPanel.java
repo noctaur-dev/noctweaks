@@ -8,7 +8,7 @@ import com.bitwig.base.geom.tfK;            // a widget size
 import com.bitwig.flt.document.core.master.g2L;
 import com.bitwig.graphics.Jkg;             // a pixel format (MRY: RGB24 in 32 bits)
 import com.bitwig.graphics.SYo;             // Bitwig's drawing surface
-import com.bitwig.graphics.oRV;             // a bitmap with its pixel memory
+import com.bitwig.base.platform.NativeMemoryBlock;   // native memory Bitwig hands to its graphics
 import com.bitwig.graphics.qc1;             // a bitmap
 import com.bitwig.graphics.sal;             // Bitwig's graphics system
 
@@ -25,6 +25,10 @@ final class VideoPanel extends dve {
    private Frames frames;
    private qc1 bitmap;
    private int bw, bh;
+   private NativeMemoryBlock block;   // the frame's pixels as Bitwig's graphics take them
+   private int blockStride;
+   private int[] channels;            // for each byte of a pixel in Bitwig's order: 0-2 = B,G,R of the frame, 3 = alpha
+   private byte[] row;
    private Frames.Frame drawn;
    private Thread ticker;
    private volatile boolean repaintQueued;
@@ -115,7 +119,23 @@ final class VideoPanel extends dve {
    public void iy_() {   // disposed
       stopTicking();
       closeFrames();
+      freeBitmap();
       super.iy_();
+   }
+
+   private void freeBitmap() {
+      try {
+         if (bitmap != null) {
+            bitmap.iy_();
+         }
+         if (block != null) {
+            block.iy_();
+         }
+      } catch (Throwable t) {
+         Video.log("Video: freeing the picture", t);
+      }
+      bitmap = null;
+      block = null;
    }
 
    private void closeFrames() {
@@ -155,12 +175,12 @@ final class VideoPanel extends dve {
          return;
       }
 
-      // decode at the size the picture shows in the panel (fitted, at most 1280 x 720): drawn 1:1, no scaling
+      // decode at the size the picture shows in the panel (fitted, at most 960 x 540): drawn 1:1, no scaling
       int[] vs = sizeOf(link.video());
       if (vs == null) {
          return;
       }
-      double fit = Math.min(Math.min(w / vs[0], h / vs[1]), Math.min(1280.0 / vs[0], 720.0 / vs[1]));
+      double fit = Math.min(Math.min(w / vs[0], h / vs[1]), Math.min(960.0 / vs[0], 540.0 / vs[1]));
       int fw = Math.max(2, (int) (vs[0] * fit) & ~1), fh = Math.max(2, (int) (vs[1] * fit) & ~1);
       if (frames == null || !frames.video().equals(link.video()) || Math.abs(frames.width() - fw) > 4 || Math.abs(frames.height() - fh) > 4) {
          closeFrames();
@@ -175,25 +195,73 @@ final class VideoPanel extends dve {
       if (f == null) {
          return;
       }
-      if (bitmap == null || bw != f.width() || bh != f.height()) {
-         sal gs = afn();
-         bitmap = gs.cfM(f.width(), f.height(), Jkg.MRY);
-         bw = f.width();
-         bh = f.height();
-         drawn = null;
-      }
-      if (f != drawn && bitmap instanceof oRV mem) {
-         ByteBuffer px = mem.FzB();
-         int stride = Math.max(mem.TMF(), f.width() * 4);
-         int row = f.width() * 4;
-         for (int y = 0; y < f.height(); y++) {
-            px.position(y * stride);
-            px.put(f.pixels(), y * row, row);
-         }
-         px.rewind();
+      if (f != drawn) {
+         upload(f);
          drawn = f;
       }
-      bitmap.cfM(g, Math.floor((w - bw) / 2), Math.floor((h - bh) / 2));
+      if (bitmap != null) {
+         bitmap.cfM(g, Math.floor((w - bw) / 2), Math.floor((h - bh) / 2));
+      }
+   }
+
+   /**
+    * Puts a frame into a new Bitwig bitmap, the way Bitwig loads its own images: the pixels go into native
+    * memory from Bitwig's allocator, laid out as its graphics system wants (its stride and channel order),
+    * and the system makes a bitmap from that memory. Works for every graphics system Bitwig uses.
+    */
+   private void upload(Frames.Frame f) {
+      sal gs = afn();
+      if (gs == null) {
+         return;
+      }
+      int w = f.width(), h = f.height();
+      if (block == null || bw != w || bh != h) {
+         freeBitmap();
+         blockStride = gs.cfM(Jkg.MRY, w);
+         block = sal.cfM.cfM(h * blockStride * Jkg.MRY.cfM());   // the size Bitwig itself allocates
+         bw = w;
+         bh = h;
+         row = new byte[Math.max(blockStride, w * 4)];
+         channels = channelOrder(gs);
+      }
+      ByteBuffer mem = block.E3();
+      byte[] src = f.pixels();
+      int[] ch = channels;
+      for (int y = 0; y < h; y++) {
+         int s = y * w * 4;
+         for (int x = 0; x < w; x++, s += 4) {
+            int d = x * 4;
+            row[d] = ch[0] == 3 ? (byte) 255 : src[s + ch[0]];
+            row[d + 1] = ch[1] == 3 ? (byte) 255 : src[s + ch[1]];
+            row[d + 2] = ch[2] == 3 ? (byte) 255 : src[s + ch[2]];
+            row[d + 3] = ch[3] == 3 ? (byte) 255 : src[s + ch[3]];
+         }
+         mem.put(y * blockStride, row, 0, w * 4);
+      }
+      qc1 old = bitmap;
+      bitmap = gs.cfM(block, w, h, Jkg.MRY);   // copies the memory
+      if (old != null) {
+         old.iy_();
+      }
+      if (!loggedUpload) {
+         loggedUpload = true;
+         Video.log("Video: first frame uploaded (" + w + " x " + h + ", stride " + blockStride + ", channels "
+            + java.util.Arrays.toString(ch) + ", bitmap " + (bitmap == null ? "none" : bitmap.getClass().getSimpleName()) + ")", null);
+      }
+   }
+
+   private boolean loggedUpload;
+
+   /** Asks the graphics system where it puts blue, green, red and alpha in a pixel. */
+   private static int[] channelOrder(sal gs) {
+      ByteBuffer probe = ByteBuffer.allocate(4);
+      gs.cfM(probe, 0, (byte) 1, (byte) 2, (byte) 3, (byte) 4);   // B, G, R, A, as Bitwig passes them
+      int[] ch = new int[4];
+      for (int i = 0; i < 4; i++) {
+         int v = probe.get(i);
+         ch[i] = v >= 1 && v <= 4 ? v - 1 : 3;   // 0 = B, 1 = G, 2 = R (the frame's bytes), 3 = alpha
+      }
+      return ch;
    }
 
    // a line in the log every few seconds while the panel is shown (for testing)
@@ -213,7 +281,7 @@ final class VideoPanel extends dve {
          "Video panel: %d paints, playhead video time %.2f s (start %.2f s), frame %s, bitmap %s, panel %d x %d",
          paints, vt, Video.link() == null ? 0 : Video.link().startSeconds(),
          f == null ? "none yet" : String.format(java.util.Locale.ROOT, "%.2f s %dx%d", f.time(), f.width(), f.height()),
-         bitmap == null ? "none" : bitmap.getClass().getSimpleName() + (bitmap instanceof oRV ? " with memory" : " WITHOUT memory"),
+         bitmap == null ? "none" : bitmap.getClass().getSimpleName(),
          Sxo(), yiX()), null);
       paints = 0;
    }

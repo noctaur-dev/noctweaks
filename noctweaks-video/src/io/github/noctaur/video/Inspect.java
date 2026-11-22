@@ -123,18 +123,15 @@ final class Inspect {
    /** The audio events of a clip's content: gIs may be a timeline itself, or hold lanes (takes) of them. */
    private static void events(Object content, StringBuilder out, String indent) {
       List<?> evs = null;
-      if (content instanceof PSn p) {
-         evs = p.cfM();
-      } else if (content instanceof gIs lanes) {
+      if (content instanceof gIs c) {
          try {
-            Object lane = lanes.Hnt(0);
-            out.append(indent).append("lane 0 ").append(lane == null ? "none" : lane.getClass().getName())
-               .append(": ").append(numbers(lane)).append('\n');
-            if (lane instanceof PSn p) {
-               evs = p.cfM();
+            zmK timeline = c.sut();   // the clip's audio events
+            out.append(indent).append("events ").append(timeline == null ? "none" : timeline.getClass().getName()).append('\n');
+            if (timeline != null) {
+               evs = timeline.cfM();
             }
          } catch (Throwable t) {
-            out.append(indent).append("lane 0: ").append(t).append('\n');
+            out.append(indent).append("events: ").append(t).append('\n');
          }
       }
       if (evs == null) {
