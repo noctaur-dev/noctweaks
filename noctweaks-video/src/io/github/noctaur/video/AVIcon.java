@@ -29,6 +29,7 @@ final class AVIcon extends dve {
    static AVIcon create(xJo track) {
       AVIcon i = new AVIcon(track);
       i.H_();   // Bitwig's initialisation
+      i.video = Follow.trackHasVideo(track);   // known from the start: no popping in when a header is rebuilt
       synchronized (ALL) {
          ALL.put(i, Boolean.TRUE);
       }
