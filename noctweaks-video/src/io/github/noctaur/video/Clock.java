@@ -35,22 +35,28 @@ final class Clock {
       }
    }
 
-   /** Beats (Bitwig's timeline time) to seconds, through the project's tempo map. Call on Bitwig's thread. */
+   /**
+    * Beats (Bitwig's timeline time) to seconds, through the project's tempo map. QSF.IwV(beats) is
+    * beats -> seconds and FzB(seconds) the other way (seen in Bitwig 6.1.7: beat 110 at 110 BPM gave
+    * IwV 60.0, FzB 201.67). Call on Bitwig's thread.
+    */
    static double beatsToSeconds(g2L doc, double beats) {
       try {
          QSF t = transport(doc);
-         double a = t.FzB(beats);
-         double b = t.IwV(beats);
-         double bpm = t.dEI();
-         double guess = bpm > 1 && bpm < 2000 ? beats * 60.0 / bpm : Double.NaN;
-         Video.log("Video: beats " + beats + " -> FzB " + a + " / IwV " + b + " (tempo " + bpm + ", constant-tempo guess " + guess + ")", null);
-         if (!Double.isNaN(guess)) {
-            return Math.abs(a - guess) <= Math.abs(b - guess) ? a : b;
-         }
-         return a;
+         double s = t.IwV(beats);
+         Video.log("Video: beat " + beats + " = " + s + " s", null);
+         return s;
       } catch (Throwable e) {
          Video.log("Video: could not convert the drop time to seconds", e);
          return 0;
+      }
+   }
+
+   static double secondsToBeats(g2L doc, double seconds) {
+      try {
+         return transport(doc).FzB(seconds);
+      } catch (Throwable e) {
+         return Double.NaN;
       }
    }
 }

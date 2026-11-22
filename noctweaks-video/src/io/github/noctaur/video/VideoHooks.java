@@ -71,6 +71,7 @@ public final class VideoHooks {
       MENU.remove();
       try {
          if (m instanceof dKW menu && arranger.gfw() instanceof g2L project) {
+            Video.seen(project);
             Video.menu(menu, project);
          }
       } catch (Throwable t) {

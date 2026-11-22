@@ -61,6 +61,19 @@ final class Video {
       return project.get();
    }
 
+   /** Remembers the project the arranger is showing, so the panel can follow its transport. */
+   static void seen(g2L doc) {
+      if (doc != null && project.get() != doc) {
+         project = new java.lang.ref.WeakReference<>(doc);
+      }
+   }
+
+   /** The video time (seconds) for the playhead, or a negative number before the video starts. */
+   static double videoTime(g2L doc) {
+      Link l = link;
+      return l == null ? -1 : Clock.seconds(doc) - l.startSeconds();
+   }
+
    private static Link loadLink() {
       try {
          String v = MOD.settings().get("video", "");
@@ -136,8 +149,10 @@ final class Video {
          }
          project = new java.lang.ref.WeakReference<>(doc);
          setLink(new Link(f, sound, start));
-         Player.show(f);
-         Sync.start();
+         if (Player.running()) {
+            Player.show(f);   // the pop-out window, if it's open, follows too
+            Sync.start();
+         }
          return;   // one video at a time for now
       }
    }
@@ -153,10 +168,11 @@ final class Video {
          });
       } else {
          String name = l.video().getName();
+         m.cfM("Video: " + name + " (shown in the Video panel)", () -> project = new java.lang.ref.WeakReference<>(doc));
          if (Player.running()) {
-            m.cfM("Hide Video Window", Player::close);
+            m.cfM("Close Pop-Out Window", Player::close);
          } else {
-            m.cfM("Show Video Window (" + name + ")", () -> {
+            m.cfM("Pop Out to a Window", () -> {
                project = new java.lang.ref.WeakReference<>(doc);
                Player.show(l.video());
                Sync.start();
@@ -180,6 +196,7 @@ final class Video {
          });
       }
       m.ELS();
+      m.cfM("Describe Clips at Playhead (for linking video to clip edits)", () -> Inspect.describe(doc));
       m.cfM("Open Video Tools Folder (mpv, ffmpeg)", Tools::openToolsFolder);
    }
 
