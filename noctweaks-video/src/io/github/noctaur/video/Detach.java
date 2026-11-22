@@ -87,6 +87,14 @@ final class Detach {
       VideoPanel picture = VideoPanel.create();
       w.FzB(column(bar(pinButton), picture));
       w.UNj("Video");
+      w.qm(e -> {   // its close button (or Windows' Close window): put away, as Attach does
+         try {
+            w.t_(false);
+         } catch (Throwable t) {
+            Video.log("Video: closing the detached window", t);
+         }
+         syncLabels();
+      });
       if (pinned && owner != null) {
          w.MRY(owner);
       }
@@ -155,9 +163,9 @@ final class Detach {
    /** A bar with the buttons at its right end. */
    private static dve bar(dve... buttons) {
       dWb row = dWb.Hnt(IBe.cfM);
-      row.cfM(Space.create(), 1f);
+      row.cfM(Space.create(), 1f);   // the box shares spare room by these weights: the space takes it all
       for (dve b : buttons) {
-         row.HL(b);
+         row.cfM(b, 0f);            // each button stays its own size
       }
       return row;
    }
@@ -165,8 +173,8 @@ final class Detach {
    /** The bar above the picture, which takes the rest of the space. */
    private static dve column(dve bar, dve picture) {
       dWb col = dWb.Hnt(IBe.MRY);
-      col.HL(bar);
-      col.cfM(picture, 1f);
+      col.cfM(bar, 0f);              // the bar stays one button high
+      col.cfM(picture, 1f);          // the picture takes the rest
       return col;
    }
 
@@ -190,7 +198,7 @@ final class Detach {
 
       @Override
       public tfK nj_() {
-         return tfK.MRY();
+         return new tfK(100000, 0);   // stretches across, never down
       }
 
       @Override
