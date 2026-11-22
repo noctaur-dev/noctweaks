@@ -278,12 +278,21 @@ final class VideoPanel extends dve {
       statusCount++;
       Frames.Frame f = frames == null ? null : frames.latest();
       Video.log(String.format(java.util.Locale.ROOT,
-         "Video panel: %d paints, playhead video time %.2f s (start %.2f s), frame %s, bitmap %s, panel %d x %d",
-         paints, vt, Video.link() == null ? 0 : Video.link().startSeconds(),
+         "Video panel: %d paints, playhead %.3f beats, video time %.2f s, frame %s, bitmap %s, panel %d x %d",
+         paints, beatsNow(), vt,
          f == null ? "none yet" : String.format(java.util.Locale.ROOT, "%.2f s %dx%d", f.time(), f.width(), f.height()),
          bitmap == null ? "none" : bitmap.getClass().getSimpleName(),
          Sxo(), yiX()), null);
       paints = 0;
+   }
+
+   private static double beatsNow() {
+      try {
+         g2L doc = Video.project();
+         return doc == null ? Double.NaN : Clock.secondsToBeats(doc, Clock.seconds(doc));
+      } catch (Throwable t) {
+         return Double.NaN;
+      }
    }
 
    // the video's size, asked of mpv on a background thread (the panel stays black until it's known)

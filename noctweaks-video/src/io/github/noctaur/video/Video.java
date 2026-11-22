@@ -141,14 +141,9 @@ final class Video {
          }
          files[i] = new z2y(sound);
 
+         // The picture follows the clip Bitwig makes from the sound (see Follow), wherever it goes; this start
+         // is only used if the clips can't be read.
          double start = 0;
-         boolean onLane = target instanceof tLg && System.currentTimeMillis() - laneTimeAt < 10_000 && !Double.isNaN(laneTime);
-         if (onLane) {
-            start = Clock.beatsToSeconds(doc, laneTime);
-            log("Video: dropped at " + laneTime + " (Bitwig time) = " + start + " s", null);
-         } else {
-            log("Video: not dropped on an arranger lane, so the video starts at 0 s (use Set Video Start to Playhead)", null);
-         }
          project = new java.lang.ref.WeakReference<>(doc);
          setLink(new Link(f, sound, start));
          if (Player.running()) {

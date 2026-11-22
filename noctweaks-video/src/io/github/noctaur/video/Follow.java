@@ -15,8 +15,9 @@ import java.util.List;
  * cut it, and each piece shows its own part; between clips the panel is black.
  *
  * Bitwig 6.1.4 names: track xJo.HVx().iAj() is its arranger clip timeline (PSn, cfM() the clips); an audio
- * clip Nbl has its position AGr.ODA() and length Jsq.QWG() (beats); Nbl.z().sut() is its audio events
- * (zmK, cfM() the list), each an ocL with its position in the clip mgr.ODA() and its file Scv().uWE().IwV().
+ * clip Nbl has its position SMz.x3t() and length Jsq.QWG() (beats; as Bitwig's TestTemporalEvent and
+ * TestEnduringEvent read them); Nbl.z().sut() is its audio events (zmK, cfM() the list), each an ocL with its
+ * position in the clip SMz.x3t() and its file Scv().uWE().IwV(). (AGr.ODA() is the clip's tempo, not its position.)
  */
 final class Follow {
    private Follow() {
@@ -29,7 +30,7 @@ final class Follow {
    private static List<Span> spans = List.of();
    private static long scannedAt;
    private static File scannedFor;
-   private static boolean loggedScan;
+   private static String lastText;
 
    /**
     * The video time for the playhead: from the clip under it, or (when no clip in the project plays the
@@ -67,9 +68,10 @@ final class Follow {
       scannedFor = sound;
       List<Span> out = sound == null ? null : scan(doc, sound);
       spans = out;
-      if (!loggedScan && out != null) {
-         loggedScan = true;
-         Video.log("Video: " + out.size() + " clip(s) play " + sound.getName() + ": " + out, null);
+      String text = out == null ? "the clips can't be read" : out.size() + " clip(s) play " + sound.getName() + ": " + out;
+      if (!text.equals(lastText)) {   // logged when the clips change (for testing)
+         lastText = text;
+         Video.log("Video: " + text, null);
       }
       return out;
    }
@@ -91,7 +93,7 @@ final class Follow {
                if (c instanceof Nbl clip) {
                   Double soundStart = soundStart(clip, sound);
                   if (soundStart != null) {
-                     double start = clip.ODA();
+                     double start = clip.x3t();
                      out.add(new Span(start, start + clip.QWG(), soundStart));
                   }
                }
@@ -116,7 +118,7 @@ final class Follow {
       }
       for (Object e : events.cfM()) {
          if (e instanceof ocL ev && plays(ev, sound)) {
-            return ev.ODA();
+            return ev.x3t();
          }
       }
       return null;
