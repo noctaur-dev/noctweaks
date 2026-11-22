@@ -219,7 +219,7 @@ public final class VideoHooks {
    }
 
    private static void note(SYo g, MQG clip, DoubleRectangle r) {
-      if (clip instanceof Nbl && Video.link() != null) {
+      if (clip instanceof Nbl && Video.hasLinks()) {
          Painting p = PAINTING.get();
          p.g = g;
          p.clip = clip;

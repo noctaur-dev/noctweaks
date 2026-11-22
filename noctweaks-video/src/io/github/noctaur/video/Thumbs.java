@@ -24,7 +24,9 @@ final class Thumbs {
    static final int HEIGHT = 54;
    private static final int MAX = 300;
 
-   private static Thumbs current;   // UI thread
+   // the pictures of each video, the most recently used last; the oldest goes past MAX_VIDEOS (UI thread)
+   private static final int MAX_VIDEOS = 8;
+   private static final java.util.LinkedHashMap<File, Thumbs> ALL = new java.util.LinkedHashMap<>(16, 0.75f, true);
 
    final File video;
    final int width, height;
@@ -48,8 +50,8 @@ final class Thumbs {
 
    /** The pictures of this video (started the first time it's asked for), or null while its size isn't known. */
    static Thumbs of(File video) {
-      Thumbs t = current;
-      if (t != null && t.video.equals(video)) {
+      Thumbs t = ALL.get(video);
+      if (t != null) {
          return t;
       }
       int[] size = Frames.sizeIfKnown(video);   // never waits: asked of mpv in the background
@@ -57,15 +59,19 @@ final class Thumbs {
       if (size == null || size[1] <= 0) {
          return null;
       }
-      if (t != null) {
-         t.close();
+      if (ALL.size() >= MAX_VIDEOS) {
+         java.util.Iterator<Thumbs> it = ALL.values().iterator();
+         Thumbs oldest = it.next();
+         it.remove();
+         oldest.close();
       }
       int w = Math.max(2, (int) Math.round(HEIGHT * (double) size[0] / size[1]) & ~1);
       double fps = Double.isNaN(dur) || dur <= 0 ? 1 : Math.min(1, MAX / dur);
-      current = new Thumbs(video, w, HEIGHT, fps);
+      t = new Thumbs(video, w, HEIGHT, fps);
+      ALL.put(video, t);
       Video.log(String.format(Locale.ROOT, "Video: making clip pictures of %s (%d x %d, every %.2f s)",
          video.getName(), w, HEIGHT, 1 / fps), null);
-      return current;
+      return t;
    }
 
    /** Which picture shows the video at this time (seconds). */

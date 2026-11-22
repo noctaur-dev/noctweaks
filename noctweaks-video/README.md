@@ -34,6 +34,12 @@ the zips, `sh fetch-mpv.sh windows` (or `macos-arm`, `macos-intel`) puts mpv in 
    A video with no sound gets a clip of silence as long as the video, so it works the same way.
 3. Click the **Video** button in the bottom bar to show the panel, and press play.
 
+### Several videos
+
+Drop as many videos as you like, on any tracks. Every one becomes an AV track, and all their sound plays (mute
+a track to silence it). The **Video panel shows the highest AV track** that has a clip under the playhead, as a
+video editor does: the top track covers the ones below, and where it has a gap the next one down shows through.
+
 Clips of the video's sound carry a **film strip** across their top (pictures of the video at those points),
 so they read as video in the arranger. Short clips get a film edge along their bottom instead. A track with a
 video clip also shows a small film icon under its track icon in the header: it's an AV track.
@@ -53,14 +59,21 @@ A copy can be deleted once no project uses it; dropping the video again makes it
 
 ### The Video menu
 
+Right-click a video clip:
+
+- **Video: <name>** shows which video the clip is.
+- **Forget This Video**: its clips become plain audio clips again.
 - **Describe This Clip**: a diagnostic (what Bitwig holds for the clip), written to the log.
-- **Pop Out to a Window**: the picture in a separate window too (mpv's own), for a second screen. It still
-  uses the older fixed start, not the clip.
-- **Forget Video**
+
+Right-click empty arranger space:
+
+- **Pop Out to a Window**: the latest video in a separate window too (mpv's own), for a second screen. It
+  still uses the older fixed start, not the clips.
+- **Forget All Videos**
 
 ## Limits of this prototype
 
-- One video at a time. The link is remembered after a restart, but isn't tied to a project yet.
+- The videos are remembered after a restart, but aren't tied to a project yet.
 - Clips on tracks inside groups aren't followed yet.
 
 ## Bitwig versions

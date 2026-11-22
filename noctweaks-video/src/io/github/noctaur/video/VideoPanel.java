@@ -23,7 +23,8 @@ import java.nio.ByteBuffer;
 final class VideoPanel extends dve {
    private static final iok BLACK = iok.cfM(0, 0, 0);
 
-   private Frames frames;
+   private Frames frames;   // the decoder of the video showing now
+   private final java.util.LinkedHashMap<File, Frames> decoders = new java.util.LinkedHashMap<>(4, 0.75f, true);
    private qc1 bitmap;
    private int bw, bh;
    private NativeMemoryBlock block;   // the frame's pixels as Bitwig's graphics take them
@@ -193,11 +194,13 @@ final class VideoPanel extends dve {
    }
 
    private void closeFrames() {
-      if (frames != null) {
-         frames.close();
-         frames = null;
+      for (Frames d : decoders.values()) {
+         d.close();
       }
+      decoders.clear();
+      frames = null;
    }
+
 
    // ---------- painting ----------
 
@@ -222,26 +225,48 @@ final class VideoPanel extends dve {
       if (w < 8 || h < 8) {
          return;
       }
-      Video.Link link = Video.link();
       g2L doc = Video.project();
-      if (link == null || doc == null || !link.video().isFile()) {
-         closeFrames();
+      Follow.Now now = doc == null ? null : Follow.now(doc);   // the highest AV track's video under the playhead
+      if (now == null || !now.link().video().isFile()) {
+         for (Frames d : decoders.values()) {
+            d.want(-1);   // nothing to show: black
+         }
+         status(-1);
          return;
       }
+      File video = now.link().video();
 
-      // decode at the size the picture shows in the panel (fitted, at most 960 x 540): drawn 1:1, no scaling
-      int[] vs = sizeOf(link.video());
+      // decode at the size the picture shows in the panel (fitted, at most 960 x 540)
+      int[] vs = Frames.sizeIfKnown(video);
       if (vs == null) {
          return;
       }
       double fit = Math.min(Math.min(w / vs[0], h / vs[1]), Math.min(960.0 / vs[0], 540.0 / vs[1]));
       int fw = Math.max(2, (int) (vs[0] * fit) & ~1), fh = Math.max(2, (int) (vs[1] * fit) & ~1);
-      if (frames == null || !frames.video().equals(link.video()) || Math.abs(frames.width() - fw) > 4 || Math.abs(frames.height() - fh) > 4) {
-         closeFrames();
-         frames = new Frames(link.video(), fw, fh);
+      Frames fr = decoders.get(video);
+      if (fr == null || Math.abs(fr.width() - fw) > 4 || Math.abs(fr.height() - fh) > 4) {
+         if (fr != null) {
+            fr.close();
+         }
+         fr = new Frames(video, fw, fh);
+         decoders.put(video, fr);
+         while (decoders.size() > 3) {   // a decoder for each of the last few videos shown, so cuts between them are quick
+            java.util.Iterator<Frames> it = decoders.values().iterator();
+            Frames oldest = it.next();
+            it.remove();
+            oldest.close();
+         }
+      }
+      for (Frames d : decoders.values()) {
+         if (d != fr) {
+            d.want(Double.NaN);   // waits where it is
+         }
+      }
+      if (frames != fr) {
+         frames = fr;
          drawn = null;
       }
-      double vt = Video.videoTime(doc);
+      double vt = now.time();
       frames.want(vt);
       status(vt);
 
@@ -337,8 +362,8 @@ final class VideoPanel extends dve {
       statusCount++;
       Frames.Frame f = frames == null ? null : frames.latest();
       Video.log(String.format(java.util.Locale.ROOT,
-         "Video panel: %d paints, playhead %.3f beats, video time %.2f s, frame %s, bitmap %s, panel %d x %d",
-         paints, beatsNow(), vt,
+         "Video panel: %d paints, playhead %.3f beats, %s at %.2f s, frame %s, bitmap %s, panel %d x %d",
+         paints, beatsNow(), frames == null ? "no video" : frames.video().getName(), vt,
          f == null ? "none yet" : String.format(java.util.Locale.ROOT, "%.2f s %dx%d", f.time(), f.width(), f.height()),
          bitmap == null ? "none" : bitmap.getClass().getSimpleName(),
          Sxo(), yiX()), null);
@@ -354,26 +379,5 @@ final class VideoPanel extends dve {
       }
    }
 
-   // the video's size, asked of mpv on a background thread (the panel stays black until it's known)
-   private File sizing;
-   private volatile int[] size;
-   private File sized;
 
-   private int[] sizeOf(File video) {
-      if (video.equals(sized) && size != null) {
-         return size;
-      }
-      if (!video.equals(sizing)) {
-         sizing = video;
-         size = null;
-         Thread t = new Thread(() -> {
-            int[] s = Frames.size(video);
-            size = s;
-            sized = video;
-         }, "noctweaks-video-size");
-         t.setDaemon(true);
-         t.start();
-      }
-      return video.equals(sized) ? size : null;
-   }
 }

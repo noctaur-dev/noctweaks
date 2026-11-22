@@ -6,6 +6,8 @@ import com.bitwig.base.io.z2y;
 import com.bitwig.flt.document.core.master.g2L;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -44,17 +46,49 @@ final class Video {
       return dot > 0 && EXTENSIONS.contains(n.substring(dot + 1).toLowerCase(Locale.ROOT));
    }
 
-   // ------------------------------------------------------------------ the linked video
+   // ------------------------------------------------------------------ the linked videos
 
-   /** The video, its sound and where it starts on the timeline (seconds). */
+   /** A video, its sound (the WAV its clips play) and the start set when it was dropped (seconds; a fallback). */
    record Link(File video, File sound, double startSeconds) {
    }
 
-   private static volatile Link link = loadLink();
+   // every video dropped (latest last); kept in the mod's settings
+   private static volatile List<Link> links = loadLinks();
    private static volatile java.lang.ref.WeakReference<g2L> project = new java.lang.ref.WeakReference<>(null);
 
+   static List<Link> links() {
+      return links;
+   }
+
+   static boolean hasLinks() {
+      return !links.isEmpty();
+   }
+
+   /** The latest video dropped (for the pop-out window and diagnostics), or null. */
    static Link link() {
-      return link;
+      List<Link> l = links;
+      return l.isEmpty() ? null : l.get(l.size() - 1);
+   }
+
+   /** The video whose sound this audio file is (the same file, or a copy with its name), or null. */
+   static Link linkForSound(File file) {
+      if (file == null) {
+         return null;
+      }
+      File abs = file.getAbsoluteFile();
+      Link byName = null;
+      for (Link l : links) {
+         if (l.sound() == null) {
+            continue;
+         }
+         if (l.sound().getAbsoluteFile().equals(abs)) {
+            return l;
+         }
+         if (byName == null && l.sound().getName().equals(file.getName())) {
+            byName = l;   // Bitwig can copy dropped audio into the project's folder
+         }
+      }
+      return byName;
    }
 
    static g2L project() {
@@ -68,45 +102,76 @@ final class Video {
       }
    }
 
-   /**
-    * The video time (seconds) for the playhead, or a negative number when there's nothing to show: read
-    * from the clip playing the video's sound (see Follow). UI thread only.
-    */
-   static double videoTime(g2L doc) {
-      return Follow.videoTime(doc, link);
-   }
-
-   private static Link loadLink() {
+   private static List<Link> loadLinks() {
+      List<Link> out = new ArrayList<>();
       try {
-         String v = MOD.settings().get("video", "");
-         if (v.isEmpty()) {
-            return null;
+         int n = Integer.parseInt(MOD.settings().get("video-count", "-1"));
+         if (n < 0) {   // saved by an older version: one video
+            String v = MOD.settings().get("video", "");
+            if (!v.isEmpty()) {
+               String s = MOD.settings().get("sound", "");
+               out.add(new Link(new File(v), s.isEmpty() ? null : new File(s),
+                  Double.parseDouble(MOD.settings().get("start-seconds", "0"))));
+            }
          }
-         String s = MOD.settings().get("sound", "");
-         double start = Double.parseDouble(MOD.settings().get("start-seconds", "0"));
-         return new Link(new File(v), s.isEmpty() ? null : new File(s), start);
+         for (int i = 0; i < n; i++) {
+            String v = MOD.settings().get("video." + i, "");
+            String s = MOD.settings().get("sound." + i, "");
+            if (!v.isEmpty()) {
+               out.add(new Link(new File(v), s.isEmpty() ? null : new File(s),
+                  Double.parseDouble(MOD.settings().get("start." + i, "0"))));
+            }
+         }
       } catch (Throwable t) {
-         log("Video: could not read the saved video", t);
-         return null;
+         log("Video: could not read the saved videos", t);
       }
+      return List.copyOf(out);
    }
 
-   static void setLink(Link l) {
-      link = l;
+   private static void saveLinks(List<Link> l) {
+      links = List.copyOf(l);
       try {
-         if (l == null) {
-            MOD.settings().remove("video");
-            MOD.settings().remove("sound");
-            MOD.settings().remove("start-seconds");
-         } else {
-            MOD.settings().put("video", l.video().getAbsolutePath());
-            MOD.settings().put("sound", l.sound() == null ? "" : l.sound().getAbsolutePath());
-            MOD.settings().put("start-seconds", Double.toString(l.startSeconds()));
+         int old = Integer.parseInt(MOD.settings().get("video-count", "0"));
+         for (int i = l.size(); i < old; i++) {
+            MOD.settings().remove("video." + i);
+            MOD.settings().remove("sound." + i);
+            MOD.settings().remove("start." + i);
          }
+         MOD.settings().remove("video");
+         MOD.settings().remove("sound");
+         MOD.settings().remove("start-seconds");
+         for (int i = 0; i < l.size(); i++) {
+            MOD.settings().put("video." + i, l.get(i).video().getAbsolutePath());
+            MOD.settings().put("sound." + i, l.get(i).sound() == null ? "" : l.get(i).sound().getAbsolutePath());
+            MOD.settings().put("start." + i, Double.toString(l.get(i).startSeconds()));
+         }
+         MOD.settings().put("video-count", Integer.toString(l.size()));
          MOD.settings().flush();
       } catch (Throwable t) {
-         log("Video: could not save the video", t);
+         log("Video: could not save the videos", t);
       }
+   }
+
+   /** Adds a video (replacing an earlier link of the same video or sound). */
+   static synchronized void addLink(Link l) {
+      List<Link> next = new ArrayList<>();
+      for (Link o : links) {
+         if (!o.video().equals(l.video()) && (o.sound() == null || !o.sound().equals(l.sound()))) {
+            next.add(o);
+         }
+      }
+      next.add(l);
+      saveLinks(next);
+   }
+
+   static synchronized void forget(Link l) {
+      List<Link> next = new ArrayList<>(links);
+      next.remove(l);
+      saveLinks(next);
+   }
+
+   static synchronized void forgetAll() {
+      saveLinks(List.of());
    }
 
    // ------------------------------------------------------------------ dropping a video
@@ -145,12 +210,12 @@ final class Video {
          // is only used if the clips can't be read.
          double start = 0;
          project = new java.lang.ref.WeakReference<>(doc);
-         setLink(new Link(f, sound, start));
+         addLink(new Link(f, sound, start));
          if (Player.running()) {
             Player.show(f);   // the pop-out window, if it's open, follows too
             Sync.start();
          }
-         return;   // one video at a time for now
+         return;   // one video per drop
       }
    }
 
@@ -159,43 +224,33 @@ final class Video {
    static void menu(dKW menu, g2L doc) {
       menu.ELS();
       dKW m = menu.Hnt("Video");
-      Link l = link;
-      if (l == null) {
+      List<Link> l = links;
+      if (l.isEmpty()) {
          m.cfM("Drop a video file on a track to add it", () -> {
          });
       } else {
-         String name = l.video().getName();
-         m.cfM("Video: " + name + " (shown in the Video panel)", () -> project = new java.lang.ref.WeakReference<>(doc));
+         m.cfM(l.size() == 1 ? "1 video (the highest AV track shows in the panel)"
+            : l.size() + " videos (the highest AV track shows in the panel)", () -> seen(doc));
+         Link latest = link();
          if (Player.running()) {
             m.cfM("Close Pop-Out Window", Player::close);
          } else {
-            m.cfM("Pop Out to a Window", () -> {
-               project = new java.lang.ref.WeakReference<>(doc);
-               Player.show(l.video());
+            m.cfM("Pop Out to a Window: " + latest.video().getName(), () -> {
+               seen(doc);
+               Player.show(latest.video());
                Sync.start();
             });
          }
-         double now = Clock.seconds(doc);
-         m.cfM(String.format(Locale.ROOT, "Set Video Start to Playhead (%.2f s)", now), () -> {
-            project = new java.lang.ref.WeakReference<>(doc);
-            Link cur = link;
-            if (cur != null) {
-               setLink(new Link(cur.video(), cur.sound(), Clock.seconds(doc)));
-               Sync.kick();
-            }
-         });
-         m.cfM(String.format(Locale.ROOT, "Video Starts at %.3f s: Earlier by 1 Frame", l.startSeconds()), () -> nudge(-1.0 / 30));
-         m.cfM("Video Start: Later by 1 Frame", () -> nudge(1.0 / 30));
          m.ELS();
-         m.cfM("Forget Video", () -> {
+         m.cfM("Forget All Videos", () -> {
             Player.close();
-            setLink(null);
+            forgetAll();
          });
       }
       m.ELS();
       soundCopyItems(m);
       m.ELS();
-      m.cfM("Describe Clips at Playhead (for linking video to clip edits)", () -> Inspect.describe(doc));
+      m.cfM("Describe Clips at Playhead (for testing)", () -> Inspect.describe(doc));
       m.cfM("Open Video Tools Folder (mpv, ffmpeg)", Tools::openToolsFolder);
    }
 
@@ -221,18 +276,17 @@ final class Video {
       g2L project = doc;
       menu.ELS();
       dKW m = menu.Hnt("Video");
-      m.cfM("Describe This Clip (for linking video to clip edits)", () -> Inspect.describeClips(project, clips));
+      Follow.Span span = clips.get(0) instanceof Nbl n ? Follow.span(n) : null;
+      if (span != null) {
+         Link l = span.link();
+         m.cfM("Video: " + l.video().getName(), () -> {
+         });
+         m.cfM("Forget This Video (its clips become plain audio)", () -> forget(l));
+         m.ELS();
+      }
+      m.cfM("Describe This Clip (for testing)", () -> Inspect.describeClips(project, clips));
       m.ELS();
       soundCopyItems(m);
-      if (project != null && link != null) {
-         m.cfM(String.format(Locale.ROOT, "Set Video Start to Playhead (%.2f s)", Clock.seconds(project)), () -> {
-            Link cur = link;
-            if (cur != null) {
-               setLink(new Link(cur.video(), cur.sound(), Clock.seconds(project)));
-               Sync.kick();
-            }
-         });
-      }
    }
 
    /** Where the sound copies of videos go (also in Settings > Locations > Video). */
@@ -241,11 +295,5 @@ final class Video {
       m.cfM("Choose Folder for Sound Copies...", Sounds::chooseFolder);
    }
 
-   private static void nudge(double seconds) {
-      Link cur = link;
-      if (cur != null) {
-         setLink(new Link(cur.video(), cur.sound(), cur.startSeconds() + seconds));
-         Sync.kick();
-      }
-   }
+
 }

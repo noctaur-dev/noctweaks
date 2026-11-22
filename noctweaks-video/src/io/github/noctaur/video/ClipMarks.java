@@ -38,14 +38,14 @@ final class ClipMarks {
     * end on the timeline instead (timeline.MRY: a time to x), and only drawn where the rectangle is.
     */
    static void paint(SYo g, bpa timeline, dve widget, DoubleRectangle r, Nbl clip) {
-      Video.Link link = Video.link();
-      if (link == null || link.sound() == null || g == null || r == null) {
+      if (g == null || r == null || !Video.hasLinks()) {
          return;
       }
-      Follow.Span span = Follow.span(clip, link.sound());
+      Follow.Span span = Follow.span(clip);
       if (span == null) {
          return;   // not a video clip
       }
+      Video.Link link = span.link();
       double y0 = r.FzB(), h = r.UNj();
       double x0 = timeline.MRY(span.start()), x1 = timeline.MRY(span.end()), w = x1 - x0;
       if (!logged) {   // once, for testing
