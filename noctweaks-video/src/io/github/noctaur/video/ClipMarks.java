@@ -27,6 +27,7 @@ final class ClipMarks {
    private static final double HEADER = 14;   // the clip's name bar
 
    // bitmaps made per stretch of painting (making one waits for Bitwig's renderer, so only a few at a time)
+   private static boolean logged;
    private static long budgetAt;
    private static final int[] BUDGET = { 0 };
 
@@ -40,6 +41,10 @@ final class ClipMarks {
          return;   // not a video clip
       }
       double x0 = r.Hnt(), y0 = r.FzB(), w = r.IwV(), h = r.UNj();
+      if (!logged) {   // once, for testing
+         logged = true;
+         Video.log(String.format(java.util.Locale.ROOT, "Video: marking a video clip at %.0f, %.0f (%.0f x %.0f)", x0, y0, w, h), null);
+      }
       if (w < 6 || h < 6) {
          return;
       }

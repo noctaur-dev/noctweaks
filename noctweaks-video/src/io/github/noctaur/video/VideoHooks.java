@@ -101,75 +101,128 @@ public final class VideoHooks {
     * video's sound gets its film strip (ClipMarks), in the rectangle the painter gives for that clip (Hnt with
     * the same arguments); MIO() is the painter's drawing surface and LaE() its widget.
     */
-   // While a painter paints an audio clip: the clip (from the paint's start) and the rectangle the painter
-   // works out for it (its Hnt, called first thing in the paint), for drawing on top at the paint's end.
-   // (At the end of the paint Bitwig's arguments are gone, so they are kept here.)
+   // Bitwig paints a timeline clip in two steps: bro's public cfM(lbB, LA1, MQG, ...) works out the clip's
+   // rectangle and drawing surface, then calls the clip kind's own cfM(SYo, lbB, LA1, MQG, ..., rectangle) to
+   // draw it (each kind of clip overrides it without calling super, hence one ENTRY hook per class). The ENTRY
+   // hooks note the surface, clip and rectangle; once the public paint returns, a video clip gets its film
+   // strip on top. (At the return Bitwig's arguments are gone, so they are kept here.)
+   private static final String INNER = "cfM(Lcom/bitwig/graphics/SYo;LlbB;LLA1;LMQG;LiKU;IDDDDDDZZZZZLcom/bitwig/base/geom/DoubleRectangle;)V";
+
    private static final class Painting {
+      SYo g;
       Object clip;
       DoubleRectangle rect;
    }
 
    private static final ThreadLocal<Painting> PAINTING = ThreadLocal.withInitial(Painting::new);
 
-   @Hook(target = bpN.class, method = "cfM(Lso1;LlbB;LLA1;LMQG;DIDD)V", at = At.ENTRY, id = "video-clip-paint-start")
-   public static void clipPaintStart(@Arg(3) MQG clip) {
-      startPaint(clip);
+   @Hook(target = bro.class, method = INNER, at = At.ENTRY, id = "video-clip-body-bro")
+   public static void clipBody0(@Arg(0) SYo g, @Arg(3) MQG clip, @Arg(17) DoubleRectangle r) {
+      note(g, clip, r);
    }
 
-   @Hook(target = bst.class, method = "cfM(Lso1;LlbB;LLA1;LMQG;DIDD)V", at = At.ENTRY, id = "video-clip-paint-start-2")
-   public static void clipPaintStart2(@Arg(3) MQG clip) {
-      startPaint(clip);
+   @Hook(target = bpA.class, method = INNER, at = At.ENTRY, id = "video-clip-body-bpA")
+   public static void clipBody1(@Arg(0) SYo g, @Arg(3) MQG clip, @Arg(17) DoubleRectangle r) {
+      note(g, clip, r);
    }
 
-   @Hook(target = bpN.class, method = "Hnt(Lso1;LlbB;LLA1;LMQG;DIDD)Lcom/bitwig/base/geom/DoubleRectangle;",
-         at = At.WRAP_RETURN, id = "video-clip-rect")
-   public static DoubleRectangle clipRect(@Return DoubleRectangle r) {
-      keepRect(r);
-      return r;
+   @Hook(target = bpD.class, method = INNER, at = At.ENTRY, id = "video-clip-body-bpD")
+   public static void clipBody2(@Arg(0) SYo g, @Arg(3) MQG clip, @Arg(17) DoubleRectangle r) {
+      note(g, clip, r);
    }
 
-   @Hook(target = bst.class, method = "Hnt(Lso1;LlbB;LLA1;LMQG;DIDD)Lcom/bitwig/base/geom/DoubleRectangle;",
-         at = At.WRAP_RETURN, id = "video-clip-rect-2")
-   public static DoubleRectangle clipRect2(@Return DoubleRectangle r) {
-      keepRect(r);
-      return r;
+   @Hook(target = bpZ.class, method = INNER, at = At.ENTRY, id = "video-clip-body-bpZ")
+   public static void clipBody3(@Arg(0) SYo g, @Arg(3) MQG clip, @Arg(17) DoubleRectangle r) {
+      note(g, clip, r);
    }
 
-   @Hook(target = bpN.class, method = "cfM(Lso1;LlbB;LLA1;LMQG;DIDD)V", at = At.BEFORE_RETURN, id = "video-clip-paint")
-   public static void clipPainted(@This bpN painter) {
-      painted(painter.MIO(), painter.LaE());
+   @Hook(target = bpt.class, method = INNER, at = At.ENTRY, id = "video-clip-body-bpt")
+   public static void clipBody4(@Arg(0) SYo g, @Arg(3) MQG clip, @Arg(17) DoubleRectangle r) {
+      note(g, clip, r);
    }
 
-   @Hook(target = bst.class, method = "cfM(Lso1;LlbB;LLA1;LMQG;DIDD)V", at = At.BEFORE_RETURN, id = "video-clip-paint-2")
-   public static void clipPainted2(@This bst painter) {
-      painted(painter.MIO(), painter.LaE());
+   @Hook(target = bpy.class, method = INNER, at = At.ENTRY, id = "video-clip-body-bpy")
+   public static void clipBody5(@Arg(0) SYo g, @Arg(3) MQG clip, @Arg(17) DoubleRectangle r) {
+      note(g, clip, r);
    }
 
-   private static void startPaint(MQG clip) {
+   @Hook(target = bpz.class, method = INNER, at = At.ENTRY, id = "video-clip-body-bpz")
+   public static void clipBody6(@Arg(0) SYo g, @Arg(3) MQG clip, @Arg(17) DoubleRectangle r) {
+      note(g, clip, r);
+   }
+
+   @Hook(target = bqY.class, method = INNER, at = At.ENTRY, id = "video-clip-body-bqY")
+   public static void clipBody7(@Arg(0) SYo g, @Arg(3) MQG clip, @Arg(17) DoubleRectangle r) {
+      note(g, clip, r);
+   }
+
+   @Hook(target = bqc.class, method = INNER, at = At.ENTRY, id = "video-clip-body-bqc")
+   public static void clipBody8(@Arg(0) SYo g, @Arg(3) MQG clip, @Arg(17) DoubleRectangle r) {
+      note(g, clip, r);
+   }
+
+   @Hook(target = brC.class, method = INNER, at = At.ENTRY, id = "video-clip-body-brC")
+   public static void clipBody9(@Arg(0) SYo g, @Arg(3) MQG clip, @Arg(17) DoubleRectangle r) {
+      note(g, clip, r);
+   }
+
+   @Hook(target = brD.class, method = INNER, at = At.ENTRY, id = "video-clip-body-brD")
+   public static void clipBody10(@Arg(0) SYo g, @Arg(3) MQG clip, @Arg(17) DoubleRectangle r) {
+      note(g, clip, r);
+   }
+
+   @Hook(target = brI.class, method = INNER, at = At.ENTRY, id = "video-clip-body-brI")
+   public static void clipBody11(@Arg(0) SYo g, @Arg(3) MQG clip, @Arg(17) DoubleRectangle r) {
+      note(g, clip, r);
+   }
+
+   @Hook(target = brX.class, method = INNER, at = At.ENTRY, id = "video-clip-body-brX")
+   public static void clipBody12(@Arg(0) SYo g, @Arg(3) MQG clip, @Arg(17) DoubleRectangle r) {
+      note(g, clip, r);
+   }
+
+   @Hook(target = brv.class, method = INNER, at = At.ENTRY, id = "video-clip-body-brv")
+   public static void clipBody13(@Arg(0) SYo g, @Arg(3) MQG clip, @Arg(17) DoubleRectangle r) {
+      note(g, clip, r);
+   }
+
+   @Hook(target = bsg.class, method = INNER, at = At.ENTRY, id = "video-clip-body-bsg")
+   public static void clipBody14(@Arg(0) SYo g, @Arg(3) MQG clip, @Arg(17) DoubleRectangle r) {
+      note(g, clip, r);
+   }
+
+   @Hook(target = bro.class, method = "cfM(LlbB;LLA1;LMQG;LiKU;DDDDDDIZZZZZZ)V", at = At.ENTRY, id = "video-clip-paint-start")
+   public static void clipPaintStart(@Arg(2) MQG clip) {
       Painting p = PAINTING.get();
-      p.clip = clip instanceof Nbl && Video.link() != null ? clip : null;
+      p.g = null;
       p.rect = null;
+      p.clip = null;
    }
 
-   private static void keepRect(DoubleRectangle r) {
+   @Hook(target = bro.class, method = "cfM(LlbB;LLA1;LMQG;LiKU;DDDDDDIZZZZZZ)V", at = At.BEFORE_RETURN, id = "video-clip-paint")
+   public static void clipPainted(@This bro painter) {
       Painting p = PAINTING.get();
-      if (p.clip != null && p.rect == null) {
-         p.rect = r;
-      }
-   }
-
-   private static void painted(SYo g, dve widget) {
-      Painting p = PAINTING.get();
+      SYo g = p.g;
       Object clip = p.clip;
       DoubleRectangle r = p.rect;
+      p.g = null;
       p.clip = null;
       p.rect = null;
       try {
-         if (r != null && clip instanceof Nbl audio) {
-            ClipMarks.paint(g, widget, r, audio);
+         if (g != null && r != null && clip instanceof Nbl audio) {
+            ClipMarks.paint(g, painter.LaE(), r, audio);
          }
       } catch (Throwable t) {
          clipPaintFailed(t);
+      }
+   }
+
+   private static void note(SYo g, MQG clip, DoubleRectangle r) {
+      if (clip instanceof Nbl && Video.link() != null) {
+         Painting p = PAINTING.get();
+         p.g = g;
+         p.clip = clip;
+         p.rect = r;
       }
    }
 
